@@ -54,6 +54,8 @@
                     <group>
                         <field name="repair_order_type_id"/>
                         <field name="ticket_number"/>
+                        <field name="repair_product_id"/>
+                        <field name="repair_location_id"/>
                         <field name="repair_user_id"/>
 
                         <field name="repair_order_id"/>
