@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="repair_order_action" model="ir.actions.act_window">
+      <field name="name">Tecnicos</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">repair.order</field>
+      <field name="view_mode">kanban,tree,form</field>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            No hay registros para mostrar
+        </p>
+      </field>
+    </record>
+
+    <record id="view_repair_order_inherit" model="ir.ui.view">
+        <field name="name">repair.order.kanban.inherited</field>
+        <field name="model">repair.order</field>
+        <field name="inherit_id" ref="repair.view_repair_kanban"/>
+        <field name="arch" type="xml">
+          <xpath expr="//kanban[@class='o_kanban_mobile']" position="replace">
+            <kanban class="o_kanban_mobile" sample="1" default_group_by="repair_state">
+
+                <!-- Variables a mostrar en el kanban -->
+                <field name="repair_state" />
+
+                <templates>
+                    <t t-name="kanban-box">
+                      <div class="oe_kanban_global_click">
+                        <div class="oe_kanban_details d-flex flex-column">
+                          <strong class="o_kanban_record_title oe_partner_heading"><field name="display_name"/></strong>
+                          <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
+                          <p>Hola</p>
+                        </div>
+                      </div>
+					          </t>
+                </templates>
+            </kanban>
+          </xpath>
+        </field>
+    </record>
+    
+  </odoo>
