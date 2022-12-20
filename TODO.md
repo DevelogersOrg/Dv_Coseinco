@@ -1,0 +1,3 @@
+- crear modelo repair_order_type_id y dejar de usar Selection
+- preguntar si description existe anteriormente
+- Agregar nuevos campos al formulario de repair.order y crm.lead

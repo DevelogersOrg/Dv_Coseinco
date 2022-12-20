@@ -23,15 +23,42 @@
                     <templates>
                         <t t-name="kanban-box">
                             <div class="oe_kanban_global_click">
+                                <h1><field name="repair_order_type_id"/></h1>
                                 <div class="oe_kanban_details d-flex flex-column">
-                                    <strong class="o_kanban_record_title oe_partner_heading"><field name="name"/></strong>
+                                    <strong class="o_kanban_record_title oe_partner_heading">Servicio: <field name="name"/></strong>
                                     <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
-                                    <p>Prueba</p>
+                                    <p>N° Ticket: <field name="ticket_number"/></p>
+                                    <p>Cliente: <field name="partner_id"/></p>
+                                    <p>Asignado a: <field name="repair_user_id"/></p>
+                                    <button name="action_create_repair_order"
+                                        type="object"
+                                        class="btn btn-primary">
+                                        Confirmar
+                                    </button>
                                 </div>
                             </div>
                         </t>
                     </templates>
                 </kanban>
+            </xpath>
+		</field>
+	</record>
+
+    <record id="crm_lead_form_view_inherited" model="ir.ui.view">
+		<field name="name">crm.lead.view.form.inherited</field>
+		<field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+		<field name="arch" type="xml">
+            <xpath expr="//page[@name='lead']" position="after">
+                <page name="new_fields" string="Datos">
+                    <group>
+                        <field name="repair_order_type_id"/>
+                        <field name="ticket_number"/>
+                        <field name="repair_user_id"/>
+
+                        <field name="repair_order_id"/>
+                    </group>
+                </page>
             </xpath>
 		</field>
 	</record>
