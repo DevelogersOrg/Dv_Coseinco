@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
   <!-- Sub Menus -->
-  <menuitem name="Atención al Cliente" id="client_menu" parent="repair.menu_repair_order" action="crm_lead_action" sequence="1"/>
-  <menuitem name="Compras" id="purchase_menu" parent="repair.menu_repair_order" action="purchase_order_action" sequence="2"/>
+  <menuitem name="Atención al Cliente" id="client_menu" parent="repair.menu_repair_order" action="crm_lead_action_client" sequence="1"/>
+  <!-- <menuitem name="Compras" id="purchase_menu" parent="repair.menu_repair_order" action="purchase_order_action" sequence="2"/> -->
   <menuitem name="Almacen" id="warehouse_menu" parent="repair.menu_repair_order" action="stock_inventory_action" sequence="3"/>
-  <menuitem name="Tecnico" id="technician_menu" parent="repair.menu_repair_order" action="repair_order_action" sequence="4"/>
+  <menuitem name="Tecnico" id="technician_menu" parent="repair.menu_repair_order" action="crm_lead_action_technician" sequence="4"/>
   <menuitem name="Despacho" id="picking_menu" parent="repair.menu_repair_order" action="stock_picking_action" sequence="5"/>
   <menuitem name="Facturación" id="invoicing_menu" parent="repair.menu_repair_order" action="account_move_action" sequence="6"/>
   <!-- <menuitem name="Cobranza" id="charge_menu" parent="repair.menu_repair_order" action="repair_charge_action" sequence="7"/> -->

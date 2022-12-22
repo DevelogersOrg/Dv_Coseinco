@@ -1,2 +1,2 @@
 - Agregar nuevos campos al formulario de repair.order y crm.lead
-- Rediseñar los modelos de repair.order y crm.lead
+- repair_order_components_ids agregar vistas de tree y form

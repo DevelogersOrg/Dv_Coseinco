@@ -1,82 +1,178 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
-    <record id="crm_lead_action" model="ir.actions.act_window">
-      <field name="name">Atención al Cliente</field>
-      <field name="type">ir.actions.act_window</field>
-      <field name="res_model">crm.lead</field>
-      <field name="view_mode">kanban,tree,form</field>
-      <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">
-            No hay registros para mostrar
-        </p>
-      </field>
-    </record>
 
-    <record id="crm_lead_kanban_view" model="ir.ui.view">
+    <!-- _________________________________________________________________________ -->
+    <!-- KANBAN -->
+    <!-- _________________________________________________________________________ -->
+
+
+    <!-- Kanban para cliente -->
+	<record id="crm_lead_client_kanban_view" model="ir.ui.view">
 		<field name="name">crm.lead.view.kanban</field>
 		<field name="model">crm.lead</field>
-        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
 		<field name="arch" type="xml">
-            <xpath expr="//kanban[@default_group_by='stage_id']" position="replace">
-                <kanban default_group_by="client_state" class="o_kanban_small_column o_kanban_project_tasks" on_create="quick_create" quick_create_view="dv_repair_equipment.quick_create_crm_lead_form" records_draggable="false">
-                    <field name="client_state"/>
-                    <templates>
-                        <t t-name="kanban-box">
-                            <div class="oe_kanban_global_click">
-                                <div class="oe_kanban_details d-flex flex-column">
-                                    <!-- Nuevo Ingreso -->
-                                    <t t-if="record.client_state.raw_value == 'new'">
-                                        <div class="o_kanban_record_top">
-                                            <span class="badge badge-primary">Nuevo</span>
-                                        </div>
-                                        <p><field name="name"/> - <field name="repair_order_type_id"/></p>
-                                    </t>
-                                    <!-- Asignado para Diagnostico -->
-                                    <t t-if="record.client_state.raw_value == 'assigned'">
-                                        <div class="o_kanban_record_top">
-                                            <span class="badge badge-danger">Pendiente</span>
-                                        </div>
-                                        <h3><field name="name"/> - <field name="repair_order_type_id"/></h3>
-                                        <p>N° ticket: xxxxx</p>
-                                        <p>Cliente: xxxxxx</p>
-                                        <p>Tecnico asignado: xxxx</p>
-
-                                    </t>
-                                    <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
-                                    <p>Creado el: <field name="create_date" widget="datetime"/></p>
+            <kanban default_group_by="client_state" class="o_kanban_small_column o_kanban_project_tasks" on_create="quick_create" quick_create_view="dv_repair_equipment.quick_create_crm_lead_form" records_draggable="false">
+                <field name="client_state"/>
+                <field name="crm_type"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_details d-flex flex-column">
+                                <!-- Nuevo Ingreso -->
+                                <h3><field name="name"/> - <field name="repair_order_type_id"/></h3>
+                                <t t-if="record.client_state.raw_value == 'new'">
+                                    <div class="o_kanban_record_top">
+                                        <span class="badge badge-primary">Nuevo</span>
+                                    </div>
+                                </t>
+                                <!-- Asignado para Diagnostico -->
+                                <t t-if="record.client_state.raw_value == 'assigned'">
+                                    <p>N° ticket: <t t-if="record.n_ticket.raw_value != False"><field name="n_ticket"/></t><t t-if="record.n_ticket.raw_value = False">xxxxxxxx</t></p>
+                                    <p>Cliente: <t t-if="record.partner_id.raw_value != False"><field name="partner_id"/></t><t t-if="record.partner_id.raw_value = False">xxxxxxxx</t></p>
+                                    <p>Tecnico asignado: <t t-if="record.repair_user_id.raw_value != False"><field name="repair_user_id"/></t><t t-if="record.repair_user_id.raw_value = False">xxxxxxxx</t></p>
+                                    <div class="o_kanban_record_top">
+                                        <span class="badge badge-danger">Pendiente</span>
+                                    </div>
+                                </t>
+                                <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
+                                <p>Creado el: <field name="create_date" widget="datetime"/></p>
+                                <!-- Boton para cambiar estados -->
+                                <t t-if="record.crm_type.raw_value != 'both'">
                                     <button name="action_change_state"
-                                        type="object"
-                                        class="btn btn-primary">
-                                        Confirmar
+                                    type="object"
+                                    class="btn btn-primary">
+                                    Confirmar
                                     </button>
-                                </div>
+                                </t>
                             </div>
-                        </t>
-                    </templates>
-                </kanban>
-            </xpath>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
 		</field>
 	</record>
 
+
+    <!-- Kanban para tecnico -->
+	<record id="crm_lead_technician_kanban_view" model="ir.ui.view">
+		<field name="name">crm.lead.view.kanban</field>
+		<field name="model">crm.lead</field>
+		<field name="arch" type="xml">
+            <kanban default_group_by="repair_state" class="o_kanban_small_column o_kanban_project_tasks" on_create="quick_create" quick_create_view="dv_repair_equipment.quick_create_crm_lead_form" records_draggable="false">
+                <field name="repair_state"/>
+                <field name="crm_type"/>
+                <field name="n_ticket"/>
+                <field name="partner_id"/>
+                <field name="repair_user_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_details d-flex flex-column">
+                                <h3><field name="name"/> - <field name="repair_order_type_id"/></h3>
+                                <!-- Nuevo Ingreso -->
+                                <t t-if="record.repair_state.raw_value == 'new'">
+                                    <div class="o_kanban_record_top">
+                                        <span class="badge badge-primary">Nuevo</span>
+                                    </div>
+                                </t>
+                                <!-- Asignado para Diagnostico -->
+                                <t t-if="record.repair_state.raw_value == 'assigned'">
+                                    <p>N° ticket: <t t-if="record.n_ticket.raw_value != False"><field name="n_ticket"/></t><t t-if="record.n_ticket.raw_value = False">xxxxxxxx</t></p>
+                                    <p>Cliente: <t t-if="record.partner_id.raw_value != False"><field name="partner_id"/></t><t t-if="record.partner_id.raw_value = False">xxxxxxxx</t></p>
+                                    <p>Tecnico asignado: <t t-if="record.repair_user_id.raw_value != False"><field name="repair_user_id"/></t><t t-if="record.repair_user_id.raw_value = False">xxxxxxxx</t></p>
+                                    <div class="o_kanban_record_top">
+                                        <span class="badge badge-danger">Pendiente</span>
+                                    </div>
+                                </t>
+                                <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
+                                <p>Creado el: <field name="create_date" widget="datetime"/></p>
+                                <!-- Boton para cambiar estados -->
+                                <t t-if="record.crm_type.raw_value != 'both'">
+                                    <button name="action_change_state"
+                                    type="object"
+                                    class="btn btn-primary">
+                                    Confirmar
+                                    </button>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+		</field>
+	</record>
+
+
+    <!-- _________________________________________________________________________ -->
+    <!-- FORM -->
+    <!-- _________________________________________________________________________ -->
+
+
+    <!-- Formulario para cliente -->
     <record id="crm_lead_form_view_inherited" model="ir.ui.view">
 		<field name="name">crm.lead.view.form.inherited</field>
 		<field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
 		<field name="arch" type="xml">
             <xpath expr="//page[@name='lead']" position="after">
-                <page name="new_fields" string="Datos">
+                <page name="new_fields" string="Nuevo Ingreso">
                     <group>
+                        <field name="name"/>
                         <field name="repair_order_type_id"/>
-                        <field name="ticket_number"/>
-                        <field name="repair_product_id"/>
-                        <field name="repair_location_id"/>
-                        <field name="repair_user_id"/>
-                        <field name="repair_order_id"/>
+                    </group>
+                </page>
+                <page name="assigned_view" string="Asignado para diagnóstico">
+                    <group>
+                        <group string="Datos de Venta">
+                            <field name="name"/>
+                            <field name="repair_order_type_id"/>
+                            <field name="n_ticket" readonly="1"/>
+                            <button name="gen_ticket_number"
+                                    type="object"
+                                    class="btn btn-primary">
+                                    Generar ticket       
+                            </button>
+                        </group>
+
+                        <group string="Cliente">
+                            <field name="partner_id"/>
+                        </group>
+                        <group string="Tecnico">
+                            <field name="repair_user_id"/>
+                        </group>
+                        <group string="Equipo">
+                            <field name="repair_order_components_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="features"/>
+                                    <field name="details"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="name"/>
+                                        <field name="features"/>
+                                        <field name="details"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </group>
+                    </group>
+                </page>
+                <page name="dg_ready_view" string="Diagnostico Listo">
+                    <group>
+                        <field name="name"/>
+                        <field name="repair_order_type_id"/>
+                        <field name="n_ticket" readonly="1"/>
                     </group>
                 </page>
             </xpath>
 		</field>
 	</record>
+
+
+    <!-- _________________________________________________________________________ -->
+    <!-- QUICK CREATE -->
+    <!-- _________________________________________________________________________ -->
 
 
     <record id="quick_create_crm_lead_form" model="ir.ui.view">
@@ -94,4 +190,48 @@
         </field>
     </record>
     
+    <!-- _________________________________________________________________________ -->
+    <!-- ACCIONES -->
+    <!-- _________________________________________________________________________ -->
+
+
+    <!-- Acción de atención al cliente -->
+    <record id="crm_lead_action_client" model="ir.actions.act_window">
+        <field name="name">Atención al Cliente</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay registros para mostrar
+            </p>
+        </field>
+        <field name="domain">[('crm_type', '!=', 'repair')]</field>
+        <field name="context">{'default_crm_type': 'client'}</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.crm_lead_client_kanban_view')}),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_lead_view_form')}),]"/>
+    </record>
+
+    <!-- Acción para el tecnico -->
+    <record id="crm_lead_action_technician" model="ir.actions.act_window">
+        <field name="name">Tecnico</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+              No hay registros para mostrar
+          </p>
+        </field>
+        <field name="domain">[('crm_type', '!=', 'client')]</field>
+        <field name="context">{'default_crm_type': 'repair'}</field>
+        <field name="view_ids" eval="[
+          (5, 0, 0),
+          (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.crm_lead_technician_kanban_view')}),
+          (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
+          (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_lead_view_form')}),]"/>
+      </record>
   </odoo>

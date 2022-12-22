@@ -4,54 +4,73 @@ from odoo import models, fields, api
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
+    # Estados de cliente y tecnico
     client_state = fields.Selection([('new', 'Nuevo Ingreso'), ('assigned', 'Asignado para Diagnóstico'), ('dg_ready', 'Diagnostico Listo'), (
-        'quoted', 'Cotizado'), ('confirmed', 'Confirmado'), ], string='Estado', default='new', group_expand='_expand_states', index=True)
-
-    repair_product_id = fields.Many2one(
-        'product.product', string='Producto a reparar', required=True)
-    repair_location_id = fields.Many2one('stock.location', string='Ubicacion', required=True)
+        'quoted', 'Cotizado'), ('confirmed', 'Confirmado'), ], string='Estado', default='new', group_expand='_expand_client_states', index=True)
+    repair_state = fields.Selection([('new', 'Nuevo Ingreso'), ('assigned', 'Asignado para Diagnóstico'), ('dg_ready', 'Diagnostico Listo'),
+                ('prh_proccess', 'En Proceso de Compra'), ('confirmed', 'Confirmado')],
+                string='Estado', default='new', group_expand='_expand_repair_states', index=True)
+    crm_type = fields.Selection([('repair', 'Tecnica'), ('client', 'Atención al Cliente'), ('both', 'Tecnica y Atención al Cliente')], string='Area')
     
-    repair_order_type_id = fields.Many2one('repair.order.type', string='Tipo de Servicio a Desarrollar', required=True)
-    mesage_client = fields.Text(string='Mensaje al Cliente')
-    repair_order_id = fields.Many2one(
-        'repair.order', string='Orden de Reparación')
-
     name = fields.Char(
-        'Asunto', index=True, required=True,
+        'Asunto', index=True, 
         compute='_compute_name', readonly=False, store=True)
-    ticket_number = fields.Char(string='Número de Ticket', required=True,
-                                default=lambda self: self.env['ir.sequence'].next_by_code('crm.lead'))
+    n_ticket = fields.Char(string='Número de Ticket')
+    repair_order_type_id = fields.Many2one('repair.order.type', string='Tipo de Servicio a Desarrollar', )
+
     partner_id = fields.Many2one(
         'res.partner', string='Cliente', index=True, tracking=10,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
-        help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.", required=True)
+        help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.", )
+
+    repair_order_components_ids = fields.One2many('repair.order.components', 'crm_lead_id', string='Componentes del Producto')
 
     repair_user_id = fields.Many2one(
-        'res.users', string="Tecnico", default=lambda self: self.env.user, check_company=True, required=True)
+        'res.users', string="Tecnico", default=lambda self: self.env.user, check_company=True, )
 
-    def _expand_states(self, states, domain, order):
+    def _expand_client_states(self, states, domain, order):
         return [key for key, val in type(self).client_state.selection]
+
+    def _expand_repair_states(self, states, domain, order):
+        return [key for key, val in type(self).repair_state.selection]
 
 
     def action_change_state(self):
         """
         Función para cambiar el estado del cliente
         """
-        # Lista de posible estados
-        CLIENT_STATES = ['new', 'assigned', 'dg_ready', 'quoted', 'confirmed']
-        current_state = CLIENT_STATES.index(self.client_state)
-
-        # Cambiar el estado al siguiente, si es el último, se queda en el mismo
-        self.client_state = CLIENT_STATES[current_state + 1] if current_state < len(CLIENT_STATES) - 1 else CLIENT_STATES[current_state]
+        if self.crm_type == 'both':
+            return
         
-        # Si el estado es 'dg_ready' se crea la orden de reparación
-        if self.client_state == 'dg_ready': self.action_create_repair_order() 
+        current_state = self.client_state if self.crm_type == 'client' else self.repair_state
+
+        # Lista de posible estados
+        STATES = ['new', 'assigned', 'dg_ready']
+        next_state = STATES[STATES.index(current_state) + 1]
+
+        if self.crm_type == 'client':
+            self.client_state = next_state
+        
+        if self.crm_type == 'repair':
+            self.repair_state = next_state
+
+        # Si el diagnóstico está listo, mostrar en ambos lados el registro
+        if next_state == 'dg_ready':
+            if self.crm_type == 'client': self.repair_state = 'dg_ready'
+            if self.crm_type == 'repair': self.client_state = 'dg_ready'
+            self.crm_type = 'both'
 
         # Recargar la vista
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
         }
+
+    def gen_ticket_number(self):
+        """
+        Función para generar el número de ticket
+        """
+        self.n_ticket = f'000000000{self.id}'
 
 
     def action_create_repair_order(self):
@@ -60,5 +79,3 @@ class CrmLead(models.Model):
         """
     # LOS DATOS QUE SE PASARAN; AUN NO ESTAN DEFINIDOS
         self.env['repair.order'].create({'crm_lead_id': self.id, 'product_id': 5, 'name': self.name, 'product_uom': 1, 'location_id': 1})
-
-    
