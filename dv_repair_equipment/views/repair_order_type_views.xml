@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="repair_order_type_action" model="ir.actions.act_window">
+      <field name="name">Lugar de Reparación</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">repair.order.type</field>
+      <field name="view_mode">tree,form</field>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            No hay registros para mostrar
+        </p>
+      </field>
+    </record>
+
+
+    <record id="repair_order_type_tree_view" model="ir.ui.view">
+		<field name="name">repair.order.type.view.tree</field>
+		<field name="model">repair.order.type</field>
+		<field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+		</field>
+	</record>
+
+
+    <record id="repair_order_type_form_view" model="ir.ui.view">
+		<field name="name">repair.order.type.view.form</field>
+		<field name="model">repair.order.type</field>
+		<field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+		</field>
+	</record>
+    
+  </odoo>

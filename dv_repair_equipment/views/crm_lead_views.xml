@@ -18,19 +18,33 @@
         <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
 		<field name="arch" type="xml">
             <xpath expr="//kanban[@default_group_by='stage_id']" position="replace">
-                <kanban default_group_by="client_state" class="o_kanban_small_column o_kanban_project_tasks" on_create="quick_create">
+                <kanban default_group_by="client_state" class="o_kanban_small_column o_kanban_project_tasks" on_create="quick_create" quick_create_view="dv_repair_equipment.quick_create_crm_lead_form" records_draggable="false">
                     <field name="client_state"/>
                     <templates>
                         <t t-name="kanban-box">
                             <div class="oe_kanban_global_click">
-                                <h1><field name="repair_order_type_id"/></h1>
                                 <div class="oe_kanban_details d-flex flex-column">
-                                    <strong class="o_kanban_record_title oe_partner_heading">Servicio: <field name="name"/></strong>
+                                    <!-- Nuevo Ingreso -->
+                                    <t t-if="record.client_state.raw_value == 'new'">
+                                        <div class="o_kanban_record_top">
+                                            <span class="badge badge-primary">Nuevo</span>
+                                        </div>
+                                        <p><field name="name"/> - <field name="repair_order_type_id"/></p>
+                                    </t>
+                                    <!-- Asignado para Diagnostico -->
+                                    <t t-if="record.client_state.raw_value == 'assigned'">
+                                        <div class="o_kanban_record_top">
+                                            <span class="badge badge-danger">Pendiente</span>
+                                        </div>
+                                        <h3><field name="name"/> - <field name="repair_order_type_id"/></h3>
+                                        <p>N° ticket: xxxxx</p>
+                                        <p>Cliente: xxxxxx</p>
+                                        <p>Tecnico asignado: xxxx</p>
+
+                                    </t>
                                     <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
-                                    <p>N° Ticket: <field name="ticket_number"/></p>
-                                    <p>Cliente: <field name="partner_id"/></p>
-                                    <p>Asignado a: <field name="repair_user_id"/></p>
-                                    <button name="action_create_repair_order"
+                                    <p>Creado el: <field name="create_date" widget="datetime"/></p>
+                                    <button name="action_change_state"
                                         type="object"
                                         class="btn btn-primary">
                                         Confirmar
@@ -55,12 +69,27 @@
                         <field name="repair_order_type_id"/>
                         <field name="ticket_number"/>
                         <field name="repair_user_id"/>
-
                         <field name="repair_order_id"/>
                     </group>
                 </page>
             </xpath>
 		</field>
 	</record>
+
+
+    <record id="quick_create_crm_lead_form" model="ir.ui.view">
+        <field name="name">crm.lead.form.quick_create</field>
+        <field name="model">crm.lead</field>
+        <field name="priority">1000</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name" string="Servicio" placeholder="Reparación de" required="1"/>
+                    <field name="repair_order_type_id" required="1"/>
+                    <field name="create_date" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
     
   </odoo>

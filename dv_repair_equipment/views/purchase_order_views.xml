@@ -18,7 +18,7 @@
         <field name="inherit_id" ref="purchase.view_purchase_order_kanban"/>
         <field name="arch" type="xml">
           <xpath expr="//kanban[@class='o_kanban_mobile']" position="replace">
-            <kanban class="o_kanban_mobile" sample="1" default_group_by="purchase_state">
+            <kanban class="o_kanban_mobile" sample="1" default_group_by="purchase_state" records_draggable="false">
 
                 <!-- Variables a mostrar en el kanban -->
                 <field name="purchase_state" />

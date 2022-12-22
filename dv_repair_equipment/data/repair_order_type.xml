@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="order_type_01" model="repair.order.type">
+            <field name="name">Remoto</field>
+        </record>
+
+        <record id="order_type_02" model="repair.order.type">
+            <field name="name">Presencial</field>
+        </record>
+
+        <record id="order_type_03" model="repair.order.type">
+            <field name="name">Taller</field>
+        </record>
+
+        <record id="order_type_04" model="repair.order.type">
+            <field name="name">Externo</field>
+        </record>
+    </data>
+</odoo>

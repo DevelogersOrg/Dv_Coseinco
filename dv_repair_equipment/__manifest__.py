@@ -8,6 +8,8 @@
     'summary': '',
     "website" : "https://www.develogers.com",
     "data": [
+        'security/ir.model.access.csv',
+        'views/repair_order_type_views.xml',
         'views/crm_lead_views.xml',
         'views/purchase_order_views.xml',
         'views/stock_inventory_views.xml',
@@ -16,8 +18,8 @@
         'views/account_move_views.xml',
         'views/menu_items.xml',
     ],
-    'qweb': [
-        
+    'demo': [
+        'data/repair_order_type.xml',
     ],
     "auto_install": False,
     "installable": True,

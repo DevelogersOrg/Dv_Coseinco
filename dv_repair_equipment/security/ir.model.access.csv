@@ -1,4 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 
-
-
+access_repair_order_type_user,access_repair_order_type_user,model_repair_order_type,,1,1,1,1
