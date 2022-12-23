@@ -115,16 +115,16 @@
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
 		<field name="arch" type="xml">
             <xpath expr="//field[@name='active']" position="after">
-                <field name="repair_state" invisible="1"/>
+                <field name="client_state" invisible="1"/>
             </xpath>
             <xpath expr="//page[@name='lead']" position="after">
-                <page name="new_fields" string="Nuevo Ingreso" attrs="{'invisible': [('repair_state','!=','new')]}">
+                <page name="new_fields" string="Nuevo Ingreso" attrs="{'invisible': [('client_state','!=','new')]}">
                     <group>
                         <field name="name"/>
                         <field name="repair_order_type_id"/>
                     </group>
                 </page>
-                <page name="assigned_view" string="Asignado para diagnóstico" attrs="{'invisible': [('repair_state','!=','assigned')]}">
+                <page name="assigned_view" string="Asignado para diagnóstico" attrs="{'invisible': [('client_state','!=','assigned')]}">
                     <group>
                         <group string="Datos de Venta">
                             <field name="name"/>
@@ -161,7 +161,7 @@
                         </group>
                     </group>
                 </page>
-                <page name="dg_ready_view" string="Diagnostico Listo" attrs="{'invisible': [('repair_state','!=','dg_ready')]}">
+                <page name="dg_ready_view" string="Diagnostico Listo" attrs="{'invisible': [('client_state','!=','dg_ready')]}">
                     <group>
                         <field name="name"/>
                         <field name="repair_order_type_id"/>
