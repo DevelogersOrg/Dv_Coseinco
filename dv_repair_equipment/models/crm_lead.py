@@ -61,10 +61,10 @@ class CrmLead(models.Model):
             self.crm_type = 'both'
 
         # Recargar la vista
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'reload',
-        }
+        #return {
+        #    'type': 'ir.actions.client',
+        #    'tag': 'reload',
+        #}
 
     def gen_ticket_number(self):
         """
