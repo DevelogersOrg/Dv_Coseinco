@@ -114,6 +114,9 @@
 		<field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
 		<field name="arch" type="xml">
+            <xpath expr="//field[@name='active']" position="after">
+                <field name="repair_state " invisible="1"/>
+            </xpath>
             <xpath expr="//page[@name='lead']" position="after">
                 <page name="new_fields" string="Nuevo Ingreso" attrs="{'invisible': [('repair_state','!=','new')]}">
                     <group>
