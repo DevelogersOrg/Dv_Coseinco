@@ -3,3 +3,7 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_repair_order_type_user,access_repair_order_type_user,model_repair_order_type,,1,1,1,1
 
 access_repair_order_components_user,access_repair_order_components_user,model_repair_order_components,,1,1,1,1
+
+access_repair_equipment_type_user,access_repair_equipment_type_user,model_repair_equipment_type,,1,1,1,1
+
+access_repair_product_required_user,access_repair_product_required_user,model_repair_product_required,,1,1,1,1

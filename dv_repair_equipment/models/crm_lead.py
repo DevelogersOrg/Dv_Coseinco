@@ -10,7 +10,8 @@ class CrmLead(models.Model):
     repair_state = fields.Selection([('new', 'Nuevo Ingreso'), ('assigned', 'Asignado para Diagnóstico'), ('dg_ready', 'Diagnostico Listo'),
                 ('prh_proccess', 'En Proceso de Compra'), ('confirmed', 'Confirmado')],
                 string='Estado', default='new', group_expand='_expand_repair_states', index=True)
-    crm_type = fields.Selection([('repair', 'Tecnica'), ('client', 'Atención al Cliente'), ('both', 'Tecnica y Atención al Cliente')], string='Area')
+    is_from_client_view = fields.Boolean(string='Es parte de la vista de cliente?')
+    is_displayed_in_both = fields.Boolean(string='Se muestra en ambos lados?', default=False)
     
     name = fields.Char(
         'Asunto', index=True, 
@@ -23,10 +24,39 @@ class CrmLead(models.Model):
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.", )
 
-    repair_order_components_ids = fields.One2many('repair.order.components', 'crm_lead_id', string='Componentes del Producto')
+    # TODO indentificar de que viscta se esta llamando
+    # current_view_id = fields.Char(string='Vista Actual', compute='_compute_current_view_id')
+
+    # @api.model
+    # def _compute_current_view_id(self):
+    #     for record in self:
+    #         record.current_view_id = self.env.context.get('view_id')
 
     repair_user_id = fields.Many2one(
-        'res.users', string="Tecnico", default=lambda self: self.env.user, check_company=True, )
+        'res.users', string="Tecnico", check_company=True, )
+
+
+    # Datos de Equipo
+    n_active = fields.Char(string='N° Activo')
+    n_serie = fields.Char(string='N° Serie')
+    repair_equipment_type_id = fields.Many2one('repair.equipment.type', string='Tipo de Equipo')
+    equipment_model = fields.Char(string='Modelo')
+    equipment_accessories = fields.Char(string='Accesorios')
+    equipment_failure_report = fields.Text(string='Reporte de Falla')
+    other_equipment_data = fields.Text(string='Otros Datos del Equipo')
+    repair_order_components_ids = fields.One2many('repair.order.components', 'crm_lead_id', string='Componentes del Equipo')
+
+
+    # Etapa Desarrollo de Diagnóstico
+    # equipment_failure_report
+    initial_diagnosis = fields.Text(string='Diagnóstico Inicial')
+    repair_product_required_ids = fields.One2many('repair.product.required', 'crm_lead_id', string='Productos Necesarios para Reparar')
+    comments = fields.Text(string='Observaciones')
+    is_diagnosis_ready = fields.Boolean(string='Diagnóstico Listo?', default=False)
+
+
+    
+
 
     def _expand_client_states(self, states, domain, order):
         return [key for key, val in type(self).client_state.selection]
@@ -39,26 +69,33 @@ class CrmLead(models.Model):
         """
         Función para cambiar el estado del cliente
         """
-        if self.crm_type == 'both':
+        if self.is_displayed_in_both:
             return
-        
-        current_state = self.client_state if self.crm_type == 'client' else self.repair_state
+
+        current_state = self.client_state if self.is_from_client_view else self.repair_state
+
+        if current_state == 'assigned' and not self.n_ticket:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Error',
+                    'message': 'No se puede cambiar el estado porque no se ha generado el número de ticket',
+                    'sticky': False,
+                    'type': 'danger',
+                }
+            }
 
         # Lista de posible estados
         STATES = ['new', 'assigned', 'dg_ready']
         next_state = STATES[STATES.index(current_state) + 1]
 
-        if self.crm_type == 'client':
-            self.client_state = next_state
-        
-        if self.crm_type == 'repair':
-            self.repair_state = next_state
+        self.client_state = next_state
+        self.repair_state = next_state
 
         # Si el diagnóstico está listo, mostrar en ambos lados el registro
         if next_state == 'dg_ready':
-            if self.crm_type == 'client': self.repair_state = 'dg_ready'
-            if self.crm_type == 'repair': self.client_state = 'dg_ready'
-            self.crm_type = 'both'
+            self.is_displayed_in_both = True
 
         # Recargar la vista
         return {
@@ -70,12 +107,4 @@ class CrmLead(models.Model):
         """
         Función para generar el número de ticket
         """
-        self.n_ticket = f'000000000{self.id}'
-
-
-    def action_create_repair_order(self):
-        """
-        Función para crear la orden de reparación
-        """
-    # LOS DATOS QUE SE PASARAN; AUN NO ESTAN DEFINIDOS
-        self.env['repair.order'].create({'crm_lead_id': self.id, 'product_id': 5, 'name': self.name, 'product_uom': 1, 'location_id': 1})
+        self.n_ticket = f'{(10 - len(str(self.id))) * "0"}{self.id}'
