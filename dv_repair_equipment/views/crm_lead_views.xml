@@ -192,7 +192,7 @@
                         </button>
                     </group>
                 </page>
-                <page name="dg_ready_view" string="Diagnostico Listo" attrs="{'invisible': [('client_state','!=','dg_ready')]}">
+                <page name="dg_ready_view" string="Diagnostico Listo">
                     <group>
                         <field name="equipment_failure_report"/>
                         <field name="initial_diagnosis"/>
