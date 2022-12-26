@@ -34,7 +34,29 @@ class CrmLead(models.Model):
     def _expand_repair_states(self, states, domain, order):
         return [key for key, val in type(self).repair_state.selection]
 
-
+    has_quotation = fields.Boolean(string='Está cotizado', compute='_compute_has_quotation', store=True)
+    
+    @api.depends('sale_order_count')
+    def _compute_has_quotation(self):
+        for record in self:
+            if record.sale_order_count > 0:
+                has_quotation = True
+                record.client_state = 'quoted'
+            else:
+                has_quotation = False
+            record.has_quotation = has_quotation    
+   
+    has_confirmed_quotation = fields.Boolean(string='Está confirmado', compute='_compute_has_confirmed_quotation', store=True)         
+    @api.depends('order_ids.state')
+    def _compute_has_confirmed_quotation(self):
+        for record in self:
+            if any(order.state == 'done' for order in record.order_ids):
+                has_confirmed_quotation = True
+                record.client_state = 'confirmed'
+            else:
+                has_confirmed_quotation = False
+            record.has_confirmed_quotation = has_confirmed_quotation
+                
     def action_change_state(self):
         """
         Función para cambiar el estado del cliente
