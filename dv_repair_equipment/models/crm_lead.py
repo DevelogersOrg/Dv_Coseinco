@@ -36,10 +36,10 @@ class CrmLead(models.Model):
 
     has_quotation = fields.Boolean(string='Está cotizado', compute='_compute_has_quotation', store=True)
     
-    @api.depends('sale_order_count')
+    @api.depends('order_ids.state')
     def _compute_has_quotation(self):
         for record in self:
-            if record.sale_order_count > 0:
+            if any(order.state == 'draft' for order in record.order_ids):
                 has_quotation = True
                 record.client_state = 'quoted'
             else:
