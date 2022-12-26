@@ -50,7 +50,7 @@ class CrmLead(models.Model):
     @api.depends('order_ids.state')
     def _compute_has_confirmed_quotation(self):
         for record in self:
-            if any(order.state == 'done' for order in record.order_ids):
+            if any(order.state == 'sale' for order in record.order_ids):
                 has_confirmed_quotation = True
                 record.client_state = 'confirmed'
             else:
