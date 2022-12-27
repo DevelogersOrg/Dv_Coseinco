@@ -25,7 +25,7 @@
                                 <h3><field name="name"/> - <field name="repair_order_type_id"/></h3>
                                 <t t-if="record.client_state.raw_value == 'new'">
                                     <div class="o_kanban_record_top">
-                                        <span class="badge badge-primary" style="background-color: #6AA84F; font-size: 16px; color: black; border-radius: 15px 50px 30px;">Nuevo</span>
+                                        <span class="badge badge-primary" style="background-color: #6AA84F; font-size: 16px; color: white; border-radius: 15px 50px 30px;">Nuevo</span>
                                     </div>
                                 </t>
                                 <!-- Asignado para Diagnostico -->
@@ -81,7 +81,7 @@
                                 <!-- Nuevo Ingreso -->
                                 <t t-if="record.repair_state.raw_value == 'new'">
                                     <div class="o_kanban_record_top">
-                                        <span class="badge badge-primary" style="background-color: #6AA84F; font-size: 16px; color: black; border-radius: 15px 50px 30px;">Nuevo</span>
+                                        <span class="badge badge-primary" style="background-color: #6AA84F; font-size: 16px; color: white; border-radius: 15px 50px 30px;">Nuevo</span>
                                     </div>
                                 </t>
                                 <!-- Asignado para Diagnostico -->
@@ -92,7 +92,7 @@
                                     <div class="o_kanban_record_top">
                                         <div class="oe_kanban_bottom_right">
                                             <t t-if="record.n_ticket.value == false">
-                                                <span class="badge badge-danger" style="background-color: #CC0000; font-size: 16px; color: black; border-radius: 15px 50px 30px;">PENDIENTE</span>
+                                                <span class="badge badge-danger" style="background-color: #CC0000; font-size: 16px; color: white; border-radius: 15px 50px 30px;">PENDIENTE</span>
                                             </t>
                                             <t t-if="record.n_ticket.value != false">
                                                 <span class="badge badge-warning" style="background-color: #ffc107; font-size: 16px; color: black; border-radius: 15px 50px 30px;">EN PROCESO</span>
@@ -168,7 +168,6 @@
                         <field name="equipment_accessories"/>
                         <field name="equipment_failure_report"/>
                         <field name="other_equipment_data"/>
-
                         <field name="repair_order_components_ids">
                             <tree editable="bottom">
                                 <field name="name"/>

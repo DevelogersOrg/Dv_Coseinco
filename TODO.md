@@ -1,3 +1,5 @@
-- Agregar nuevos campos al formulario de repair.order y crm.lead
-- repair_order_components_ids agregar vistas de tree y form
 - Mejores los cuadrados de estado del kanban
+- Hacer los TODOs del código
+- Cuando todo este listo, configurar el grupo de control total de la aplicación
+- Consultar sobre la individualidad de permisos de usuarios
+- self.env.context.get('action_id')

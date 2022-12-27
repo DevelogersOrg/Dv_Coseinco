@@ -8,6 +8,7 @@
     'summary': '',
     "website" : "https://www.develogers.com",
     "data": [
+        'security/security_groups.xml',
         'security/ir.model.access.csv',
         'views/repair_order_type_views.xml',
         'views/crm_lead_views.xml',

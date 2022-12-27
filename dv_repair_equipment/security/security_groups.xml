@@ -1,4 +1,144 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
+    <!-- Atencion al cliente -->
+	<record id="client_category" model="ir.module.category">
+		<field name="name">Atención al cliente</field>
+		<field name="description">Otorgar permisos en la tabla de Atención al cliente</field>
+		<field name="sequence">1</field>
+	</record>
+	<record id="client_app_group_user" model="res.groups">
+		<field name="name">Usuario: solo mostrar documentos propios</field>
+		<field name="category_id" ref="client_category" />
+		<field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+	</record>
+	<record id="client_app_group_admin" model="res.groups">
+		<field name="name">Administrador: acceso a todos los documentos</field>
+		<field name="category_id" ref="client_category" />
+		<field name="implied_ids" eval="[(4, ref('client_app_group_user'))]"/>
+	</record>
+
+    <!-- Compras -->
+    <record id="purchase_category" model="ir.module.category">
+        <field name="name">Compras</field>
+        <field name="description">Otorgar permisos en la tabla de Compras</field>
+        <field name="sequence">2</field>
+    </record>
+    <record id="purchase_app_group_user" model="res.groups">
+        <field name="name">Usuario: solo mostrar documentos propios</field>
+        <field name="category_id" ref="purchase_category" />
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="purchase_app_group_admin" model="res.groups">
+        <field name="name">Administrador: acceso a todos los documentos</field>
+        <field name="category_id" ref="purchase_category" />
+        <field name="implied_ids" eval="[(4, ref('purchase_app_group_user'))]"/>
+    </record>
+
+    <!-- Almacen -->
+    <record id="warehouse_category" model="ir.module.category">
+        <field name="name">Almacen</field>
+        <field name="description">Otorgar permisos en la tabla de Almacen</field>
+        <field name="sequence">3</field>
+    </record>
+    <record id="warehouse_app_group_user" model="res.groups">
+        <field name="name">Usuario: solo mostrar documentos propios</field>
+        <field name="category_id" ref="warehouse_category" />
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="warehouse_app_group_admin" model="res.groups">
+        <field name="name">Administrador: acceso a todos los documentos</field>
+        <field name="category_id" ref="warehouse_category" />
+        <field name="implied_ids" eval="[(4, ref('warehouse_app_group_user'))]"/>
+    </record>
+
+    <!-- Tecnico -->
+    <record id="technician_category" model="ir.module.category">
+        <field name="name">Tecnico</field>
+        <field name="description">Otorgar permisos en la tabla de Tecnico</field>
+        <field name="sequence">4</field>
+    </record>
+    <record id="technician_app_group_user" model="res.groups">
+        <field name="name">Usuario: solo mostrar documentos propios</field>
+        <field name="category_id" ref="technician_category" />
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="technician_app_group_admin" model="res.groups">
+        <field name="name">Administrador: acceso a todos los documentos</field>
+        <field name="category_id" ref="technician_category" />
+        <field name="implied_ids" eval="[(4, ref('technician_app_group_user'))]"/>
+    </record>
+
+    <!-- Despacho -->
+    <record id="picking_category" model="ir.module.category">
+        <field name="name">Despacho</field>
+        <field name="description">Otorgar permisos en la tabla de Despacho</field>
+        <field name="sequence">5</field>
+    </record>
+    <record id="picking_app_group_user" model="res.groups">
+        <field name="name">Usuario: solo mostrar documentos propios</field>
+        <field name="category_id" ref="picking_category" />
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="picking_app_group_admin" model="res.groups">
+        <field name="name">Administrador: acceso a todos los documentos</field>
+        <field name="category_id" ref="picking_category" />
+        <field name="implied_ids" eval="[(4, ref('picking_app_group_user'))]"/>
+    </record>
+
+    <!-- Facturación -->
+    <record id="invoicing_category" model="ir.module.category">
+        <field name="name">Facturación</field>
+        <field name="description">Otorgar permisos en la tabla de Facturación</field>
+        <field name="sequence">6</field>
+    </record>
+    <record id="invoicing_app_group_user" model="res.groups">
+        <field name="name">Usuario: solo mostrar documentos propios</field>
+        <field name="category_id" ref="invoicing_category" />
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="invoicing_app_group_admin" model="res.groups">
+        <field name="name">Administrador: acceso a todos los documentos</field>
+        <field name="category_id" ref="invoicing_category" />
+        <field name="implied_ids" eval="[(4, ref('invoicing_app_group_user'))]"/>
+    </record>
+
+    <!-- Control total de acceso a las aplicaciones -->
+    <record id="full_access_group" model="res.groups">
+        <field name="name">Acceso total a los modulos de Reparación</field>
+        <field name="category_id" ref="base.module_category_hidden" />
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <data noupdate="0">
+        <!-- Permisos para cliente -->
+		<record id="client_app_group_user_rule1" model="ir.rule">
+			<field name="name">Permisos de usuario para la tabla de clientes</field>
+			<field ref="model_crm_lead" name="model_id"/>
+			<field name="domain_force">[('create_uid','=',user.env.user.id)]</field>
+			<field name="groups" eval="[(4, ref('client_app_group_user'))]"/>
+		</record>
+		<record id="client_app_group_admin_rule1" model="ir.rule">
+			<field name="name">Permisos de administrados para la tabla de clientes</field>
+			<field ref="model_crm_lead" name="model_id"/>
+			<field name="domain_force">[(1,'=',1)]</field>
+			<field name="groups" eval="[(4, ref('client_app_group_admin'))]"/>
+		</record>
+
+        <!-- Permisos para tecnico -->
+        <record id="technician_app_group_user_rule1" model="ir.rule">
+            <field name="name">Permisos de usuario para la tabla de tecnico</field>
+            <field ref="model_crm_lead" name="model_id"/>
+            <field name="domain_force">[('create_uid','=',user.env.user.id)]</field>
+            <field name="groups" eval="[(4, ref('technician_app_group_user'))]"/>
+        </record>
+        <record id="technician_app_group_admin_rule1" model="ir.rule">
+            <field name="name">Permisos de administrados para la tabla de tecnico</field>
+            <field ref="model_crm_lead" name="model_id"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[(4, ref('technician_app_group_admin'))]"/>
+        </record>
+	</data>
+
+    <!-- TODO: agregar permisos para los demas modulos, segun se valla avanzado -->
 
 </odoo>
