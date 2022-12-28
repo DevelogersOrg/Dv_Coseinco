@@ -8,6 +8,7 @@
             <xpath expr="//page[@name='order_lines']" position="before">
                 <page name="diagnosis_view" string="Datos del diagnostico">
                     <group>
+                        <field name="repair_user_id" string="Este servicio sera atendido por" readonly="1"/>
                         <field name="equipment_failure_report"/>
                         <field name="initial_diagnosis"/>
                         <field name="comments"/>

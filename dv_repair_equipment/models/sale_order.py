@@ -6,3 +6,4 @@ class SaleOrder(models.Model):
     equipment_failure_report = fields.Text(string='Reporte de Falla')
     initial_diagnosis = fields.Text(string='Diagnóstico Inicial')
     comments = fields.Text(string='Observaciones')
+    repair_user_id = fields.Many2one('res.users', string="Tecnico", check_company=True, )

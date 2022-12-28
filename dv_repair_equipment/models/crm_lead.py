@@ -23,17 +23,11 @@ class CrmLead(models.Model):
         'res.partner', string='Cliente', index=True, tracking=10,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.", )
-
-    is_now_in_client_view = fields.Boolean(string='Está en la vista de cliente?', compute='_compute_is_in_client_view', store=False)
-
-    def _compute_is_in_client_view(self):
-        self.is_now_in_client_view = self.env.context.get('default_is_from_client_view')
-
-
-
     repair_user_id = fields.Many2one(
         'res.users', string="Tecnico", check_company=True, )
 
+    # Esta variable deternima si el cliente está en la vista de cliente o en la vista de técnico
+    is_now_in_client_view = fields.Boolean(string='Está en la vista de cliente?', compute='_compute_is_in_client_view', store=False)
 
     # Datos de Equipo
     n_active = fields.Char(string='N° Activo')
@@ -49,19 +43,14 @@ class CrmLead(models.Model):
     # Etapa Desarrollo de Diagnóstico
     # equipment_failure_report
     initial_diagnosis = fields.Text(string='Diagnóstico Inicial')
-    repair_product_required_ids = fields.One2many('repair.product.required', 'crm_lead_id', string='Productos Necesarios para Reparar')
+    repair_product_required_ids = fields.One2many('repair.product.required', 'crm_lead_id', string='Productos a incluir')
     comments = fields.Text(string='Observaciones')
     is_diagnosis_ready = fields.Boolean(string='Diagnóstico Listo?', default=False)
 
-    def _expand_client_states(self, states, domain, order):
-        return [key for key, val in type(self).client_state.selection]
-
-    def _expand_repair_states(self, states, domain, order):
-        return [key for key, val in type(self).repair_state.selection]
-
-    
+    # Campos para el seguimiento de la cotización
     has_quotation = fields.Boolean(string='Está cotizado', compute='_compute_has_quotation', store=True)
-    
+    has_confirmed_quotation = fields.Boolean(string='Está confirmado', compute='_compute_has_confirmed_quotation', store=True)         
+
     @api.depends('order_ids.state')
     def _compute_has_quotation(self):
         for record in self:
@@ -72,7 +61,7 @@ class CrmLead(models.Model):
                 has_quotation = False
             record.has_quotation = has_quotation    
    
-    has_confirmed_quotation = fields.Boolean(string='Está confirmado', compute='_compute_has_confirmed_quotation', store=True)         
+
     @api.depends('order_ids.state')
     def _compute_has_confirmed_quotation(self):
         for record in self:
@@ -82,6 +71,19 @@ class CrmLead(models.Model):
             else:
                 has_confirmed_quotation = False
             record.has_confirmed_quotation = has_confirmed_quotation
+
+
+    def _compute_is_in_client_view(self):
+        self.is_now_in_client_view = self.env.context.get('default_is_from_client_view')
+
+        
+    def _expand_client_states(self, states, domain, order):
+        return [key for key, val in type(self).client_state.selection]
+
+
+    def _expand_repair_states(self, states, domain, order):
+        return [key for key, val in type(self).repair_state.selection]
+
 
     def action_change_state(self):
         """
@@ -94,21 +96,11 @@ class CrmLead(models.Model):
 
         if current_state == 'assigned' and not self.n_ticket:
             # Si no hay número de ticket, se envía una alerta
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': 'Error',
-                    'message': 'No se puede cambiar el estado porque no se ha generado el número de ticket',
-                    'sticky': False,
-                    'type': 'danger',
-                }
-            }
+            return self.show_error_message('Sin número de ticket', 'Se necesita un número de ticket para continuar')
 
         # Lista de posible estados
         STATES = ['new', 'assigned', 'dg_ready']
         next_state = STATES[STATES.index(current_state) + 1]
-
         self.client_state = next_state
         self.repair_state = next_state
 
@@ -122,14 +114,21 @@ class CrmLead(models.Model):
             'tag': 'reload',
         }
 
+
     def gen_ticket_number(self):
         """
         Función para generar el número de ticket
         """
+        if self.n_ticket:
+            return self.show_error_message('Error', 'No se puede generar el número de ticket porque ya existe')
+        
         self.n_ticket = f'{(10 - len(str(self.id))) * "0"}{self.id}'
 
 
     def action_new_quotation(self):
+        if not self.is_now_in_client_view or not self.client_state == 'dg_ready':
+            return self.show_error_message('Atención!!', 'Para crear una cotización, el cliente debe estar en la vista de cliente y en el estado "Diagnóstico Listo"')
+
         action = self.env["ir.actions.actions"]._for_xml_id("sale_crm.sale_action_quotations_new")
 
         action['context'] = {
@@ -145,8 +144,10 @@ class CrmLead(models.Model):
             'default_tag_ids': [(6, 0, self.tag_ids.ids)],
             'default_initial_diagnosis': self.initial_diagnosis,
             'default_equipment_failure_report': self.equipment_failure_report,
+            'default_repair_user_id': self.repair_user_id.id,
         }
 
+        # Datos opcionales
         if self.repair_product_required_ids:
             order_lines = []
             for product in self.repair_product_required_ids:
@@ -158,8 +159,12 @@ class CrmLead(models.Model):
                     'product_template_id' : product.product_id.product_tmpl_id.id,
                     'product_uom': product.product_id.uom_id.id,
                 }))
+            # Agregar una sección de mano de obra
+            order_lines.append((0, 0, {
+            'display_type': 'line_section',
+            'name': 'Mano de Obra',
+            }))
             action['context']['default_order_line'] = order_lines
-
         if self.comments:
             action['context']['default_comments'] = self.comments
         if self.team_id:
@@ -167,3 +172,16 @@ class CrmLead(models.Model):
         if self.user_id:
             action['context']['default_user_id'] = self.user_id.id
         return action
+
+    
+    def show_error_message(self, title:str, message:str):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': title,
+                'message': message,
+                'sticky': False,
+                'type': 'danger',
+            }
+        }
