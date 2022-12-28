@@ -155,6 +155,8 @@ class CrmLead(models.Model):
                     'name': product.product_id.name,
                     'product_uom_qty': product.quantity,
                     'price_unit': product.product_id.list_price,
+                    'product_template_id' : product.product_id.product_tmpl_id.id,
+                    'product_uom': product.product_id.uom_id.id,
                 }))
             action['context']['default_order_line'] = order_lines
 
