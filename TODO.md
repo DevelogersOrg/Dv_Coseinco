@@ -2,4 +2,9 @@
 - Hacer los TODOs del código
 - Cuando todo este listo, configurar el grupo de control total de la aplicación
 - Consultar sobre la individualidad de permisos de usuarios
-- self.env.context.get('action_id')
+- Preguntar si la descripcion es necesaria
+- antes de generar el ticket, minimo poner info del cliente y tecnico
+- ver si es posible agregar una seccion
+- equipment_failure_report, initial_diagnosis, required
+- mover los invisibles arriba
+- pasar todos los datos necesarios a sale.order

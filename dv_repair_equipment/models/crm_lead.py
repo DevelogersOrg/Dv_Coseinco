@@ -24,13 +24,12 @@ class CrmLead(models.Model):
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.", )
 
-    # TODO indentificar de que viscta se esta llamando
-    # current_view_id = fields.Char(string='Vista Actual', compute='_compute_current_view_id')
+    is_now_in_client_view = fields.Boolean(string='Está en la vista de cliente?', compute='_compute_is_in_client_view', store=False)
 
-    # @api.model
-    # def _compute_current_view_id(self):
-    #     for record in self:
-    #         record.current_view_id = self.env.context.get('view_id')
+    def _compute_is_in_client_view(self):
+        self.is_now_in_client_view = self.env.context.get('default_is_from_client_view')
+
+
 
     repair_user_id = fields.Many2one(
         'res.users', string="Tecnico", check_company=True, )
@@ -54,16 +53,13 @@ class CrmLead(models.Model):
     comments = fields.Text(string='Observaciones')
     is_diagnosis_ready = fields.Boolean(string='Diagnóstico Listo?', default=False)
 
-
-    
-
-
     def _expand_client_states(self, states, domain, order):
         return [key for key, val in type(self).client_state.selection]
 
     def _expand_repair_states(self, states, domain, order):
         return [key for key, val in type(self).repair_state.selection]
 
+    
     has_quotation = fields.Boolean(string='Está cotizado', compute='_compute_has_quotation', store=True)
     
     @api.depends('order_ids.state')
@@ -86,7 +82,7 @@ class CrmLead(models.Model):
             else:
                 has_confirmed_quotation = False
             record.has_confirmed_quotation = has_confirmed_quotation
-                
+
     def action_change_state(self):
         """
         Función para cambiar el estado del cliente
@@ -97,6 +93,7 @@ class CrmLead(models.Model):
         current_state = self.client_state if self.is_from_client_view else self.repair_state
 
         if current_state == 'assigned' and not self.n_ticket:
+            # Si no hay número de ticket, se envía una alerta
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
@@ -130,3 +127,41 @@ class CrmLead(models.Model):
         Función para generar el número de ticket
         """
         self.n_ticket = f'{(10 - len(str(self.id))) * "0"}{self.id}'
+
+
+    def action_new_quotation(self):
+        action = self.env["ir.actions.actions"]._for_xml_id("sale_crm.sale_action_quotations_new")
+
+        action['context'] = {
+            'search_default_opportunity_id': self.id,
+            'default_opportunity_id': self.id,
+            'search_default_partner_id': self.partner_id.id,
+            'default_partner_id': self.partner_id.id,
+            'default_campaign_id': self.campaign_id.id,
+            'default_medium_id': self.medium_id.id,
+            'default_origin': self.name,
+            'default_source_id': self.source_id.id,
+            'default_company_id': self.company_id.id or self.env.company.id,
+            'default_tag_ids': [(6, 0, self.tag_ids.ids)],
+            'default_initial_diagnosis': self.initial_diagnosis,
+            'default_equipment_failure_report': self.equipment_failure_report,
+        }
+
+        if self.repair_product_required_ids:
+            order_lines = []
+            for product in self.repair_product_required_ids:
+                order_lines.append((0, 0, {
+                    'product_id': product.product_id.id,
+                    'name': product.product_id.name,
+                    'product_uom_qty': product.quantity,
+                    'price_unit': product.product_id.list_price,
+                }))
+            action['context']['default_order_line'] = order_lines
+
+        if self.comments:
+            action['context']['default_comments'] = self.comments
+        if self.team_id:
+            action['context']['default_team_id'] = self.team_id.id,
+        if self.user_id:
+            action['context']['default_user_id'] = self.user_id.id
+        return action

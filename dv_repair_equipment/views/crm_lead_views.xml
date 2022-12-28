@@ -135,11 +135,6 @@
                 <field name="client_state" invisible="1"/>
             </xpath>
             <xpath expr="//page[@name='lead']" position="after">
-                <!-- <page name="just_test" string="xd">
-                    <group>
-                        <field name="current_view_id"/>
-                    </group>
-                </page> -->
                 <page name="new_fields" string="Nuevo Ingreso" attrs="{'invisible': [('client_state','!=','new')]}">
                     <group>
                         <field name="name"/>
@@ -191,11 +186,12 @@
                         </button>
                     </group>
                 </page>
-                <page name="dg_ready_view" string="Diagnostico Listo">
+                <page name="dg_ready_view" string="Diagnostico Listo" attrs="{'invisible': [('client_state','!=','dg_ready')]}">
                     <group>
-                        <field name="equipment_failure_report"/>
-                        <field name="initial_diagnosis"/>
-                        <field name="repair_product_required_ids">
+                        <field name="is_now_in_client_view" invisible="1"/>
+                        <field name="equipment_failure_report" attrs="{'readonly': [('is_now_in_client_view','=', True)]}"/>
+                        <field name="initial_diagnosis" attrs="{'readonly': [('is_now_in_client_view','=', True)]}"/>
+                        <field name="repair_product_required_ids" attrs="{'readonly': [('is_now_in_client_view','=', True)]}">
                             <tree editable="bottom">
                                 <field name="product_id"/>
                                 <field name="description"/>
@@ -209,11 +205,13 @@
                                 </group>
                             </form>
                         </field>
-                        <field name="comments"/>
-                        <field name="is_diagnosis_ready"/>
+                        <field name="comments" attrs="{'readonly': [('is_now_in_client_view','=', True)]}"/>
+                        <field name="is_diagnosis_ready" attrs="{'readonly': [('is_now_in_client_view','=', True)]}"/>
                     </group>
                 </page>
                 <page name="quoted_view" string="Cotizado" attrs="{'invisible': [('client_state','!=','quoted')]}">
+                    <field name="has_confirmed_quotation" invisible="1"/>
+                    <field name="has_quotation" invisible="1"/>
                 </page>
             </xpath>
 		</field>
