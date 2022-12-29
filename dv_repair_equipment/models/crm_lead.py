@@ -61,12 +61,20 @@ class CrmLead(models.Model):
                 has_quotation = False
             record.has_quotation = has_quotation    
    
+    def action_create_transfer_status(self):
+        self.ensure_one()
+        stock_transfter_status = {
+            'crm_lead_id': self.id,
+        }
+        
+        self.env['stock.transfer.status'].create(stock_transfter_status)
 
     @api.depends('order_ids.state')
     def _compute_has_confirmed_quotation(self):
         for record in self:
             if any(order.state == 'sale' for order in record.order_ids):
                 has_confirmed_quotation = True
+                record.action_create_transfer_status()
                 record.client_state = 'confirmed'
             else:
                 has_confirmed_quotation = False

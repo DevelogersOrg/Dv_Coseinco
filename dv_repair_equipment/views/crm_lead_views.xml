@@ -162,7 +162,7 @@
                         <field name="repair_equipment_type_id"/>
                         <field name="equipment_model"/>
                         <field name="equipment_accessories"/>
-                        <field name="equipment_failure_report" attrs="{'required': [('client_state','=','assigned')]}"/>
+                        <field name="equipment_failure_report"/>
                         <field name="other_equipment_data"/>
                         <field name="repair_order_components_ids">
                             <tree editable="bottom">
@@ -196,12 +196,16 @@
                                 <field name="product_id"/>
                                 <field name="description"/>
                                 <field name="quantity"/>
+                                <field name="product_qty_available"/>
+                                <field name="qty_to_order"/>
                             </tree>
                             <form>
                                 <group>
                                     <field name="product_id"/>
                                     <field name="description"/>
                                     <field name="quantity"/>
+                                    <field name="product_qty_available"/>
+                                    <field name="qty_to_order"/>
                                 </group>
                             </form>
                         </field>
