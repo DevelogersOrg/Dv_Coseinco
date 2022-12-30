@@ -3,4 +3,10 @@
 - Cuando todo este listo, configurar el grupo de control total de la aplicación
 - Consultar sobre la individualidad de permisos de usuarios
 - Preguntar si la descripcion es necesaria
-- arreglar el problema con campos repetidos
+- arreglar el problema con campos repetidos (habrá una forma mejor?)
+- crear funcion para llevar cuenta de stados
+- agregar al kanba el creador del registro con su imagen
+
+# Secundario
+
+- Agregar los estados al form

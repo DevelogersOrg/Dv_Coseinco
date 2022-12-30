@@ -134,26 +134,25 @@
             <xpath expr="//field[@name='active']" position="after">
                 <field name="client_state" invisible="1"/>
                 <field name="is_now_in_client_view" invisible="1"/>
+                <field name="repair_current_state_type" invisible="1"/>
+                <field name="repair_current_state_msg" invisible="1"/>
+            </xpath>
+            <xpath expr="//group[@name='lead_partner']" position="after">
+                <group>
+                    <field name="repair_order_type_id"/>
+                    <label for="n_ticket" string="Ticket"/>
+                    <h1 attrs="{'invisible': [('n_ticket','=', False)]}">N° : <field name="n_ticket" readonly="1"/></h1>
+                </group>
+
             </xpath>
             <xpath expr="//page[@name='lead']" position="after">
-                <page name="new_fields" string="Nuevo Ingreso" attrs="{'invisible': [('client_state','!=','new')]}">
-                    <group>
-                        <field name="name"/>
-                        <field name="repair_order_type_id"/>
-                    </group>
-                </page>
                 <page name="assigned_view" string="Asignado para diagnóstico" attrs="{'invisible': [('client_state','!=','assigned')]}">
-                    <group string="Datos de Venta">
-                        <field name="name"/>
-                        <field name="repair_order_type_id"/>
-                        <field name="n_ticket" readonly="1"/>
-                    </group>
                     <group>
-                        <group string="Cliente">
-                            <field name="partner_id" attrs="{'required': [('client_state','=','assigned')]}"/>
+                        <group string="Cliente" nolabel="1">
+                            <field name="partner_id" attrs="{'required': [('client_state','=','assigned')]}" string="Cliente *"/>
                         </group>
-                        <group string="Tecnico">
-                            <field name="repair_user_id" attrs="{'required': [('client_state','=','assigned')]}"/>
+                        <group string="Tecnico" nolabel="1">
+                            <field name="repair_user_id" attrs="{'required': [('client_state','=','assigned')]}" string="Técnico *"/>
                         </group>
                     </group>
                     <group string="Equipo">
@@ -162,7 +161,7 @@
                         <field name="repair_equipment_type_id"/>
                         <field name="equipment_model"/>
                         <field name="equipment_accessories"/>
-                        <field name="equipment_failure_report" attrs="{'required': [('client_state','=','assigned')]}"/>
+                        <field name="equipment_failure_report" attrs="{'required': [('client_state','=','assigned')]}" string="Reporte de Falla *"/>
                         <field name="other_equipment_data"/>
                         <field name="repair_order_components_ids">
                             <tree editable="bottom">
@@ -179,6 +178,8 @@
                             </form>
                         </field>
                     </group>
+                    <span>Campos obligatorios (*)</span>
+                    <br/>
                     <group attrs="{'invisible': [('n_ticket','!=', False)]}">
                         <button name="gen_ticket_number"
                         type="object"
@@ -189,8 +190,8 @@
                 </page>
                 <page name="dg_ready_view" string="Diagnostico Listo" attrs="{'invisible': [('client_state','!=','dg_ready')]}">
                     <group>
-                        <field name="equipment_failure_report" attrs="{'readonly': [('is_now_in_client_view','=', True)], 'required': [('client_state','=','dg_ready')]}"/>
-                        <field name="initial_diagnosis" attrs="{'readonly': [('is_now_in_client_view','=', True)], 'required': [('client_state','=','dg_ready')]}"/>
+                        <field name="equipment_failure_report_for_tech" attrs="{'readonly': [('is_now_in_client_view','=', True)]}"/>
+                        <field name="initial_diagnosis" attrs="{'readonly': [('is_now_in_client_view','=', True)], 'required': [('client_state','=','dg_ready')]}" string="Diagnóstico Inicial *"/>
                         <field name="repair_product_required_ids" attrs="{'readonly': [('is_now_in_client_view','=', True)]}">
                             <tree editable="bottom">
                                 <field name="product_id"/>
@@ -208,6 +209,9 @@
                         <field name="comments" attrs="{'readonly': [('is_now_in_client_view','=', True)]}"/>
                         <field name="is_diagnosis_ready" attrs="{'readonly': [('is_now_in_client_view','=', True)]}"/>
                     </group>
+                    <br/>
+                    <span>Campos obligatorios (*)</span>
+                    <br/>
                 </page>
                 <page name="quoted_view" string="Cotizado" attrs="{'invisible': [('client_state','!=','quoted')]}">
                     <field name="has_confirmed_quotation" invisible="1"/>
@@ -230,9 +234,11 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="name" string="Servicio" placeholder="Reparación de" required="1"/>
-                    <field name="repair_order_type_id" required="1"/>
+                    <field name="name" string="Servicio *" placeholder="Reparación de ..." required="1"/>
+                    <field name="repair_order_type_id" required="1" string="Tipo de Servicio a Desarrollar *"/>
                     <field name="create_date" invisible="1"/>
+                    <span>Campos Obligatorios (*)</span>
+                    <br/>
                 </group>
             </form>
         </field>

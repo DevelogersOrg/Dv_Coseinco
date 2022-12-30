@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
-  <menuitem id="app_menu_root" name="Coseinco S.A" web_icon="dv_repair_equipment,static/description/icon.png"/>
+  <menuitem id="app_menu_root" name="Coseinco S.A" web_icon="dv_repair_equipment,static/description/icon.png" sequence="0"/>
 
   <!-- Sub Menus -->
   <menuitem name="Atención al Cliente" id="client_menu" parent="app_menu_root" action="crm_lead_action_client"
             groups="dv_repair_equipment.client_app_group_user" sequence="1"/>
-  <!-- <menuitem name="Compras" id="purchase_menu" parent="app_menu_root" action="purchase_order_action"
-            groups="dv_repair_equipment.purchase_app_group_user" sequence="2"/> -->
+  <menuitem name="Compras" id="purchase_menu" parent="app_menu_root" action="purchase_order_action"
+            groups="dv_repair_equipment.purchase_app_group_user" sequence="2"/>
   <menuitem name="Almacen" id="warehouse_menu" parent="app_menu_root" action="stock_inventory_action"
             groups="dv_repair_equipment.warehouse_app_group_user" sequence="3"/>
   <menuitem name="Tecnico" id="technician_menu" parent="app_menu_root" action="crm_lead_action_technician"

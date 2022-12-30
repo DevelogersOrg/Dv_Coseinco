@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <!-- Vista kanban -->
+    <record id="purchase_order_kanban_view" model="ir.ui.view">
+		<field name="name">crm.lead.view.kanban</field>
+		<field name="model">crm.lead</field>
+		<field name="arch" type="xml">
+            <kanban default_group_by="purchase_state" class="o_kanban_small_column o_kanban_project_tasks" records_draggable="false">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_details d-flex flex-column">
+                                <p>Compras</p>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+		</field>
+	</record>
+
+    <!-- Formulario -->
+    <record id="purchase_order_form_view_inherited" model="ir.ui.view">
+		<field name="name">purchase.order.view.form.inherited</field>
+		<field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+		<field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="purchase_state" invisible="1"/>
+            </xpath>
+		</field>
+	</record>
+
+    <!-- Acción -->
+    <record id="purchase_order_action" model="ir.actions.act_window">
+        <field name="name">Compras</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">purchase.order</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+              No hay registros para mostrar
+          </p>
+        </field>
+        <field name="view_ids" eval="[
+          (5, 0, 0),
+          (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.purchase_order_kanban_view')}),
+          (0, 0, {'view_mode': 'tree', 'view_id': ref('purchase.purchase_order_tree')}),
+          (0, 0, {'view_mode': 'form', 'view_id': ref('purchase.purchase_order_form')}),]"/>
+      </record>
+  </odoo>

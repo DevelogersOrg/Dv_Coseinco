@@ -8,7 +8,7 @@ class CrmLead(models.Model):
     client_state = fields.Selection([('new', 'Nuevo Ingreso'), ('assigned', 'Asignado para Diagnóstico'), ('dg_ready', 'Diagnostico Listo'), (
         'quoted', 'Cotizado'), ('confirmed', 'Confirmado'), ], string='Estado', default='new', group_expand='_expand_client_states', index=True)
     repair_state = fields.Selection([('new', 'Nuevo Ingreso'), ('assigned', 'Asignado para Diagnóstico'), ('dg_ready', 'Diagnostico Listo'),
-                ('prh_proccess', 'En Proceso de Compra'), ('confirmed', 'Confirmado')],
+                ('prh_proccess', 'En Proceso de Compra'), ('confirmed', 'Confirmado'), ('in_repair', 'En Reparación'), ('ready', 'Servicio Culminado')],
                 string='Estado', default='new', group_expand='_expand_repair_states', index=True)
     is_from_client_view = fields.Boolean(string='Es parte de la vista de cliente?')
     is_displayed_in_both = fields.Boolean(string='Se muestra en ambos lados?', default=False)
@@ -41,7 +41,7 @@ class CrmLead(models.Model):
 
 
     # Etapa Desarrollo de Diagnóstico
-    # equipment_failure_report
+    equipment_failure_report_for_tech = fields.Text(string='Reporte de Falla', related='equipment_failure_report', store=False, readonly=True)
     initial_diagnosis = fields.Text(string='Diagnóstico Inicial')
     repair_product_required_ids = fields.One2many('repair.product.required', 'crm_lead_id', string='Productos a incluir')
     comments = fields.Text(string='Observaciones')
@@ -49,7 +49,11 @@ class CrmLead(models.Model):
 
     # Campos para el seguimiento de la cotización
     has_quotation = fields.Boolean(string='Está cotizado', compute='_compute_has_quotation', store=True)
-    has_confirmed_quotation = fields.Boolean(string='Está confirmado', compute='_compute_has_confirmed_quotation', store=True)         
+    has_confirmed_quotation = fields.Boolean(string='Está confirmado', compute='_compute_has_confirmed_quotation', store=True)
+
+    # Campos para un seguimiento detallado de las ordenes de reparación
+    repair_current_state_type = fields.Selection([('notice', 'Aviso'), ('atention', 'Atención'), ('urgent', 'Urgente')], string='Tipo de Estado')
+    repair_current_state_msg = fields.Char(string='Mensaje de Estado')
 
     @api.depends('order_ids.state')
     def _compute_has_quotation(self):
@@ -126,52 +130,53 @@ class CrmLead(models.Model):
 
 
     def action_new_quotation(self):
-        if not self.is_now_in_client_view or not self.client_state == 'dg_ready':
-            return self.show_error_message('Atención!!', 'Para crear una cotización, el cliente debe estar en la vista de cliente y en el estado "Diagnóstico Listo"')
+        if self.is_now_in_client_view and self.client_state == 'dg_ready' and self.is_diagnosis_ready:
+            action = self.env["ir.actions.actions"]._for_xml_id("sale_crm.sale_action_quotations_new")
 
-        action = self.env["ir.actions.actions"]._for_xml_id("sale_crm.sale_action_quotations_new")
+            action['context'] = {
+                'search_default_opportunity_id': self.id,
+                'default_opportunity_id': self.id,
+                'search_default_partner_id': self.partner_id.id,
+                'default_partner_id': self.partner_id.id,
+                'default_campaign_id': self.campaign_id.id,
+                'default_medium_id': self.medium_id.id,
+                'default_origin': self.name,
+                'default_source_id': self.source_id.id,
+                'default_company_id': self.company_id.id or self.env.company.id,
+                'default_tag_ids': [(6, 0, self.tag_ids.ids)],
+                'default_initial_diagnosis': self.initial_diagnosis,
+                'default_equipment_failure_report': self.equipment_failure_report,
+                'default_repair_user_id': self.repair_user_id.id,
+            }
 
-        action['context'] = {
-            'search_default_opportunity_id': self.id,
-            'default_opportunity_id': self.id,
-            'search_default_partner_id': self.partner_id.id,
-            'default_partner_id': self.partner_id.id,
-            'default_campaign_id': self.campaign_id.id,
-            'default_medium_id': self.medium_id.id,
-            'default_origin': self.name,
-            'default_source_id': self.source_id.id,
-            'default_company_id': self.company_id.id or self.env.company.id,
-            'default_tag_ids': [(6, 0, self.tag_ids.ids)],
-            'default_initial_diagnosis': self.initial_diagnosis,
-            'default_equipment_failure_report': self.equipment_failure_report,
-            'default_repair_user_id': self.repair_user_id.id,
-        }
-
-        # Datos opcionales
-        if self.repair_product_required_ids:
-            order_lines = []
-            for product in self.repair_product_required_ids:
+            # Datos opcionales
+            if self.repair_product_required_ids:
+                order_lines = []
+                for product in self.repair_product_required_ids:
+                    order_lines.append((0, 0, {
+                        'product_id': product.product_id.id,
+                        'name': product.product_id.name,
+                        'product_uom_qty': product.quantity,
+                        'price_unit': product.product_id.list_price,
+                        'product_template_id' : product.product_id.product_tmpl_id.id,
+                        'product_uom': product.product_id.uom_id.id,
+                    }))
+                # Agregar una sección de mano de obra
                 order_lines.append((0, 0, {
-                    'product_id': product.product_id.id,
-                    'name': product.product_id.name,
-                    'product_uom_qty': product.quantity,
-                    'price_unit': product.product_id.list_price,
-                    'product_template_id' : product.product_id.product_tmpl_id.id,
-                    'product_uom': product.product_id.uom_id.id,
+                'display_type': 'line_section',
+                'name': 'Mano de Obra',
                 }))
-            # Agregar una sección de mano de obra
-            order_lines.append((0, 0, {
-            'display_type': 'line_section',
-            'name': 'Mano de Obra',
-            }))
-            action['context']['default_order_line'] = order_lines
-        if self.comments:
-            action['context']['default_comments'] = self.comments
-        if self.team_id:
-            action['context']['default_team_id'] = self.team_id.id,
-        if self.user_id:
-            action['context']['default_user_id'] = self.user_id.id
-        return action
+                action['context']['default_order_line'] = order_lines
+            if self.comments:
+                action['context']['default_comments'] = self.comments
+            if self.team_id:
+                action['context']['default_team_id'] = self.team_id.id,
+            if self.user_id:
+                action['context']['default_user_id'] = self.user_id.id
+            return action
+
+        else:
+            return self.show_error_message('Aún no!!', 'Para crear una cotización, debes estar en la vista de Atención al cliente y el diagnóstico debe estar listo')
 
     
     def show_error_message(self, title:str, message:str):
