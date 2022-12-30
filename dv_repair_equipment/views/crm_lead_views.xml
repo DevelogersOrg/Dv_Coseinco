@@ -197,12 +197,16 @@
                                 <field name="product_id"/>
                                 <field name="description"/>
                                 <field name="quantity"/>
+                                <field name="product_qty_available"/>
+                                <field name="qty_to_order"/>
                             </tree>
                             <form>
                                 <group>
                                     <field name="product_id"/>
                                     <field name="description"/>
                                     <field name="quantity"/>
+                                    <field name="product_qty_available"/>
+                                    <field name="qty_to_order"/>
                                 </group>
                             </form>
                         </field>

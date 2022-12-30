@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <record id="stock_transfer_status_action" model="ir.actions.act_window">
+    <field name="name">Almacen</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">stock.transfer.status</field>
+    <field name="view_mode">kanban,tree,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+            No hay registros para mostrar
+        </p>
+    </field>
+  </record>
+  <record id="view_stock_transfer_status_inherit" model="ir.ui.view">
+    <field name="name">stock_transfer_status.kanban.inherited</field>
+    <field name="model">stock.transfer.status</field>
+    <field name="arch" type="xml">
+      <kanban class="o_kanban_mobile" sample="1" default_group_by="transfer_state" records_draggable="false">
+        <field name="transfer_state" />
+        <templates>
+          <t t-name="kanban-box">
+            <div class="oe_kanban_global_click">
+              <div class="oe_kanban_details d-flex flex-column">
+                <strong class="o_kanban_record_title oe_partner_heading">
+                  <field name="display_name"/>
+                </strong>
+                <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
+                <p>Hola</p>
+              </div>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+</odoo>
