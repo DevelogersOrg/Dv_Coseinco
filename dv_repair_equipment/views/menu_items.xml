@@ -7,11 +7,11 @@
             groups="dv_repair_equipment.client_app_group_user" sequence="1"/>
   <menuitem name="Compras" id="purchase_menu" parent="app_menu_root" action="purchase_order_action"
             groups="dv_repair_equipment.purchase_app_group_user" sequence="2"/>
-  <menuitem name="Almacen" id="warehouse_menu" parent="app_menu_root" action="stock_transfer_status_action"
+  <menuitem name="Almacen" id="warehouse_menu" parent="app_menu_root" action="warehouse_stock_transfer_status_action"
             groups="dv_repair_equipment.warehouse_app_group_user" sequence="3"/>
   <menuitem name="Tecnico" id="technician_menu" parent="app_menu_root" action="crm_lead_action_technician"
             groups="dv_repair_equipment.technician_app_group_user" sequence="4"/>
-  <menuitem name="Despacho" id="picking_menu" parent="app_menu_root" action="stock_picking_action"
+  <menuitem name="Despacho" id="picking_menu" parent="app_menu_root" action="pick_stock_transfer_status_action"
             groups="dv_repair_equipment.picking_app_group_user" sequence="5"/>
   <menuitem name="Facturación" id="invoicing_menu" parent="app_menu_root" action="account_move_action"
             groups="dv_repair_equipment.invoicing_app_group_user" sequence="6"/>

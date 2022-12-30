@@ -82,6 +82,7 @@ class CrmLead(models.Model):
                 record.client_state = 'confirmed'
             else:
                 has_confirmed_quotation = False
+                record.repair_state = 'confirmed'
             record.has_confirmed_quotation = has_confirmed_quotation
 
 
@@ -140,7 +141,6 @@ class CrmLead(models.Model):
     def action_new_quotation(self):
         if self.is_now_in_client_view and self.client_state == 'dg_ready' and self.is_diagnosis_ready:
             action = self.env["ir.actions.actions"]._for_xml_id("sale_crm.sale_action_quotations_new")
-
             action['context'] = {
                 'search_default_opportunity_id': self.id,
                 'default_opportunity_id': self.id,
@@ -158,8 +158,8 @@ class CrmLead(models.Model):
             }
 
             # Datos opcionales
+            order_lines = []
             if self.repair_product_required_ids:
-                order_lines = []
                 for product in self.repair_product_required_ids:
                     order_lines.append((0, 0, {
                         'product_id': product.product_id.id,
@@ -169,12 +169,12 @@ class CrmLead(models.Model):
                         'product_template_id' : product.product_id.product_tmpl_id.id,
                         'product_uom': product.product_id.uom_id.id,
                     }))
-                # Agregar una sección de mano de obra
-                order_lines.append((0, 0, {
-                'display_type': 'line_section',
-                'name': 'Mano de Obra',
-                }))
-                action['context']['default_order_line'] = order_lines
+            # Agregar una sección de mano de obra
+            order_lines.append((0, 0, {
+            'display_type': 'line_section',
+            'name': 'Mano de Obra',
+            }))
+            action['context']['default_order_line'] = order_lines
             if self.comments:
                 action['context']['default_comments'] = self.comments
             if self.team_id:

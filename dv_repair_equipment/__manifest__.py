@@ -16,7 +16,6 @@
         'views/purchase_order_views.xml',
         'views/crm_lead_views.xml',
         'views/stock_transfer_status_views.xml',
-        'views/stock_picking_views.xml',
         'views/account_move_views.xml',
         'views/menu_items.xml',
     ],

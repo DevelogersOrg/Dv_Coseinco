@@ -6,7 +6,10 @@
 - arreglar el problema con campos repetidos (habrá una forma mejor?)
 - crear funcion para llevar cuenta de stados
 - agregar al kanba el creador del registro con su imagen
-
+- agregar el vendor x defecto en el formulario
+- evitar crear producto de almacen si no hay producto
+- consultas del flujo de almacen con stock a tecnico confirmado
 # Secundario
 
-- Agregar los estados al form
+- Agregar los estados al form, con mensaje
+- mensajes de confirmación
