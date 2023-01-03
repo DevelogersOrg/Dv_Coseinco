@@ -29,7 +29,6 @@
                                     <span>Cliente: <t t-if="record.partner_id.value != false"><field name="partner_id"/></t><t t-if="record.partner_id.value == false">xxxxxxxx</t></span>
                                     <span>Tecnico asignado: <t t-if="record.repair_user_id.value != false"><field name="repair_user_id"/></t><t t-if="record.repair_user_id.value == false">xxxxxxxx</t></span>
                                 </t>
-                                <separator string="High Priority Projects"/>
                             </div>
                             <div class="o_kanban_record_bottom" style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
                                 <div class="text-muted">
@@ -82,7 +81,6 @@
                                     <span>Cliente: <t t-if="record.partner_id.value != false"><field name="partner_id"/></t><t t-if="record.partner_id.value == false">xxxxxxxx</t></span>
                                     <span>Tecnico asignado: <t t-if="record.repair_user_id.value != false"><field name="repair_user_id"/></t><t t-if="record.repair_user_id.value == false">xxxxxxxx</t></span>
                                 </t>
-                                <separator string="High Priority Projects"/>
                             </div>
                             <div class="o_kanban_record_bottom" style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
                                 <div class="text-muted">

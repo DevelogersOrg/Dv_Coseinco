@@ -69,7 +69,8 @@ class StockTransferStatus(models.Model):
                     }))
         purchase_order_data ={
                 'partner_id': self.crm_lead_id.partner_id.id,
-                'stoct_transfer_status_id': self.id,
+                'stock_transfer_status_id': self.id,
+                'purchase_state': 'in_process',
                 'order_line': order_line,
             }
         purchase_order = self.env['purchase.order'].create(purchase_order_data)
@@ -87,4 +88,13 @@ class StockTransferStatus(models.Model):
             'message': 'Producto(s) entregado(s)',
             'type': 'rainbow_man',
             }}
+        
+    def confirm_stock_pickings(self):
+        if not self.purchase_order_id:
+            return
+
+        self.purchase_order_id.validate_stock_pickings()
+        self.transfer_state = 'delivery'
+        self.purchase_order_id.purchase_state = 'received'
+
 

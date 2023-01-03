@@ -12,15 +12,28 @@
       <kanban class="o_kanban_mobile" sample="1" default_group_by="transfer_state" records_draggable="false">
         <field name="transfer_state" />
         <field name="crm_lead_id"/>
+        <field name="create_date"/>
+        <field name="__last_update"/>
         <templates>
           <t t-name="kanban-box">
-            <div class="oe_kanban_global_click">
-              <div class="oe_kanban_details d-flex flex-column">
-                <h3><field name="crm_lead_id"/></h3>
-                <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
-                <p>Creado el: <field name="create_date" widget="datetime"/></p>
-                <p>Actualizado al: <field name="__last_update" widget="datetime"/></p>
+            <div class="oe_kanban_card oe_kanban_global_click">
+              <div class="o_kanban_record_top  d-flex flex-column ml-1">
+                <h3 class="o_kanban_record_title" style="margin-bottom: 8px !important"><field name="crm_lead_id"/></h3>
               </div>
+              <div class="o_kanban_record_bottom" style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
+                <div class="text-muted">
+                    <span>Creado :<t t-esc="record.create_date.value" modifiers="{}"/></span><br/>
+                    <span>Actulizado: <t t-esc="record.__last_update.value" modifiers="{}"/></span><br/>
+                </div>
+              </div>
+              <t t-if="record.transfer_state.raw_value == income">
+                <button name="confirm_stock_pickings"
+                type="object"
+                class="btn btn-primary"
+                style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                Confirmar Entrega
+                </button>
+            </t>
             </div>
           </t>
         </templates>

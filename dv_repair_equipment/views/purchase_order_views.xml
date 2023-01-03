@@ -2,16 +2,34 @@
 <odoo>
     <!-- Vista kanban -->
     <record id="purchase_order_kanban_view" model="ir.ui.view">
-		<field name="name">crm.lead.view.kanban</field>
-		<field name="model">crm.lead</field>
+		<field name="name">purchase.order.view.kanban</field>
+		<field name="model">purchase.order</field>
 		<field name="arch" type="xml">
             <kanban default_group_by="purchase_state" class="o_kanban_small_column o_kanban_project_tasks" records_draggable="false">
+                <field name="create_date"/>
+                <field name="__last_update"/>
+                <field name="purchase_state"/>
+                <field name="stock_transfer_status_id"/>
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click">
-                            <div class="oe_kanban_details d-flex flex-column">
-                                <p>Compras</p>
+                    <div class="oe_kanban_card oe_kanban_global_click">
+                        <div class="o_kanban_record_top  d-flex flex-column ml-1">
+                            <h3 class="o_kanban_record_title" style="margin-bottom: 8px !important"><field name="stock_transfer_status_id"/></h3>
+                        </div>
+                        <div class="o_kanban_record_bottom" style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
+                            <div class="text-muted">
+                                <span>Creado :<t t-esc="record.create_date.value" modifiers="{}"/></span><br/>
+                                <span>Actulizado: <t t-esc="record.__last_update.value" modifiers="{}"/></span><br/>
                             </div>
+                          </div>
+                          <t t-if="record.purchase_state.raw_value == 'in_process'">
+                            <button name="button_confirm"
+                            type="object"
+                            class="btn btn-primary"
+                            style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                            Confirmar Comnpra
+                            </button>
+                          </t>
                         </div>
                     </t>
                 </templates>
@@ -42,7 +60,7 @@
               No hay registros para mostrar
           </p>
         </field>
-        <field name="domain">[('stoct_transfer_status_id', '!=', False)]</field>
+        <field name="domain">[('stock_transfer_status_id', '!=', False)]</field>
         <field name="view_ids" eval="[
           (5, 0, 0),
           (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.purchase_order_kanban_view')}),

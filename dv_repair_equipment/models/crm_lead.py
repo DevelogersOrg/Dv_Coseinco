@@ -150,7 +150,7 @@ class CrmLead(models.Model):
 
 
     def action_new_quotation(self):
-        if self.is_now_in_client_view and self.client_state == 'dg_ready' and self.is_diagnosis_ready:
+        if self.is_now_in_client_view and self.client_state in ['dg_ready', 'quoted'] and self.is_diagnosis_ready:
             action = self.env["ir.actions.actions"]._for_xml_id("sale_crm.sale_action_quotations_new")
             action['context'] = {
                 'search_default_opportunity_id': self.id,
