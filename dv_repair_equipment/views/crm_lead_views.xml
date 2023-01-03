@@ -17,43 +17,40 @@
                 <field name="partner_id"/>
                 <field name="repair_user_id"/>
                 <field name="is_displayed_in_both"/>
+                <field name="create_date"/>
+                <field name="__last_update"/>
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click">
-                            <div class="oe_kanban_details d-flex flex-column">
-                                <!-- Nuevo Ingreso -->
-                                <h3><field name="name"/> - <field name="repair_order_type_id"/></h3>
-                                <t t-if="record.client_state.raw_value == 'new'">
-                                    <div class="o_kanban_record_top">
-                                        <span class="badge badge-primary" style="background-color: #6AA84F; font-size: 16px; color: white; border-radius: 15px 50px 30px;">Nuevo</span>
-                                    </div>
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top  d-flex flex-column ml-1">
+                                <h3 class="o_kanban_record_title" style="margin-bottom: 8px !important"><field name="name"/> - <field name="repair_order_type_id"/></h3>
+                                <t t-if="record.client_state.raw_value != 'new'">
+                                    <span>N° ticket: <t t-if="record.n_ticket.value != false"><field name="n_ticket"/></t><t t-if="record.n_ticket.value == false">xxxxxxxx</t></span>
+                                    <span>Cliente: <t t-if="record.partner_id.value != false"><field name="partner_id"/></t><t t-if="record.partner_id.value == false">xxxxxxxx</t></span>
+                                    <span>Tecnico asignado: <t t-if="record.repair_user_id.value != false"><field name="repair_user_id"/></t><t t-if="record.repair_user_id.value == false">xxxxxxxx</t></span>
                                 </t>
-                                <!-- Asignado para Diagnostico -->
-                                <t t-if="record.client_state.raw_value == 'assigned'">
-                                    <p>N° ticket: <t t-if="record.n_ticket.value != false"><field name="n_ticket"/></t><t t-if="record.n_ticket.value == false">xxxxxxxx</t></p>
-                                    <p>Cliente: <t t-if="record.partner_id.value != false"><field name="partner_id"/></t><t t-if="record.partner_id.value == false">xxxxxxxx</t></p>
-                                    <p>Tecnico asignado: <t t-if="record.repair_user_id.value != false"><field name="repair_user_id"/></t><t t-if="record.repair_user_id.value == false">xxxxxxxx</t></p>
-                                    <div class="o_kanban_record_top">
-                                        <t t-if="record.n_ticket.value == false">
-                                            <span class="badge badge-danger" style="background-color: #CC0000; font-size: 16px; color: white; border-radius: 15px 50px 30px;">PENDIENTE</span>
-                                        </t>
-                                        <t t-if="record.n_ticket.value != false">
-                                            <span class="badge badge-warning" style="background-color: #ffc107; font-size: 16px; color: black; border-radius: 15px 50px 30px;">EN PROCESO</span>
-                                        </t>
-                                    </div>
-                                </t>
-                                <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
-                                <p>Creado el: <field name="create_date" widget="datetime"/></p>
-                                <p>Actualizado al: <field name="__last_update" widget="datetime"/></p>
-                                <!-- Boton para cambiar estados -->
-                                <t t-if="record.is_displayed_in_both.raw_value == false">
-                                    <button name="action_change_state"
-                                    type="object"
-                                    class="btn btn-primary">
-                                    Confirmar
-                                    </button>
-                                </t>
+                                <separator string="High Priority Projects"/>
                             </div>
+                            <div class="o_kanban_record_bottom" style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
+                                <div class="text-muted">
+                                    <span>Creado :<t t-esc="record.create_date.value" modifiers="{}"/></span><br/>
+                                    <span>Actulizado: <t t-esc="record.__last_update.value" modifiers="{}"/></span><br/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="crm_lead_state" widget="label_selection"
+                                    options="{'classes': {'new': 'success', 'assigned': 'danger', 'assigned_ready': 'warning', 'dg_ready': 'warning',
+                                    'dg_ready_ready': 'danger', 'quoted' : 'warning', 'confirmed': 'success'}}" 
+                                    modifiers="{'readonly':true}"/>
+                                </div>
+                            </div>
+                            <t t-if="record.is_displayed_in_both.raw_value == false">
+                                <button name="action_change_state"
+                                type="object"
+                                class="btn btn-primary"
+                                style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                                Confirmar
+                                </button>
+                            </t>
                         </div>
                     </t>
                 </templates>
@@ -73,45 +70,40 @@
                 <field name="partner_id"/>
                 <field name="repair_user_id"/>
                 <field name="is_displayed_in_both"/>
+                <field name="create_date"/>
+                <field name="__last_update"/>
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click">
-                            <div class="oe_kanban_details d-flex flex-column">
-                                <h3><field name="name"/> - <field name="repair_order_type_id"/></h3>
-                                <!-- Nuevo Ingreso -->
-                                <t t-if="record.repair_state.raw_value == 'new'">
-                                    <div class="o_kanban_record_top">
-                                        <span class="badge badge-primary" style="background-color: #6AA84F; font-size: 16px; color: white; border-radius: 15px 50px 30px;">Nuevo</span>
-                                    </div>
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top  d-flex flex-column ml-1">
+                                <h3 class="o_kanban_record_title" style="margin-bottom: 8px !important"><field name="name"/> - <field name="repair_order_type_id"/></h3>
+                                <t t-if="record.repair_state.raw_value != 'new'">
+                                    <span>N° ticket: <t t-if="record.n_ticket.value != false"><field name="n_ticket"/></t><t t-if="record.n_ticket.value == false">xxxxxxxx</t></span>
+                                    <span>Cliente: <t t-if="record.partner_id.value != false"><field name="partner_id"/></t><t t-if="record.partner_id.value == false">xxxxxxxx</t></span>
+                                    <span>Tecnico asignado: <t t-if="record.repair_user_id.value != false"><field name="repair_user_id"/></t><t t-if="record.repair_user_id.value == false">xxxxxxxx</t></span>
                                 </t>
-                                <!-- Asignado para Diagnostico -->
-                                <t t-if="record.repair_state.raw_value == 'assigned'">
-                                    <p>N° ticket: <t t-if="record.n_ticket.value != false"><field name="n_ticket"/></t><t t-if="record.n_ticket.value == false">xxxxxxxx</t></p>
-                                    <p>Cliente: <t t-if="record.partner_id.value != false"><field name="partner_id"/></t><t t-if="record.partner_id.value == false">xxxxxxxx</t></p>
-                                    <p>Tecnico asignado: <t t-if="record.repair_user_id.value != false"><field name="repair_user_id"/></t><t t-if="record.repair_user_id.value == false">xxxxxxxx</t></p>
-                                    <div class="o_kanban_record_top">
-                                        <div class="oe_kanban_bottom_right">
-                                            <t t-if="record.n_ticket.value == false">
-                                                <span class="badge badge-danger" style="background-color: #CC0000; font-size: 16px; color: white; border-radius: 15px 50px 30px;">PENDIENTE</span>
-                                            </t>
-                                            <t t-if="record.n_ticket.value != false">
-                                                <span class="badge badge-warning" style="background-color: #ffc107; font-size: 16px; color: black; border-radius: 15px 50px 30px;">EN PROCESO</span>
-                                            </t>
-                                        </div>
-                                    </div>
-                                </t>
-                                <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
-                                <ap>Creado el: <field name="create_date" widget="datetime"/></ap>
-                                <p>Actualizado al: <field name="__last_update" widget="datetime"/></p>
-                                <!-- Boton para cambiar estados -->
-                                <t t-if="record.is_displayed_in_both.raw_value == false">
-                                    <button name="action_change_state"
-                                    type="object"
-                                    class="btn btn-primary">
-                                    Confirmar
-                                    </button>
-                                </t>
+                                <separator string="High Priority Projects"/>
                             </div>
+                            <div class="o_kanban_record_bottom" style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
+                                <div class="text-muted">
+                                    <span>Creado :<t t-esc="record.create_date.value" modifiers="{}"/></span><br/>
+                                    <span>Actulizado: <t t-esc="record.__last_update.value" modifiers="{}"/></span><br/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="crm_lead_state" widget="label_selection"
+                                    options="{'classes': {'new': 'success', 'assigned': 'danger', 'assigned_ready': 'warning', 'dg_ready': 'warning',
+                                    'dg_ready_ready': 'danger', 'quoted' : 'warning', 'confirmed': 'success'}}" 
+                                    modifiers="{'readonly':true}"/>
+                                </div>
+                            </div>
+                            <t t-if="record.is_displayed_in_both.raw_value == false">
+                                <button name="action_change_state"
+                                type="object"
+                                class="btn btn-primary"
+                                style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                                Confirmar
+                                </button>
+                            </t>
                         </div>
                     </t>
                 </templates>
@@ -134,8 +126,6 @@
             <xpath expr="//field[@name='active']" position="after">
                 <field name="client_state" invisible="1"/>
                 <field name="is_now_in_client_view" invisible="1"/>
-                <field name="repair_current_state_type" invisible="1"/>
-                <field name="repair_current_state_msg" invisible="1"/>
             </xpath>
             <xpath expr="//group[@name='lead_partner']" position="after">
                 <group>
@@ -211,7 +201,15 @@
                             </form>
                         </field>
                         <field name="comments" attrs="{'readonly': [('is_now_in_client_view','=', True)]}"/>
-                        <field name="is_diagnosis_ready" attrs="{'readonly': [('is_now_in_client_view','=', True)]}"/>
+                        <field name="is_diagnosis_ready" invisible="1"/>
+                    </group>
+                    <group attrs="{'invisible': [('is_now_in_client_view','=', True)]}">
+                        <button name="set_diagnosis_ready"
+                        type="object"
+                        class="btn btn-primary"
+                        attrs="{'invisible': [('is_diagnosis_ready','=', True)]}">
+                        Terminar diagnóstico      
+                        </button>
                     </group>
                     <br/>
                     <span>Campos obligatorios (*)</span>
@@ -261,7 +259,7 @@
         <field name="view_mode">kanban,tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                No hay registros para mostrar
+                  No hay registros para mostrar
             </p>
         </field>
         <field name="domain">['|',('is_from_client_view', '=', True),('is_displayed_in_both', '=', True)]</field>
@@ -280,9 +278,9 @@
         <field name="res_model">crm.lead</field>
         <field name="view_mode">kanban,tree,form</field>
         <field name="help" type="html">
-          <p class="o_view_nocontent_smiling_face">
-              No hay registros para mostrar
-          </p>
+            <p class="o_view_nocontent_smiling_face">
+                  No hay registros para mostrar
+            </p>
         </field>
         <field name="domain">['|',('is_from_client_view', '=', False),('is_displayed_in_both', '=', True)]</field>
         <field name="context">{'default_is_from_client_view': False}</field>

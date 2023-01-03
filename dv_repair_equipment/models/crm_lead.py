@@ -35,13 +35,13 @@ class CrmLead(models.Model):
     repair_equipment_type_id = fields.Many2one('repair.equipment.type', string='Tipo de Equipo')
     equipment_model = fields.Char(string='Modelo')
     equipment_accessories = fields.Char(string='Accesorios')
-    equipment_failure_report = fields.Text(string='Reporte de Falla')
+    equipment_failure_report = fields.Text(string='Reporte de Falla por el Cliente')
     other_equipment_data = fields.Text(string='Otros Datos del Equipo')
     repair_order_components_ids = fields.One2many('repair.order.components', 'crm_lead_id', string='Componentes del Equipo')
 
 
     # Etapa Desarrollo de Diagnóstico
-    equipment_failure_report_for_tech = fields.Text(string='Reporte de Falla', related='equipment_failure_report', store=False, readonly=True)
+    equipment_failure_report_for_tech = fields.Text(string='Reporte de Falla por el Cliente', related='equipment_failure_report', store=False, readonly=True)
     initial_diagnosis = fields.Text(string='Diagnóstico Inicial')
     repair_product_required_ids = fields.One2many('repair.product.required', 'crm_lead_id', string='Productos a incluir')
     comments = fields.Text(string='Observaciones')
@@ -51,9 +51,12 @@ class CrmLead(models.Model):
     has_quotation = fields.Boolean(string='Está cotizado', compute='_compute_has_quotation', store=True)
     has_confirmed_quotation = fields.Boolean(string='Está confirmado', compute='_compute_has_confirmed_quotation', store=True)
 
-    # Campos para un seguimiento detallado de las ordenes de reparación
-    repair_current_state_type = fields.Selection([('notice', 'Aviso'), ('atention', 'Atención'), ('urgent', 'Urgente')], string='Tipo de Estado')
-    repair_current_state_msg = fields.Char(string='Mensaje de Estado')
+    # Campo para un seguimiento detallado de las ordenes de reparación
+    crm_lead_state = fields.Selection(
+        [('new', 'Nuevo Ingreso'), ('assigned', 'Pendiente'), ('assigned_ready', 'Por confirmar'), ('dg_ready', 'En Proceso'),
+        ('dg_ready_ready', 'Por Cotizar'), ('quoted', 'Esperando'), ('confirmed', 'Confirmado')],
+        default='new', string='Estado de la Orden de Reparación'
+        )
 
     @api.depends('order_ids.state')
     def _compute_has_quotation(self):
@@ -61,6 +64,7 @@ class CrmLead(models.Model):
             if any(order.state == 'draft' for order in record.order_ids):
                 has_quotation = True
                 record.client_state = 'quoted'
+                record.crm_lead_state = 'quoted'
             else:
                 has_quotation = False
             record.has_quotation = has_quotation    
@@ -69,6 +73,8 @@ class CrmLead(models.Model):
         self.ensure_one()
         stock_transfter_status = {
             'crm_lead_id': self.id,
+            'is_a_warehouse_order': True,
+            'transfer_state': 'new',
         }
         
         self.env['stock.transfer.status'].create(stock_transfter_status)
@@ -78,8 +84,9 @@ class CrmLead(models.Model):
         for record in self:
             if any(order.state == 'sale' for order in record.order_ids):
                 has_confirmed_quotation = True
-                record.action_create_transfer_status()
                 record.client_state = 'confirmed'
+                if record.repair_product_required_ids: record.action_create_transfer_status()
+                record.crm_lead_state = 'confirmed'
             else:
                 has_confirmed_quotation = False
                 record.repair_state = 'confirmed'
@@ -111,11 +118,14 @@ class CrmLead(models.Model):
             # Si no hay número de ticket, se envía una alerta
             return self.show_error_message('Sin número de ticket', 'Se necesita un número de ticket para continuar')
 
+
         # Lista de posible estados
         STATES = ['new', 'assigned', 'dg_ready']
         next_state = STATES[STATES.index(current_state) + 1]
         self.client_state = next_state
         self.repair_state = next_state
+        self.crm_lead_state = next_state
+
 
         # Si el diagnóstico está listo, mostrar en ambos lados el registro
         if next_state == 'dg_ready':
@@ -136,6 +146,7 @@ class CrmLead(models.Model):
             return self.show_error_message('Error', 'No se puede generar el número de ticket porque ya existe')
         
         self.n_ticket = f'{(10 - len(str(self.id))) * "0"}{self.id}'
+        self.crm_lead_state = 'assigned_ready'
 
 
     def action_new_quotation(self):
@@ -198,3 +209,13 @@ class CrmLead(models.Model):
                 'type': 'danger',
             }
         }
+
+    def set_diagnosis_ready(self):
+        self.is_diagnosis_ready = True
+        self.crm_lead_state = 'dg_ready_ready'
+        return {
+            'effect': {
+            'fadeout': 'slow',
+            'message': 'Diagnóstico listo',
+            'type': 'rainbow_man',
+            }}

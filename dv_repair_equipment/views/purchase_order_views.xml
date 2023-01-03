@@ -42,6 +42,7 @@
               No hay registros para mostrar
           </p>
         </field>
+        <field name="domain">[('stoct_transfer_status_id', '!=', False)]</field>
         <field name="view_ids" eval="[
           (5, 0, 0),
           (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.purchase_order_kanban_view')}),
