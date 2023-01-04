@@ -70,7 +70,7 @@ class StockTransferStatus(models.Model):
         purchase_order_data ={
                 'partner_id': self.crm_lead_id.partner_id.id,
                 'stock_transfer_status_id': self.id,
-                'purchase_state': 'in_process',
+                'purchase_state': 'required',
                 'order_line': order_line,
             }
         purchase_order = self.env['purchase.order'].create(purchase_order_data)
@@ -78,17 +78,15 @@ class StockTransferStatus(models.Model):
         self.transfer_state = 'request'
         self.need_to_purchase = False
         self.purchase_order_id = purchase_order.id
-
-
-    def confirm_delivery(self):
-        self.transfer_state = 'delivery'
+        self.crm_lead_id.crm_lead_state = 'purchase'
         return {
             'effect': {
             'fadeout': 'slow',
-            'message': 'Producto(s) entregado(s)',
+            'message': 'Compra(s) creada(s) con exito',
             'type': 'rainbow_man',
             }}
-        
+
+
     def confirm_stock_pickings(self):
         if not self.purchase_order_id:
             return
@@ -96,5 +94,11 @@ class StockTransferStatus(models.Model):
         self.purchase_order_id.validate_stock_pickings()
         self.transfer_state = 'delivery'
         self.purchase_order_id.purchase_state = 'received'
+        self.crm_lead_id.crm_lead_state = 'confirmed'
+        self.crm_lead_id.repair_state = 'confirmed'
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
 
 

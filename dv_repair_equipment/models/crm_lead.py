@@ -53,8 +53,8 @@ class CrmLead(models.Model):
 
     # Campo para un seguimiento detallado de las ordenes de reparación
     crm_lead_state = fields.Selection(
-        [('new', 'Nuevo Ingreso'), ('assigned', 'Pendiente'), ('assigned_ready', 'Por confirmar'), ('dg_ready', 'En Proceso'),
-        ('dg_ready_ready', 'Por Cotizar'), ('quoted', 'Esperando'), ('confirmed', 'Confirmado')],
+        [('new', 'Nuevo Ingreso'), ('assigned', 'Pendiente'), ('assigned_ready', 'Por confirmar'), ('dg_ready', 'Pendiente'),
+        ('dg_ready_ready', 'Por Cotizar'), ('quoted', 'Esperando'),('warehouse', 'En Almacén'), ('purchase', 'En proceso de compra'), ('confirmed', 'Confirmado')],
         default='new', string='Estado de la Orden de Reparación'
         )
 
@@ -76,7 +76,6 @@ class CrmLead(models.Model):
             'is_a_warehouse_order': True,
             'transfer_state': 'new',
         }
-        
         self.env['stock.transfer.status'].create(stock_transfter_status)
 
     @api.depends('order_ids.state')
@@ -85,11 +84,13 @@ class CrmLead(models.Model):
             if any(order.state == 'sale' for order in record.order_ids):
                 has_confirmed_quotation = True
                 record.client_state = 'confirmed'
-                if record.repair_product_required_ids: record.action_create_transfer_status()
-                record.crm_lead_state = 'confirmed'
+                record.crm_lead_state = 'warehouse'
+                if record.repair_product_required_ids:
+                    record.action_create_transfer_status()
+                else:
+                    record.repair_state = 'confirmed'
             else:
                 has_confirmed_quotation = False
-                record.repair_state = 'confirmed'
             record.has_confirmed_quotation = has_confirmed_quotation
 
 
@@ -219,3 +220,14 @@ class CrmLead(models.Model):
             'message': 'Diagnóstico listo',
             'type': 'rainbow_man',
             }}
+
+    def do_repair(self):
+        if self.repair_state != 'confirmed':
+            return self.show_error_message('Error', 'Se debe haber confirmado el servicio para continuar')
+        
+        self.repair_state = 'in_repair'
+        # Recargar la vista
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }

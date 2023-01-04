@@ -26,7 +26,7 @@
                     <span>Actulizado: <t t-esc="record.__last_update.value" modifiers="{}"/></span><br/>
                 </div>
               </div>
-              <t t-if="record.transfer_state.raw_value == income">
+              <t t-if="record.transfer_state.raw_value == 'income'">
                 <button name="confirm_stock_pickings"
                 type="object"
                 class="btn btn-primary"
@@ -125,7 +125,7 @@
                 </sheet>
               </form>
             </field>
-            <field name="purchase_order_id" readonly="1" attrs="{'invisible': [('need_to_purchase','=', False)]}"/>
+            <field name="purchase_order_id" readonly="1" attrs="{'invisible': [('purchase_order_id','=', False)]}"/>
             <field name="crm_lead_id" invisible="1"/>
             <field name="sale_order_id" invisible="1"/>
             <field name="transfer_state" invisible="1"/>
@@ -137,14 +137,6 @@
             class="btn btn-primary"
             attrs="{'invisible': [('transfer_state','!=', 'new')]}">
             Comprar productos faltantes      
-            </button>
-          </group>
-          <group attrs="{'invisible': [('need_to_purchase','=', True)]}">
-            <button name="confirm_delivery"
-            type="object"
-            class="btn btn-primary"
-            attrs="{'invisible': [('transfer_state','!=', 'new')]}">
-            Entregar productos     
             </button>
           </group>
         </sheet>

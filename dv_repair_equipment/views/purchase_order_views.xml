@@ -22,7 +22,7 @@
                                 <span>Actulizado: <t t-esc="record.__last_update.value" modifiers="{}"/></span><br/>
                             </div>
                           </div>
-                          <t t-if="record.purchase_state.raw_value == 'in_process'">
+                          <t t-if="record.purchase_state.raw_value == 'required'">
                             <button name="button_confirm"
                             type="object"
                             class="btn btn-primary"

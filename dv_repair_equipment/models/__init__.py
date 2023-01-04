@@ -2,7 +2,6 @@ from . import crm_lead
 from . import sale_order
 from . import purchase_order
 from . import stock_transfer_status
-from . import repair_order
 from . import account_move
 
 from . import repair_order_type

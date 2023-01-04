@@ -102,6 +102,14 @@
                                 Confirmar
                                 </button>
                             </t>
+                            <t t-if="record.repair_state.raw_value == 'confirmed'">
+                                <button name="do_repair"
+                                type="object"
+                                class="btn btn-primary"
+                                style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                                Comenzar reparación
+                                </button>
+                            </t>
                         </div>
                     </t>
                 </templates>

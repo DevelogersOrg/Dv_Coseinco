@@ -8,6 +8,7 @@
 - agregar el vendor x defecto en el formulario
 - consultas del flujo de almacen con stock a tecnico confirmado
 - Por alguna razon, al confirma la cotizacion. el tecnico tambien llega con estado confirmado, sea q haya q comprar o no
+- El permiso de almacen no funciona, no se puede ver el menu
 # Secundario
 
 - Agregar los estados al form, con mensaje
