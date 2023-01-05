@@ -38,7 +38,7 @@
                                 <div class="oe_kanban_bottom_right">
                                     <field name="crm_lead_state" widget="label_selection"
                                     options="{'classes': {'new': 'success', 'assigned': 'danger', 'assigned_ready': 'warning', 'dg_ready': 'warning',
-                                    'dg_ready_ready': 'danger', 'quoted' : 'warning', 'confirmed': 'success'}}" 
+                                    'dg_ready_ready': 'danger', 'quoted' : 'warning','warehouse': 'warning','purchase': 'warning','ready_to_repair':'warning','repairing':'warning','confirmed': 'success'}}" 
                                     modifiers="{'readonly':true}"/>
                                 </div>
                             </div>
@@ -89,8 +89,8 @@
                                 </div>
                                 <div class="oe_kanban_bottom_right">
                                     <field name="crm_lead_state" widget="label_selection"
-                                    options="{'classes': {'new': 'success', 'assigned': 'danger', 'assigned_ready': 'warning', 'dg_ready': 'warning',
-                                    'dg_ready_ready': 'danger', 'quoted' : 'warning', 'confirmed': 'success'}}" 
+                                    options="{'classes': {'new': 'success', 'assigned': 'danger', 'assigned_ready': 'warning', 'dg_ready': 'danger',
+                                    'dg_ready_ready': 'warning', 'quoted' : 'warning','warehouse': 'warning','purchase': 'warning','ready_to_repair':'danger','repairing':'warning','confirmed': 'success'}}" 
                                     modifiers="{'readonly':true}"/>
                                 </div>
                             </div>
@@ -135,7 +135,7 @@
             </xpath>
             <xpath expr="//group[@name='lead_partner']" position="after">
                 <group>
-                    <field name="repair_order_type_id"/>
+                    <field name="repair_order_type_id" required="1"/>
                     <label for="n_ticket" string="Ticket"/>
                     <h1 attrs="{'invisible': [('n_ticket','=', False)]}">N° : <field name="n_ticket" readonly="1"/></h1>
                 </group>

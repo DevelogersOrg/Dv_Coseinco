@@ -14,6 +14,7 @@
         <field name="crm_lead_id"/>
         <field name="create_date"/>
         <field name="__last_update"/>
+        <field name="need_to_purchase"/>
         <templates>
           <t t-name="kanban-box">
             <div class="oe_kanban_card oe_kanban_global_click">
@@ -32,6 +33,14 @@
                 class="btn btn-primary"
                 style="display: block !important; width: 100% !important; margin-top: 10px !important;">
                 Confirmar Entrega
+                </button>
+            </t>
+              <t t-if="record.transfer_state.raw_value == 'new' and record.need_to_purchase.raw_value == false">
+                <button name="deliver_products_to_tech"
+                type="object"
+                class="btn btn-primary"
+                style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                Entregar Productos
                 </button>
             </t>
             </div>

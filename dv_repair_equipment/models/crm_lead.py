@@ -8,7 +8,7 @@ class CrmLead(models.Model):
     client_state = fields.Selection([('new', 'Nuevo Ingreso'), ('assigned', 'Asignado para Diagnóstico'), ('dg_ready', 'Diagnostico Listo'), (
         'quoted', 'Cotizado'), ('confirmed', 'Confirmado'), ], string='Estado', default='new', group_expand='_expand_client_states', index=True)
     repair_state = fields.Selection([('new', 'Nuevo Ingreso'), ('assigned', 'Asignado para Diagnóstico'), ('dg_ready', 'Diagnostico Listo'),
-                ('prh_proccess', 'En Proceso de Compra'), ('confirmed', 'Confirmado'), ('in_repair', 'En Reparación'), ('ready', 'Servicio Culminado')],
+                ('waiting_for_products', 'Esperando repuestos'), ('confirmed', 'Confirmado'), ('in_repair', 'En Reparación'), ('ready', 'Servicio Culminado')],
                 string='Estado', default='new', group_expand='_expand_repair_states', index=True)
     is_from_client_view = fields.Boolean(string='Es parte de la vista de cliente?')
     is_displayed_in_both = fields.Boolean(string='Se muestra en ambos lados?', default=False)
@@ -54,7 +54,7 @@ class CrmLead(models.Model):
     # Campo para un seguimiento detallado de las ordenes de reparación
     crm_lead_state = fields.Selection(
         [('new', 'Nuevo Ingreso'), ('assigned', 'Pendiente'), ('assigned_ready', 'Por confirmar'), ('dg_ready', 'Pendiente'),
-        ('dg_ready_ready', 'Por Cotizar'), ('quoted', 'Esperando'),('warehouse', 'En Almacén'), ('purchase', 'En proceso de compra'), ('confirmed', 'Confirmado')],
+        ('dg_ready_ready', 'Por Cotizar'), ('quoted', 'Esperando'),('warehouse', 'En Almacén'), ('purchase', 'En proceso de compra'),('ready_to_repair', 'Por reparar'),('repairing', 'En reparación'),('confirmed', 'Confirmado')],
         default='new', string='Estado de la Orden de Reparación'
         )
 
@@ -84,18 +84,21 @@ class CrmLead(models.Model):
             if any(order.state == 'sale' for order in record.order_ids):
                 has_confirmed_quotation = True
                 record.client_state = 'confirmed'
-                record.crm_lead_state = 'warehouse'
                 if record.repair_product_required_ids:
                     record.action_create_transfer_status()
+                    record.crm_lead_state = 'warehouse'
+                    record.repair_state = 'waiting_for_products'
                 else:
                     record.repair_state = 'confirmed'
+                    record.crm_lead_state = 'ready_to_repair'
             else:
                 has_confirmed_quotation = False
             record.has_confirmed_quotation = has_confirmed_quotation
 
 
     def _compute_is_in_client_view(self):
-        self.is_now_in_client_view = self.env.context.get('default_is_from_client_view')
+        for record in self:
+            record.is_now_in_client_view = self.env.context.get('default_is_from_client_view')
 
         
     def _expand_client_states(self, states, domain, order):
@@ -217,7 +220,7 @@ class CrmLead(models.Model):
         return {
             'effect': {
             'fadeout': 'slow',
-            'message': 'Diagnóstico listo',
+            'message': 'Gracias',
             'type': 'rainbow_man',
             }}
 
@@ -226,6 +229,7 @@ class CrmLead(models.Model):
             return self.show_error_message('Error', 'Se debe haber confirmado el servicio para continuar')
         
         self.repair_state = 'in_repair'
+        self.crm_lead_state = 'repairing'
         # Recargar la vista
         return {
             'type': 'ir.actions.client',
