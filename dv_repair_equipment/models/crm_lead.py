@@ -54,9 +54,39 @@ class CrmLead(models.Model):
     # Campo para un seguimiento detallado de las ordenes de reparación
     crm_lead_state = fields.Selection(
         [('new', 'Nuevo Ingreso'), ('assigned', 'Pendiente'), ('assigned_ready', 'Por confirmar'), ('dg_ready', 'Pendiente'),
-        ('dg_ready_ready', 'Por Cotizar'), ('quoted', 'Esperando'),('warehouse', 'En Almacén'), ('purchase', 'En proceso de compra'),('ready_to_repair', 'Por reparar'),('repairing', 'En reparación'),('confirmed', 'Confirmado')],
+        ('dg_ready_ready', 'Por Cotizar'), ('quoted', 'Esperando'),('warehouse', 'En Almacén'), ('purchase', 'En proceso de compra'),('ready_to_repair', 'Por reparar'),('repairing', 'En reparación'),('to_finish', 'Por concluir'),('confirmed', 'Confirmado')],
         default='new', string='Estado de la Orden de Reparación'
         )
+
+    # Es un servicio o un producto?
+    product_or_service = fields.Selection([('product', 'Bien'), ('service', 'Servicio')], string='Bien / servicio', default='service')
+
+    # Campos para el seguimiento de la orden de reparación
+    repair_observation_detail_ids = fields.One2many('repair.observation.detail', 'crm_lead_id', string='Observaciones')
+
+    # Campor para la finalización de la orden de reparación
+    final_product_state = fields.Char(string='Estado de la Reparación')
+    conclusion = fields.Text(string='Conclusión')
+    reparation_proofs = fields.Binary(string='Prueba de Reparación')
+    repair_products_to_return_ids = fields.Many2many('repair.products.to.return', string='Productos a devolver', compute='_compute_repair_products_to_return_ids', store=True)
+
+    @api.depends('repair_order_components_ids', 'repair_product_required_ids')
+    def _compute_repair_products_to_return_ids(self):
+        for record in self:
+            repair_products_to_return_ids = []
+            for repair_order_component in record.repair_order_components_ids:
+                repair_products_to_return_ids.append((0, 0, {
+                    'product_id': repair_order_component.product_id.id,
+                    'details': repair_order_component.details,
+                    'quantity': repair_order_component.quantity,
+                }))
+            for repair_product_required in record.repair_product_required_ids:
+                repair_products_to_return_ids.append((0, 0, {
+                    'product_id': repair_product_required.product_id.id,
+                    'details': repair_product_required.description,
+                    'quantity': repair_product_required.quantity,
+                }))
+            record.repair_products_to_return_ids = repair_products_to_return_ids
 
     @api.depends('order_ids.state')
     def _compute_has_quotation(self):
@@ -115,6 +145,18 @@ class CrmLead(models.Model):
         """
         if self.is_displayed_in_both:
             return
+
+        if self.product_or_service == 'product':
+            if not self.repair_product_required_ids or not self.partner_id:
+                # raise models.ValidationError(f'{self.repair_product_required_ids} -- {self.partner_id}')
+                return self.show_error_message('Alto ahi!!', 'Se necesita al menos un producto para continuar y un cliente')
+            
+            self.client_state = 'confirmed'
+            self.crm_lead_state = 'warehouse'
+            self.action_create_transfer_status()
+            return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',}
 
         current_state = self.client_state if self.is_from_client_view else self.repair_state
 
@@ -224,6 +266,13 @@ class CrmLead(models.Model):
             'type': 'rainbow_man',
             }}
 
+    def set_repair_to_concluded(self):
+        self.crm_lead_state = 'to_finish'
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
+
     def do_repair(self):
         if self.repair_state != 'confirmed':
             return self.show_error_message('Error', 'Se debe haber confirmado el servicio para continuar')
@@ -235,3 +284,13 @@ class CrmLead(models.Model):
             'type': 'ir.actions.client',
             'tag': 'reload',
         }
+
+    def conclude_repair(self):
+        if self.final_product_state and self.conclusion and self.reparation_proofs:
+            self.repair_state = 'ready'
+            self.crm_lead_state = 'confirmed'
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'reload',
+            }
+        return self.show_error_message('Aun no!!!', 'Debes llenar todos los campos para continuar')

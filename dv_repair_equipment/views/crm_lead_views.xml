@@ -19,11 +19,17 @@
                 <field name="is_displayed_in_both"/>
                 <field name="create_date"/>
                 <field name="__last_update"/>
+                <field name="product_or_service"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_card oe_kanban_global_click">
                             <div class="o_kanban_record_top  d-flex flex-column ml-1">
-                                <h3 class="o_kanban_record_title" style="margin-bottom: 8px !important"><field name="name"/> - <field name="repair_order_type_id"/></h3>
+                                <h3 class="o_kanban_record_title" style="margin-bottom: 8px !important"><field name="name"/> - 
+                                    <t t-if="record.product_or_service.raw_value == 'service'"><field name="repair_order_type_id"/></t>
+                                    <t t-if="record.product_or_service.raw_value == 'product'">venta de bienes</t>
+                                </h3>
+
+
                                 <t t-if="record.client_state.raw_value != 'new'">
                                     <span>N° ticket: <t t-if="record.n_ticket.value != false"><field name="n_ticket"/></t><t t-if="record.n_ticket.value == false">xxxxxxxx</t></span>
                                     <span>Cliente: <t t-if="record.partner_id.value != false"><field name="partner_id"/></t><t t-if="record.partner_id.value == false">xxxxxxxx</t></span>
@@ -46,7 +52,8 @@
                                 <button name="action_change_state"
                                 type="object"
                                 class="btn btn-primary"
-                                style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                                style="display: block !important; width: 100% !important; margin-top: 10px !important;"
+                                attrs="{'invisible': [('client_state', '=', 'confirmed')]}">
                                 Confirmar
                                 </button>
                             </t>
@@ -131,18 +138,21 @@
 		<field name="arch" type="xml">
             <xpath expr="//field[@name='active']" position="after">
                 <field name="client_state" invisible="1"/>
+                <field name="repair_state" invisible="1"/>
+                <field name="crm_lead_state" invisible="1"/>
                 <field name="is_now_in_client_view" invisible="1"/>
+                <field name="product_or_service" invisible="1"/>
             </xpath>
             <xpath expr="//group[@name='lead_partner']" position="after">
                 <group>
-                    <field name="repair_order_type_id" required="1"/>
+                    <field name="repair_order_type_id" attrs="{'required': [('product_or_service','=','service')]}"/>
                     <label for="n_ticket" string="Ticket"/>
                     <h1 attrs="{'invisible': [('n_ticket','=', False)]}">N° : <field name="n_ticket" readonly="1"/></h1>
                 </group>
-
             </xpath>
             <xpath expr="//page[@name='lead']" position="after">
-                <page name="assigned_view" string="Asignado para diagnóstico" attrs="{'invisible': [('client_state','!=','assigned')]}">
+                <page name="assigned_view" string="Asignado para diagnóstico" 
+                    attrs="{'invisible': [('client_state', '=', 'new')]}">
                     <group>
                         <group string="Cliente" nolabel="1">
                             <field name="partner_id" attrs="{'required': [('client_state','=','assigned')]}" string="Cliente *"/>
@@ -161,14 +171,14 @@
                         <field name="other_equipment_data"/>
                         <field name="repair_order_components_ids">
                             <tree editable="bottom">
-                                <field name="name"/>
-                                <field name="features"/>
+                                <field name="product_id"/>
+                                <field name="quantity"/>
                                 <field name="details"/>
                             </tree>
                             <form>
                                 <group>
-                                    <field name="name"/>
-                                    <field name="features"/>
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
                                     <field name="details"/>
                                 </group>
                             </form>
@@ -193,7 +203,7 @@
                                 <field name="product_id"/>
                                 <field name="description"/>
                                 <field name="quantity"/>
-                                <field name="product_qty_available"/>
+                                <field name="product_qty_available" string="Cantidad disponible"/>
                                 <field name="qty_to_order"/>
                             </tree>
                             <form>
@@ -201,7 +211,7 @@
                                     <field name="product_id"/>
                                     <field name="description"/>
                                     <field name="quantity"/>
-                                    <field name="product_qty_available"/>
+                                    <field name="product_qty_available" string="Cantidad disponible"/>
                                     <field name="qty_to_order"/>
                                 </group>
                             </form>
@@ -225,8 +235,82 @@
                     <field name="has_confirmed_quotation" invisible="1"/>
                     <field name="has_quotation" invisible="1"/>
                 </page>
+                <page name="purchase_view" string="Venta de bienes" attrs="{'invisible': [('product_or_service', '=', 'service')]}">
+                    <group>
+                        <field name="repair_product_required_ids">
+                            <tree editable="bottom">
+                                <field name="product_id"/>
+                                <field name="description"/>
+                                <field name="quantity"/>
+                                <field name="product_qty_available"/>
+                                <field name="qty_to_order"/>
+                            </tree>
+                            <form>
+                                <group>
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="product_qty_available"/>
+                                    <field name="qty_to_order"/>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+                </page>
+                <page name="reparation_view" string="Reparando" attrs="{'invisible': [('crm_lead_state','!=','repairing')], 'readonly': [('is_now_in_client_view','=', True)]}">
+                    <group>
+                        <field name="repair_observation_detail_ids">
+                            <tree editable="bottom">
+                                <field name="name"/>
+                                <field name="date_of_observation"/>
+                                <field name="details"/>
+                            </tree>
+                            <form>
+                                <group>
+                                    <field name="name"/>
+                                    <field name="date_of_observation"/>
+                                    <field name="details"/>
+                                </group>
+                            </form>
+                        </field>
+                        <button name="set_repair_to_concluded"
+                        type="object"
+                        class="btn btn-primary"
+                        attrs="{'invisible': [('crm_lead_state','!=', 'repairing')]}">
+                        Terminar reparación       
+                        </button>
+                    </group>
+                </page>
+                <page name="reparation_conclusion" string="Concluir reparación" 
+                attrs="{'invisible': [('crm_lead_state','!=','to_finish')], 'readonly': [('is_now_in_client_view','=', True)]}">
+                    <group>
+                        <field name="final_product_state" attrs="{'required': [('crm_lead_state','=','to_finish')]}"/>
+                        <field name="conclusion" attrs="{'required': [('crm_lead_state','=','to_finish')]}"/>
+                        <field name="reparation_proofs" widget="image" attrs="{'required': [('crm_lead_state','=','to_finish')]}"/>
+                        <field name="repair_products_to_return_ids">
+                            <tree>
+                                <field name="product_id"/>
+                                <field name="details"/>
+                                <field name="quantity"/>
+                            </tree>
+                            <form>
+                                <group>
+                                    <field name="product_id"/>
+                                    <field name="details"/>
+                                    <field name="quantity"/>
+                                </group>
+                            </form>
+                        </field>
+                        <button name="conclude_repair"
+                        type="object"
+                        class="btn btn-primary"
+                        attrs="{'invisible': [('crm_lead_state','!=', 'to_finish')]}">
+                        Confirmar conclusion de reparación      
+                        </button>
+                    </group>
+                </page>
             </xpath>
-		</field>
+        </field>
 	</record>
 
 
@@ -242,8 +326,10 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="name" string="Servicio *" placeholder="Reparación de ..." required="1"/>
-                    <field name="repair_order_type_id" required="1" string="Tipo de Servicio a Desarrollar *"/>
+                    <field name="product_or_service" required="1" string="Bien/Servicio *"/>
+                    <field name="name" string="Descr. *" placeholder="Reparación de ..." required="1"/>
+                    <field name="repair_order_type_id" string="Modalidad del Servicio *" 
+                    attrs="{'invisible': [('product_or_service','=','product')], 'required': [('product_or_service','=','service')]}"/>
                     <field name="create_date" invisible="1"/>
                     <span>Campos Obligatorios (*)</span>
                     <br/>

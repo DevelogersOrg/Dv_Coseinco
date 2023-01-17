@@ -8,3 +8,5 @@ from . import repair_order_type
 from . import repair_order_components
 from . import repair_equipment_type
 from . import repair_product_required
+from . import repair_observation_detail
+from . import repair_products_to_return
