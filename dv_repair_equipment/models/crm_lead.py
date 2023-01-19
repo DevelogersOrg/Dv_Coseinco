@@ -30,14 +30,14 @@ class CrmLead(models.Model):
     is_now_in_client_view = fields.Boolean(string='Está en la vista de cliente?', compute='_compute_is_in_client_view', store=False)
 
     # Datos de Equipo
-    n_active = fields.Char(string='N° Activo')
-    n_serie = fields.Char(string='N° Serie')
-    repair_equipment_type_id = fields.Many2one('repair.equipment.type', string='Tipo de Equipo')
-    equipment_model = fields.Char(string='Modelo')
-    equipment_accessories = fields.Char(string='Accesorios')
-    equipment_failure_report = fields.Text(string='Reporte de Falla por el Cliente')
-    other_equipment_data = fields.Text(string='Otros Datos del Equipo')
-    repair_order_components_ids = fields.One2many('repair.order.components', 'crm_lead_id', string='Componentes del Equipo')
+    n_active = fields.Char(string='N° Activo', store=True)
+    n_serie = fields.Char(string='N° Serie', store=True)
+    repair_equipment_type_id = fields.Many2one('repair.equipment.type', string='Tipo de Equipo', store=True)
+    equipment_model = fields.Char(string='Modelo', store=True)
+    equipment_accessories = fields.Char(string='Accesorios', store=True)
+    equipment_failure_report = fields.Text(string='Reporte de Falla por el Cliente', store=True)
+    other_equipment_data = fields.Text(string='Otros Datos del Equipo', store=True)
+    repair_order_components_ids = fields.One2many('repair.order.components', 'crm_lead_id', string='Componentes del Equipo', store=True)
 
 
     # Etapa Desarrollo de Diagnóstico
@@ -310,7 +310,20 @@ class CrmLead(models.Model):
         if self.repair_state != 'ready':
             return self.show_error_message('Error', 'El servicio debe estar listo para continuar')
         
+        invoice_lines = []
+        for product in self.repair_product_required_ids:
+            invoice_lines.append((0, 0, {
+                'product_id': product.product_id.id,
+                'name': product.product_id.name,
+                'quantity': product.quantity,
+                'price_unit': product.product_id.list_price,
+            }))
+
         self.account_move_id = self.env['account.move'].create({
             'move_state': 'in_process',
             'crm_lead_id': self.id,
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_id.id,
+            'invoice_date': fields.Date.today(),
+            'invoice_line_ids': invoice_lines,
             })

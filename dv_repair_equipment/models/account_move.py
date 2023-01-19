@@ -12,6 +12,7 @@ class AccountMove(models.Model):
     equipment_failure_report = fields.Text(string='Reporte de falla', related='crm_lead_id.equipment_failure_report')
     initial_diagnosis = fields.Text(string='Diagnóstico inicial', related='crm_lead_id.initial_diagnosis')
     conclusion = fields.Text(string='Conclusión', related='crm_lead_id.conclusion')
+    ready_to_invoice = fields.Boolean(string='Listo para facturar')
 
     def _expand_states(self, states, domain, order):
         return [key for key, val in type(self).move_state.selection]
@@ -19,7 +20,16 @@ class AccountMove(models.Model):
     def change_move_state(self):
         STATES = ['in_process', 'tb_invoiced', 'invoiced']
         self.move_state = STATES[STATES.index(self.move_state) + 1] if self.move_state != 'invoiced' else 'invoiced'
+        if self.move_state == 'invoiced':
+            self.create_invoice()
+
+            
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
         }
+
+
+    def create_invoice(self):
+        self.ensure_one()
+        self.ready_to_invoice = True

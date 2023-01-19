@@ -149,7 +149,10 @@
             <field name="need_to_purchase" invisible="1"/>
             <field name="client_id" invisible="1"/>
             <field name="company_id" invisible="1"/>
-            <field name="receiver_id" invisible="1"/>
+            <field name="reciever_name" invisible="1"/>
+            <field name="reciever_phone" invisible="1"/>
+            <field name="reciever_id" invisible="1"/>
+            <field name="reciever_direction" invisible="1"/>
             <field name="repair_products_to_return_ids" invisible="1"/>
           </group>
           <group attrs="{'invisible': [('need_to_purchase','=', False)]}">
@@ -202,16 +205,27 @@
                   <group string="Cliente">
                     <field name="client_id"/>
                   </group>
-  
                   <group attrs="{'invisible': [('company_id','=', False)]}" string="Empresa">
                     <field name="company_id"/>
                   </group>
-                  
                   <group string="Receptor">
-                    <field name="receiver_id"/>
+                    <field name="reciever_name"/>
+                    <field name="reciever_function"/>
+                    <field name="reciever_phone"/>
+                    <field name="reciever_id"/>
+                    <field name="reciever_direction"/>
+                    <span>¡Si los campos estan vacios se usarán los valores del cliente!</span>
+                  </group>
+                  <group string="Datos de entrega">
+                    <field name="ship_date"/>
                   </group>
                 </group>
-              </page> 
+              </page>
+              <page name="ship_info" string="Odoo delivery_boy" attrs="{'invisible': [('picking_state', '!=', 'shiped')]}">
+                <group>
+                  <h4>Aqui se creará la solicitud de Odoo delivery boy</h4>
+                </group>
+              </page>
             </notebook>
 
           </group>

@@ -14,7 +14,13 @@ class StockTransferStatus(models.Model):
 
     client_id = fields.Many2one('res.partner', string="Cliente", related='crm_lead_id.partner_id')
     company_id = fields.Many2one('res.partner', string="Empresa", related='crm_lead_id.partner_id.parent_id')
-    receiver_id = fields.Many2one('res.partner', string="Receptor")
+    reciever_name = fields.Char(string="Nombre del receptor")
+    reciever_phone = fields.Char(string="Teléfono del receptor")
+    reciever_function = fields.Char(string="Función del receptor")
+    reciever_id = fields.Char(string="Cédula del receptor")
+    reciever_direction = fields.Char(string="Dirección del receptor")
+    ship_date = fields.Datetime(string="Fecha y hora de despacho")
+
 
     sale_order_id = fields.Many2one('sale.order')
     need_to_purchase = fields.Boolean(compute="_compute_need_to_purchase", store=False)
@@ -140,11 +146,18 @@ class StockTransferStatus(models.Model):
                 'tag': 'reload',
             }
 
-        STATES = ['tb_confirmed','confirmed','to_ship', 'delivered']
+        STATES = ['tb_confirmed','confirmed','to_ship', 'shiped', 'delivered']
         self.picking_state = STATES[STATES.index(self.picking_state) + 1] if self.picking_state != 'delivered' else 'delivered'
+        if self.picking_state in 'to_ship':
+            self.change_account_move_state()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
         }
+
+    def change_account_move_state(self):
+        account_move_ids = self.env['account.move'].search([('crm_lead_id', '=', self.crm_lead_id.id)])
+        for account_move in account_move_ids:
+            account_move.move_state = 'tb_invoiced'
 
 

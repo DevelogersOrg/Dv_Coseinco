@@ -152,10 +152,11 @@
             </xpath>
             <xpath expr="//page[@name='lead']" position="after">
                 <page name="assigned_view" string="Asignado para diagnóstico" 
-                    attrs="{'invisible': [('client_state', '=', 'new')]}">
+                    attrs="{'invisible': [('client_state', '=', 'assigned'), ('client_state', '=', 'dg_ready')]}">
                     <group>
                         <group string="Cliente" nolabel="1">
-                            <field name="partner_id" attrs="{'required': [('client_state','=','assigned')]}" string="Cliente *"/>
+                            <field name="partner_id" attrs="{'required': [('client_state','=','assigned')]}"
+                            string="Cliente *"/>
                         </group>
                         <group string="Tecnico" nolabel="1">
                             <field name="repair_user_id" attrs="{'required': [('client_state','=','assigned')]}" string="Técnico *"/>
