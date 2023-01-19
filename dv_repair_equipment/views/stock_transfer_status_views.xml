@@ -67,6 +67,14 @@
                 <p>Creado el: <field name="create_date" widget="datetime"/></p>
                 <p>Actualizado al: <field name="__last_update" widget="datetime"/></p>
               </div>
+              <t t-if="record.picking_state.raw_value != 'delivered'">
+                <button name="change_picking_state"
+                type="object"
+                class="btn btn-primary"
+                style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                Confirmar
+                </button>
+            </t>
             </div>
           </t>
         </templates>
@@ -139,6 +147,10 @@
             <field name="sale_order_id" invisible="1"/>
             <field name="transfer_state" invisible="1"/>
             <field name="need_to_purchase" invisible="1"/>
+            <field name="client_id" invisible="1"/>
+            <field name="company_id" invisible="1"/>
+            <field name="receiver_id" invisible="1"/>
+            <field name="repair_products_to_return_ids" invisible="1"/>
           </group>
           <group attrs="{'invisible': [('need_to_purchase','=', False)]}">
             <button name="create_purchase_orders"
@@ -161,36 +173,47 @@
       <form string="Almacen">
         <sheet>
           <h1>N : <field name="name"/></h1>
-          <group>
-            <field name="repair_product_required_ids">
+          <group string="Productos a devolver">
+            <field name="repair_products_to_return_ids">
               <tree>
                 <field name="product_id"/>
-                <field name="description"/>
+                <field name="details"/>
                 <field name="quantity"/>
-                <field name="product_qty_available"/>
               </tree>
               <form>
                 <sheet>
                   <group>
                     <field name="product_id"/>
-                    <field name="description"/>
+                    <field name="details"/>
                     <field name="quantity"/>
-                    <field name="product_qty_available"/>
                   </group>
                 </sheet>
               </form>
             </field>
+            <field name="repair_product_required_ids" invisible="1"/>
+            <field name="picking_state" invisible="1"/>
             <field name="crm_lead_id" invisible="1"/>
             <field name="sale_order_id" invisible="1"/>
             <field name="transfer_state" invisible="1"/>
             <field name="need_to_purchase" invisible="1"/>
-          </group>
-          <group attrs="{'invisible': [('need_to_purchase','=', False)]}">
-            <button name="create_purchase_orders"
-            type="object"
-            class="btn btn-primary">
-            Comprar productos faltantes      
-            </button>
+            <notebook>
+              <page name="ship_info" string="Información para despachar" attrs="{'invisible': [('picking_state', '!=', 'to_ship')]}">
+                <group name="name">
+                  <group string="Cliente">
+                    <field name="client_id"/>
+                  </group>
+  
+                  <group attrs="{'invisible': [('company_id','=', False)]}" string="Empresa">
+                    <field name="company_id"/>
+                  </group>
+                  
+                  <group string="Receptor">
+                    <field name="receiver_id"/>
+                  </group>
+                </group>
+              </page> 
+            </notebook>
+
           </group>
         </sheet>
       </form>
@@ -231,7 +254,7 @@
             No hay registros para mostrar
         </p>
     </field>
-    <field name="domain">[('is_a_warehouse_order', '=', False)]</field>
+    <field name="domain">[('is_now_picking_order', '=', True)]</field>
     <field name="context">{'default_is_a_warehouse_order': False}</field>
     <field name="view_ids" eval="[
         (5, 0, 0),

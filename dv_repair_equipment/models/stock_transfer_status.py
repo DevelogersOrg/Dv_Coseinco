@@ -9,19 +9,33 @@ class StockTransferStatus(models.Model):
     crm_lead_id = fields.Many2one('crm.lead')
     repair_product_required_ids = fields.Many2many(
                                 'repair.product.required', compute='_compute_repair_product_required_ids', store=True, string="Productos necesitados")
+    repair_products_to_return_ids = fields.Many2many(
+                                'repair.products.to.return', string='Productos a devolver', compute='_compute_repair_products_to_return_ids', store=True)
+
+    client_id = fields.Many2one('res.partner', string="Cliente", related='crm_lead_id.partner_id')
+    company_id = fields.Many2one('res.partner', string="Empresa", related='crm_lead_id.partner_id.parent_id')
+    receiver_id = fields.Many2one('res.partner', string="Receptor")
+
     sale_order_id = fields.Many2one('sale.order')
     need_to_purchase = fields.Boolean(compute="_compute_need_to_purchase", store=False)
 
     is_a_warehouse_order = fields.Boolean(string="Es una orden de compra?")
+    is_now_picking_order = fields.Boolean(string="Es ahora una orden de despacho?")
     
     transfer_state = fields.Selection(
         [('new', 'Solicitud de Repuestos'), ('request', 'En proceso de compra'), ('income', 'Ingreso de Repuestos'), ('delivery', 'Entrega de Repuestos')],
         string='Estado', group_expand='_expand_transfer_states', index=True)
     picking_state = fields.Selection(
-        [('tb_confirmed', 'Equipo a confirmar recepción'), ('confirmed', 'Recepción de Equipo Confirmado'), ('to_ship', 'Despacho Programado'), ('delivered', 'Entregado')],
-        string='Estado', group_expand='_expand_picking_states', index=True)
+        [('tb_confirmed', 'Equipo a confirmar recepción'), ('confirmed', 'Recepción de Equipo Confirmado'), ('to_ship', 'Despacho Programado'), ('shiped', 'Despachado'),('delivered', 'Entregado')],
+        string='Estado', group_expand='_expand_picking_states', index=True, default='tb_confirmed')
 
     purchase_order_id = fields.Many2one('purchase.order', string="Orden de compra")
+    is_now_in_warehouse_view = fields.Boolean(string='Está en la vista de almacen?', compute='_compute_is_in_warehouse_view', store=False)
+
+
+    def _compute_is_in_warehouse_view(self):
+        for record in self:
+            record.is_now_in_warehouse_view = self.env.context.get('default_is_a_warehouse_order')
 
 
     def _expand_transfer_states(self, states, domain, order):
@@ -34,6 +48,11 @@ class StockTransferStatus(models.Model):
     def _compute_repair_product_required_ids(self):
         for record in self:
             record.repair_product_required_ids = record.crm_lead_id.repair_product_required_ids
+
+    @api.depends('crm_lead_id.repair_products_to_return_ids')
+    def _compute_repair_products_to_return_ids(self):
+        for record in self:
+            record.repair_products_to_return_ids = record.crm_lead_id.repair_products_to_return_ids
 
     @api.depends('crm_lead_id.n_ticket')
     def _compute_name(self):
@@ -108,6 +127,21 @@ class StockTransferStatus(models.Model):
         self.transfer_state = 'delivery'
         self.crm_lead_id.crm_lead_state = 'ready_to_repair'
         self.crm_lead_id.repair_state = 'confirmed'
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
+
+    def change_picking_state(self):
+        if self.picking_state == False:
+            self.picking_state = 'tb_confirmed'
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'reload',
+            }
+
+        STATES = ['tb_confirmed','confirmed','to_ship', 'delivered']
+        self.picking_state = STATES[STATES.index(self.picking_state) + 1] if self.picking_state != 'delivered' else 'delivered'
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',

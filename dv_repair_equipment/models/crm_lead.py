@@ -70,6 +70,9 @@ class CrmLead(models.Model):
     reparation_proofs = fields.Binary(string='Prueba de Reparación')
     repair_products_to_return_ids = fields.Many2many('repair.products.to.return', string='Productos a devolver', compute='_compute_repair_products_to_return_ids', store=True)
 
+    stock_transfter_status_id = fields.Many2one('stock.transfer.status', string='Estado de la Transferencia en Almacén')
+    account_move_id = fields.Many2one('account.move', string='Factura')
+
     @api.depends('repair_order_components_ids', 'repair_product_required_ids')
     def _compute_repair_products_to_return_ids(self):
         for record in self:
@@ -86,6 +89,8 @@ class CrmLead(models.Model):
                     'details': repair_product_required.description,
                     'quantity': repair_product_required.quantity,
                 }))
+            # eliminamos los productos que ya estan en la lista de productos a devolver
+            record.repair_products_to_return_ids = [(5, 0, 0)]                
             record.repair_products_to_return_ids = repair_products_to_return_ids
 
     @api.depends('order_ids.state')
@@ -106,8 +111,9 @@ class CrmLead(models.Model):
             'is_a_warehouse_order': True,
             'transfer_state': 'new',
         }
-        self.env['stock.transfer.status'].create(stock_transfter_status)
+        self.stock_transfter_status_id = self.env['stock.transfer.status'].create(stock_transfter_status)
 
+        
     @api.depends('order_ids.state')
     def _compute_has_confirmed_quotation(self):
         for record in self:
@@ -148,12 +154,12 @@ class CrmLead(models.Model):
 
         if self.product_or_service == 'product':
             if not self.repair_product_required_ids or not self.partner_id:
-                # raise models.ValidationError(f'{self.repair_product_required_ids} -- {self.partner_id}')
                 return self.show_error_message('Alto ahi!!', 'Se necesita al menos un producto para continuar y un cliente')
             
             self.client_state = 'confirmed'
             self.crm_lead_state = 'warehouse'
             self.action_create_transfer_status()
+            self.n_ticket = f'{(10 - len(str(self.id))) * "0"}{self.id}'
             return {
             'type': 'ir.actions.client',
             'tag': 'reload',}
@@ -289,8 +295,22 @@ class CrmLead(models.Model):
         if self.final_product_state and self.conclusion and self.reparation_proofs:
             self.repair_state = 'ready'
             self.crm_lead_state = 'confirmed'
+            self.stock_transfter_status_id.is_now_picking_order = True
+            self.stock_transfter_status_id.picking_state = 'tb_confirmed'
+
+            self.create_account_move()
             return {
                 'type': 'ir.actions.client',
                 'tag': 'reload',
             }
         return self.show_error_message('Aun no!!!', 'Debes llenar todos los campos para continuar')
+
+
+    def create_account_move(self):
+        if self.repair_state != 'ready':
+            return self.show_error_message('Error', 'El servicio debe estar listo para continuar')
+        
+        self.account_move_id = self.env['account.move'].create({
+            'move_state': 'in_process',
+            'crm_lead_id': self.id,
+            })
