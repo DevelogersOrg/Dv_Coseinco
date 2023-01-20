@@ -18,10 +18,10 @@ class PurchaseOrder(models.Model):
                 for mv in picking.move_ids_without_package:
                     mv.quantity_done = mv.product_uom_qty
                 picking.button_validate()
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'reload',
-            }
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
 
     def button_confirm(self):
         if self.purchase_state != 'required':

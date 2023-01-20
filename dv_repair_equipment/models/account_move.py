@@ -33,3 +33,19 @@ class AccountMove(models.Model):
     def create_invoice(self):
         self.ensure_one()
         self.ready_to_invoice = True
+    
+    
+    # Tesoreria
+    treasury_state = fields.Selection([('to_pay', 'Por Cobrar'), ('paid', 'Cobrado')],
+                string='Estado de cobranza', default='to_pay', group_expand='_expand_treasury_states', index=True)
+    
+    def _expand_treasury_states(self, states, domain, order):
+        return [key for key, val in type(self).treasury_state.selection]
+    
+    def action_treasury_state_pay(self):
+        self.treasury_state = 'paid'
+        self.payment_state = 'paid'
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
