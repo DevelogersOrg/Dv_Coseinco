@@ -193,6 +193,7 @@
                 </sheet>
               </form>
             </field>
+            <field name="given_products_state_probe_by_technician" widget="image" attrs="{'readonly': [('picking_state','=', 'confirmed')]}"/>
             <field name="repair_product_required_ids" invisible="1"/>
             <field name="picking_state" invisible="1"/>
             <field name="crm_lead_id" invisible="1"/>

@@ -37,6 +37,8 @@ class StockTransferStatus(models.Model):
 
     purchase_order_id = fields.Many2one('purchase.order', string="Orden de compra")
     is_now_in_warehouse_view = fields.Boolean(string='Está en la vista de almacen?', compute='_compute_is_in_warehouse_view', store=False)
+    given_products_state_probe_by_technician = fields.Binary(string='Imagen de prueba')
+
 
 
     def _compute_is_in_warehouse_view(self):
@@ -60,10 +62,10 @@ class StockTransferStatus(models.Model):
         for record in self:
             record.repair_products_to_return_ids = record.crm_lead_id.repair_products_to_return_ids
 
-    @api.depends('crm_lead_id.n_ticket')
+    @api.depends('crm_lead_id')
     def _compute_name(self):
         for record in self:
-            record.name = record.crm_lead_id.n_ticket
+            record.name = record.crm_lead_id.name
 
     # TODO: Testear si las cantidades se actualizan
     @api.depends('repair_product_required_ids.qty_to_order')
