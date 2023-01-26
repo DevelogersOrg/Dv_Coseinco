@@ -152,7 +152,7 @@
                 </group>
             </xpath>
             <xpath expr="//page[@name='lead']" position="after">
-                <page name="assigned_view" string="Asignado para diagnóstico"
+                <page name="assigned_view" string="Detalles del diagnóstico"
                     attrs="{'invisible': [('client_state', '!=', 'assigned'), ('client_state', '!=', 'dg_ready')]}">
                     <group>
                         <group string="Cliente" nolabel="1">
@@ -167,8 +167,8 @@
                         </group>
                     </group>
                     <group string="Equipo">
-                        <field name="n_active" />
-                        <field name="n_serie" />
+                        <field name="n_active" string="Nª de activo (t)"/>
+                        <field name="n_serie" string="Nª de serie (ac)"/>
                         <field name="repair_equipment_type_id" />
                         <field name="equipment_model" />
                         <field name="equipment_accessories" />
@@ -195,7 +195,7 @@
                     <span>Campos obligatorios (*)</span>
                     <br />
                 </page>
-                <page name="dg_ready_view" string="Diagnostico Listo"
+                <page name="dg_ready_view" string="Diagnóstico inicial"
                     attrs="{'invisible': [('client_state','!=','dg_ready')]}">
                     <group>
                         <field name="equipment_failure_report_for_tech"
@@ -251,7 +251,7 @@
                                 <field name="product_id" />
                                 <field name="description" />
                                 <field name="quantity" />
-                                <field name="product_qty_available" />
+                                <field name="product_qty_available" string="Cantidad disponible"/>
                                 <field name="qty_to_order" />
                             </tree>
                             <form>
@@ -259,7 +259,7 @@
                                     <field name="product_id" />
                                     <field name="description" />
                                     <field name="quantity" />
-                                    <field name="product_qty_available" />
+                                    <field name="product_qty_available" string="Cantidad disponible"/>
                                     <field name="qty_to_order" />
                                 </group>
                             </form>

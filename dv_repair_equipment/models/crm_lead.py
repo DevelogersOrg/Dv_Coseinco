@@ -5,9 +5,9 @@ class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
     # Estados de cliente y tecnico
-    client_state = fields.Selection([('new', 'Nuevo Ingreso'), ('assigned', 'Asignado para Diagnóstico'), ('dg_ready', 'Diagnostico Listo'), (
+    client_state = fields.Selection([('new', 'Nuevo Ingreso'), ('assigned', 'Detalles del diagnóstico'), ('dg_ready', 'Diagnóstico inicial'), (
         'quoted', 'Cotizado'), ('confirmed', 'Confirmado'), ], string='Estado', default='new', group_expand='_expand_client_states', index=True)
-    repair_state = fields.Selection([('new', 'Nuevo Ingreso'), ('assigned', 'Asignado para Diagnóstico'), ('dg_ready', 'Diagnostico Listo'),
+    repair_state = fields.Selection([('new', 'Nuevo Ingreso'), ('assigned', 'Detalles del diagnóstico'), ('dg_ready', 'Diagnóstico inicial'),
                 ('waiting_for_products', 'Esperando repuestos'), ('confirmed', 'Confirmado'), ('in_repair', 'En Reparación'), ('ready', 'Servicio Culminado')],
                 string='Estado', default='new', group_expand='_expand_repair_states', index=True)
     is_from_client_view = fields.Boolean(string='Es parte de la vista de cliente?')
@@ -277,17 +277,19 @@ class CrmLead(models.Model):
         if self.final_product_state and self.conclusion and self.reparation_proofs:
             self.repair_state = 'ready'
             self.crm_lead_state = 'confirmed'
-            self.stock_transfter_status_id.is_now_picking_order = True
-            self.stock_transfter_status_id.picking_state = 'tb_confirmed'
-
+            self.set_order_to_picking()
             self.create_account_move()
+
             return self.reload_view()
 
         return self.show_error_message('Aun no!!!', 'Debes llenar todos los campos para continuar')
 
+    def set_order_to_picking(self):
+        self.stock_transfter_status_id.is_now_picking_order = True
+        self.stock_transfter_status_id.picking_state = 'tb_confirmed'
 
     def create_account_move(self):
-        if self.repair_state != 'ready':
+        if self.repair_state != 'ready' and self.product_or_service == 'service':
             return self.show_error_message('Error', 'El servicio debe estar listo para continuar')
         
         invoice_lines = []

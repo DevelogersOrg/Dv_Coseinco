@@ -36,7 +36,7 @@
                 </button>
             </t>
               <t t-if="record.transfer_state.raw_value == 'new' and record.need_to_purchase.raw_value == false">
-                <button name="deliver_products_to_tech"
+                <button name="deliver_products"
                 type="object"
                 class="btn btn-primary"
                 style="display: block !important; width: 100% !important; margin-top: 10px !important;">
@@ -129,7 +129,7 @@
                 <field name="product_id"/>
                 <field name="description"/>
                 <field name="quantity"/>
-                <field name="product_qty_available"/>
+                <field name="product_qty_available" string="Cantidad disponible"/>
               </tree>
               <form>
                 <sheet>
@@ -137,7 +137,7 @@
                     <field name="product_id"/>
                     <field name="description"/>
                     <field name="quantity"/>
-                    <field name="product_qty_available"/>
+                    <field name="product_qty_available" string="Cantidad disponible"/>
                   </group>
                 </sheet>
               </form>

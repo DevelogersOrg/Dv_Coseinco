@@ -129,12 +129,27 @@ class StockTransferStatus(models.Model):
             'tag': 'reload',
         }
     
+    def deliver_products(self):
+        if self.crm_lead_id.product_or_service == 'service':
+            return self.deliver_products_to_tech()
+        if self.crm_lead_id.product_or_service == 'product':
+            return self.deliver_products_to_customer()
+        else:
+            raise models.ValidationError('No se puede entregar el producto, si el error persiste contacte al desarrollador')
+
     def deliver_products_to_tech(self):
-        if self.purchase_order_id or self.transfer_state != 'new':
-            return
         self.transfer_state = 'delivery'
         self.crm_lead_id.crm_lead_state = 'ready_to_repair'
         self.crm_lead_id.repair_state = 'confirmed'
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
+
+    def deliver_products_to_customer(self):
+        self.transfer_state = 'delivery'
+        self.crm_lead_id.set_order_to_picking()
+        self.crm_lead_id.create_account_move()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
