@@ -3,6 +3,8 @@ from . import sale_order
 from . import purchase_order
 from . import stock_transfer_status
 from . import account_move
+from . import res_company
+from . import res_users
 
 from . import repair_order_type
 from . import repair_order_components

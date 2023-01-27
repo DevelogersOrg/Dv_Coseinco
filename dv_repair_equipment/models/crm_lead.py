@@ -157,6 +157,9 @@ class CrmLead(models.Model):
         current_state = self.client_state if self.is_from_client_view else self.repair_state
         if current_state == 'new': self.name = f'{(10 - len(str(self.id))) * "0"}{self.id}'
 
+        if not self.is_diagnosis_ready_to_continue(current_state):
+            return self.show_error_message('Alto ahi!!', 'Falta información para pasar al siguiente estado')
+
         # Lista de posible estados
         STATES = ['new', 'assigned', 'dg_ready']
         next_state = STATES[STATES.index(current_state) + 1]
@@ -169,6 +172,13 @@ class CrmLead(models.Model):
             self.is_displayed_in_both = True
         return self.reload_view()
 
+    def is_diagnosis_ready_to_continue(self, current_state):
+        if current_state != 'assigned':
+            return True
+        if self.partner_id and self.repair_user_id and self.equipment_failure_report:
+            return True
+        else:
+            return False
 
     def change_state_for_products(self):
         if not self.has_quotation:
@@ -277,16 +287,23 @@ class CrmLead(models.Model):
         if self.final_product_state and self.conclusion and self.reparation_proofs:
             self.repair_state = 'ready'
             self.crm_lead_state = 'confirmed'
-            self.set_order_to_picking()
+            self.create_order_to_picking()
             self.create_account_move()
 
             return self.reload_view()
 
         return self.show_error_message('Aun no!!!', 'Debes llenar todos los campos para continuar')
 
-    def set_order_to_picking(self):
-        self.stock_transfter_status_id.is_now_picking_order = True
-        self.stock_transfter_status_id.picking_state = 'tb_confirmed'
+    def create_order_to_picking(self):
+        self.ensure_one()
+        stock_transfter_status = {
+            'crm_lead_id': self.id,
+            'is_a_warehouse_order': False,
+            'transfer_state': 'new',
+            'picking_state': 'tb_confirmed',
+            'is_now_picking_order': True,
+        }
+        self.stock_transfter_status_id = self.env['stock.transfer.status'].create(stock_transfter_status)
 
     def create_account_move(self):
         if self.repair_state != 'ready' and self.product_or_service == 'service':

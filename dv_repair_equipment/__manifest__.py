@@ -11,6 +11,7 @@
         'data/repair_order_type.xml',
         'security/security_groups.xml',
         'security/ir.model.access.csv',
+        'views/res_users_views.xml',
         'views/sale_order_views.xml',
         'views/repair_order_type_views.xml',
         'views/purchase_order_views.xml',
