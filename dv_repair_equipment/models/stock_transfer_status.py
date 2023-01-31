@@ -100,6 +100,7 @@ class StockTransferStatus(models.Model):
                 'stock_transfer_status_id': self.id,
                 'purchase_state': 'required',
                 'order_line': order_line,
+                'state': 'draft',
             }
         purchase_order = self.env['purchase.order'].create(purchase_order_data)
         
@@ -120,10 +121,9 @@ class StockTransferStatus(models.Model):
             return
 
         self.purchase_order_id.validate_stock_pickings()
-        self.transfer_state = 'delivery'
         self.purchase_order_id.purchase_state = 'received'
-        self.crm_lead_id.crm_lead_state = 'ready_to_repair'
-        self.crm_lead_id.repair_state = 'confirmed'
+        self.deliver_products()
+
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
@@ -148,7 +148,8 @@ class StockTransferStatus(models.Model):
 
     def deliver_products_to_customer(self):
         self.transfer_state = 'delivery'
-        self.crm_lead_id.set_order_to_picking()
+        self.crm_lead_id.crm_lead_state = 'confirmed'
+        self.crm_lead_id.create_order_to_picking()
         self.crm_lead_id.create_account_move()
         return {
             'type': 'ir.actions.client',

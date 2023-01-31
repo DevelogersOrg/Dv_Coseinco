@@ -54,8 +54,9 @@ class CrmLead(models.Model):
 
     # Campo para un seguimiento detallado de las ordenes de reparación
     crm_lead_state = fields.Selection(
-        [('new', 'Nuevo Ingreso'), ('assigned', 'Pendiente'), ('dg_ready', 'Pendiente'),
-        ('dg_ready_ready', 'Por Cotizar'), ('quoted', 'Esperando'),('warehouse', 'En Almacén'), ('purchase', 'En proceso de compra'),('ready_to_repair', 'Por reparar'),('repairing', 'En reparación'),('to_finish', 'Por concluir'),('confirmed', 'Confirmado')],
+        [('new', 'Nuevo Ingreso'), ('assigned', 'Pendiente'), ('dg_ready', 'Pendiente'), ('ext_technician', 'Diagnóstico externo'),
+        ('dg_ready_ready', 'Por Cotizar'), ('quoted', 'Esperando'),('warehouse', 'En Almacén'), ('purchase', 'En proceso de compra'),
+        ('ready_to_repair', 'Por reparar'),('repairing', 'En reparación'),('to_finish', 'Por concluir'),('confirmed', 'Confirmado')],
         default='new', string='Estado de la Orden de Reparación'
         )
 
@@ -76,6 +77,11 @@ class CrmLead(models.Model):
 
     given_products_state_probe_by_client = fields.Binary(string='Imagen de prueba')
     given_products_state_probe_by_warehouse = fields.Binary(string='Imagen de prueba')
+
+    # Campos para diagnostico de tecnico externo
+    need_external_diagnosis = fields.Boolean(string='Necesita Diagnóstico Externo?', default=False)
+    external_technician_id = fields.Many2one('res.partner', string='Técnico Externo')
+    
 
     @api.depends('repair_order_components_ids', 'repair_product_required_ids')
     def _compute_repair_products_to_return_ids(self):
@@ -111,6 +117,9 @@ class CrmLead(models.Model):
    
     def action_create_transfer_status(self):
         self.ensure_one()
+        if self.stock_transfter_status_id:
+            return
+
         stock_transfter_status = {
             'crm_lead_id': self.id,
             'is_a_warehouse_order': True,
@@ -153,10 +162,10 @@ class CrmLead(models.Model):
     def action_change_both_state(self):
         if self.is_displayed_in_both:
             return
+            
+        self.name = f'{(10 - len(str(self.id))) * "0"}{self.id}'
         if self.product_or_service == 'product': return self.change_state_for_products()
         current_state = self.client_state if self.is_from_client_view else self.repair_state
-        if current_state == 'new': self.name = f'{(10 - len(str(self.id))) * "0"}{self.id}'
-
         if not self.is_diagnosis_ready_to_continue(current_state):
             return self.show_error_message('Alto ahi!!', 'Falta información para pasar al siguiente estado')
 
@@ -184,8 +193,8 @@ class CrmLead(models.Model):
         if not self.has_quotation:
             return self.show_error_message('Alto ahi!!', 'Necesitas tener una cotización para continuar')
 
-        self.name = f'{(10 - len(str(self.id))) * "0"}{self.id}'
         self.client_state = 'confirmed'
+        self.repair_state = 'ready'
         self.crm_lead_state = 'warehouse'
         self.action_create_transfer_status()
         return self.reload_view()
@@ -237,11 +246,9 @@ class CrmLead(models.Model):
         return action
 
     def can_create_new_quotation(self):
-        if not self.is_now_in_client_view or not self.product_or_service:
-            return False
-        if self.partner_id and self.repair_product_required_ids:
+        if self.partner_id and self.repair_product_required_ids and self.product_or_service == 'product':
             return True
-        if self.client_state in ['dg_ready', 'quoted'] and self.is_diagnosis_ready:
+        if self.client_state in ['dg_ready', 'quoted'] and self.is_diagnosis_ready and self.is_now_in_client_view:
             return True
         else:
             return False
@@ -261,6 +268,11 @@ class CrmLead(models.Model):
         }
 
     def set_diagnosis_ready(self):
+        if self.need_external_diagnosis and self.crm_lead_state != 'dg_ready':
+            return self.show_error_message('Alto ahi!!', 'Necesitas terminar el diagnóstico externo para continuar')
+
+        if not self.initial_diagnosis:
+            return self.show_error_message('Alto ahi!!', 'Necesitas agregar un diagnóstico para continuar')
         self.is_diagnosis_ready = True
         self.crm_lead_state = 'dg_ready_ready'
         return {
@@ -326,6 +338,18 @@ class CrmLead(models.Model):
             'invoice_date': fields.Date.today(),
             'invoice_line_ids': invoice_lines,
             })
+
+    def start_external_diagnosis(self):
+        self.crm_lead_state = 'ext_technician'
+        self.need_external_diagnosis = True
+        return self.reload_view()
+
+    def stop_external_diagnosis(self):
+        if not self.external_technician_id:
+            return self.show_error_message('Error', 'Debes seleccionar un tecnico externo para continuar')
+
+        self.crm_lead_state = 'dg_ready'
+        return self.reload_view()
 
     def gen_ticket_number(self):
         for record in self:

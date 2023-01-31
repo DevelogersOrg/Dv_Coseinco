@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//page[@name='order_lines']" position="after">
-                <page name="diagnosis_view" string="Datos del diagnostico">
+                <page name="diagnosis_view" string="Datos del diagnóstico">
                     <group>
                         <field name="repair_user_id" string="Este servicio sera atendido por" readonly="1"/>
                         <field name="equipment_failure_report"/>

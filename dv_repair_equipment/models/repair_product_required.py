@@ -6,7 +6,7 @@ class RepairProductRequired(models.Model):
 
     product_id = fields.Many2one('product.product', string='Producto', required=True)
     description = fields.Char(string='Nota para almacen')
-    quantity = fields.Integer(string='Cantidad', required=True)
+    quantity = fields.Integer(string='Cantidad', required=True, default=1)
     product_qty_available = fields.Float(related='product_id.qty_available')
     crm_lead_id = fields.Many2one('crm.lead', string='Orden de Reparación')
     

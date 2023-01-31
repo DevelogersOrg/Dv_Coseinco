@@ -106,7 +106,8 @@
                                 <button name="action_change_both_state"
                                     type="object"
                                     class="btn btn-primary"
-                                    style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                                    style="display: block !important; width: 100% !important; margin-top: 10px !important;"
+                                    attrs="{'invisible': [('repair_state', '=', 'ready')]}">
                                     Confirmar
                                 </button>
                             </t>
@@ -202,7 +203,7 @@
                         <field name="equipment_failure_report_for_tech"
                             attrs="{'readonly': [('is_now_in_client_view','=', True)]}" />
                         <field name="initial_diagnosis"
-                            attrs="{'readonly': [('is_now_in_client_view','=', True)], 'required': [('client_state','=','dg_ready')]}"
+                            attrs="{'readonly': [('is_now_in_client_view','=', True)]}"
                             string="Diagnóstico Inicial *" />
                         <field name="repair_product_required_ids"
                             attrs="{'readonly': [('is_now_in_client_view','=', True)]}">
@@ -226,6 +227,27 @@
                         <field name="comments"
                             attrs="{'readonly': [('is_now_in_client_view','=', True)]}" />
                         <field name="is_diagnosis_ready" invisible="1" />
+                    </group>
+                    <group string="Diagnóstico externo" attrs="{'invisible': [('crm_lead_state','!=', 'ext_technician')]}">
+                        <field name="need_external_diagnosis" invisible="1"/>
+                        <field name="external_technician_id"/>
+                    </group>
+                    <group attrs="{'invisible': [('is_now_in_client_view','=', True)]}">
+                        <button
+                            name="start_external_diagnosis"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': [('need_external_diagnosis','=', True)]}">
+                            Necesita diagnóstico externo
+                        </button>
+                        <br/>
+                        <button
+                            name="stop_external_diagnosis"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': [('crm_lead_state','!=', 'ext_technician')]}">
+                            Diagnóstico externo terminado
+                        </button>
                     </group>
                     <group attrs="{'invisible': [('is_now_in_client_view','=', True)]}">
                         <button name="set_diagnosis_ready"

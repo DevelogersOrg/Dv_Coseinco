@@ -26,7 +26,16 @@ class PurchaseOrder(models.Model):
     def button_confirm(self):
         if self.purchase_state != 'required':
             return
-        self.state = 'draft'
+        if self.stock_transfer_status_id.crm_lead_id.partner_id == self.partner_id:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'No tan rápido!',
+                    'message': 'El cliente de la orden de reparación no puede ser el mismo que el proveedor de la orden de compra',
+                    'sticky': False,
+                    'type': 'danger'}}
+
         super(PurchaseOrder, self).button_confirm()
         if self.stock_transfer_status_id:
             self.purchase_state = 'in_process'
