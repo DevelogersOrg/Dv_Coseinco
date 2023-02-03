@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="external_layout_standard" name="Informe Coseinco" inherit_id="web.external_layout_standard">
+        <!-- *HEADER -->
+        <xpath expr="//div[1]" position="replace">
+            <div class="container-fuild">
+                <div t-attf-class="header o_company_#{company.id}_layout">
+                    <div class="row container-fluid" name="header">
+                        <div class="col">
+                            <!-- TODO: imagen del logo -->
+                            <img/>
+                            <hr style="background-color: black;"/>
+                            <p>Coseinco</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+
+        <!-- *FOOTER -->
+        <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout" position="replace">
+            <div class="footer container text-center">
+                <hr style="background-color: black;"/>
+                <div class="row" style="font-size: 19px;">
+                    <div class="col-4">74006064-74847733</div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+</odoo>

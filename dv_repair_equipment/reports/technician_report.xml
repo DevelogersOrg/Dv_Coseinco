@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <report id="technician_info_document_report"
+                string="Generar Informe Tecnico"
+                model="account.move"
+                report_type="qweb-pdf"
+                name="dv_repair_equipment.technician_info_report"
+        />
+</odoo>

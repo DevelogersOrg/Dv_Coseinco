@@ -128,7 +128,7 @@
         <record id="technician_app_group_user_rule1" model="ir.rule">
             <field name="name">Permisos de usuario para la tabla de tecnico</field>
             <field ref="model_crm_lead" name="model_id"/>
-            <field name="domain_force">[('create_uid','=',user.env.user.id)]</field>
+            <field name="domain_force">['|',('create_uid','=',user.env.user.id), ('repair_user_id', '=',user.env.user.id)]</field>
             <field name="groups" eval="[(4, ref('technician_app_group_user'))]"/>
         </record>
         <record id="technician_app_group_admin_rule1" model="ir.rule">
