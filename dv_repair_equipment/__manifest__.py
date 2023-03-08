@@ -22,6 +22,8 @@
         'views/menu_items.xml',
         'templates/external_layout_standard.xml',
         'templates/quotation_report_layout.xml',
+        'templates/technician_info_report.xml',
+        'templates/ir_actions_report.xml',
     ],
     "auto_install": False,
     "installable": True,

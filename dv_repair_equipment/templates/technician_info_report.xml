@@ -1,17 +1,71 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="complete_report" name="Informe Tecnico">
-        <t t-set="company" t-value="env.company"/>
-        <t t-call="web.html_container">
-            <t t-set="o" t-value="res_company"/>
-            <t t-call="dv_repair_equipment.external_layout_standard">
-                <t t-foreach="docs" t-as="doc">
-                    <div class="text-center container" style="color: #139b00;">
-                        <h1>Informe Tecnico</h1>
-                    </div>
+<template id="technician_info_report_document">
+    <t t-call="web.external_layout">
+        <h4><u>INFORME TÉCNICO Nª 12345678</u></h4>
+        <br/>
+        <p>A continuación, presentamos el informe técnico del equipo con solicitud de servicio en el área de almacén</p>
+        <style>
+            .lst_products {
+              border-collapse: collapse;
+              margin: 0 auto;
+              text-align: center;
+              width: 100%;
+            }
+            .lst_products td, .lst_products th {
+              border: 1px solid black;
+              padding: 2px;
+              font-size: 14px;
+            }
+            .lst_products th{
+                background-color: #ffd966;
+            }
+            .bordered {
+                border: 1px solid black;
+                font-weight: bold;
+                padding: 4px;
+            }
+        </style>
+        <table class="lst_products">
+            <thead>
+                <tr>
+                    <th>ITEM</th>
+                    <th>EQUIPO</th>
+                    <th>MARCA</th>
+                    <th>MODELO</th>
+                    <th>Nª SERIE</th>
+                    <th>ACTIVO</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                    <td>01</td>
+                    <td>IMPRESORA</td>
+                    <td>HP</td>
+                    <td>HP 1234</td>
+                    <td>123456789</td>
+                    <td>123456789</td>
+                </tr>
+              </tbody>
+        </table>
+        <br/>
+        <h6 class="bordered">OBSERVACIONES:</h6>
+        <br/>
+        <h6 class="bordered">FALLA REPORTADA:</h6>
+        <br/>
+        <h6 class="bordered">DIAGNOSTICO:</h6>
+        <br/>
+        <h6 class="bordered">CONCLUSIÓN:</h6>
+        <br/>
+    </t>
+</template>
 
-                </t>
-            </t>
+
+<template id="technician_info_report">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="dv_repair_equipment.technician_info_report_document"/>
         </t>
-    </template>
+    </t>
+</template>
 </odoo>
