@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//h2[1]" position="replace">
+            <p>Estimad@:</p>
+            <p>Por intermedio dlepresente nos es grato dirigirnos a usted, con el propósito de hacerle llegar nuestra propuesta técnico-económica</p>
+        </xpath>
+
+        <!-- Sobrescribir la penultima linea que indica el plazo de pago -->
+        <xpath expr="//p[last() - 1]" position="replace">
+            <style>
+                .condiciones {
+                  border-collapse: collapse;
+                  margin: 0 auto;
+                  text-align: center;
+                }
+                .condiciones td, .condiciones th {
+                  border: 1px solid black;
+                  padding: 2px;
+                  font-size: 12px;
+                }
+            </style>
+            <h6><u>CONDICIONES COMERCIALES</u></h6>
+            <table class="condiciones">
+                <tr>
+                    <td>Aceptación del presupuesto</td>
+                    <td>De ser aceptado nuestro presupuesto, deberá enviarse una orden de compra por parte de su empresa con firma y sello del personal encargado, y/o en su defecto, reenviar esta misma cotización sellada y firmada al email: venta@coseinco.com.pe</td>
+                </tr>
+                <tr>
+                    <td>Forma de Pago</td>
+                    <td>Factura a 15 días</td>
+                </tr>
+                <tr>
+                    <td>Tiempo de Entrega</td>
+                    <td>24 horas</td>
+                </tr>
+                <tr>
+                    <td>Garantía</td>
+                    <td>1 año</td>
+                </tr>
+                <tr>
+                    <td>Validez de Cotización</td>
+                    <td>05 Días hábiles</td>
+                </tr>
+            </table>
+            <br/>
+            <p style="font-size: 12px;">Sin otro particular y en espera de sus gratas noticias, nos despedimos de usted.</p>
+        </xpath>
+    </template>
+</odoo>

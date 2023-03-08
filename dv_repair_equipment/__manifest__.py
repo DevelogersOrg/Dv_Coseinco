@@ -20,6 +20,8 @@
         'views/account_move_views.xml',
         'views/account_move_treasury_views.xml',
         'views/menu_items.xml',
+        'templates/external_layout_standard.xml',
+        'templates/quotation_report_layout.xml',
     ],
     "auto_install": False,
     "installable": True,
