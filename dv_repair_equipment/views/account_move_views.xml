@@ -146,6 +146,7 @@
           No hay registros para mostrar
       </p>
     </field>
+    <field name="domain">[('crm_lead_id', '!=', False)]</field>
     <field name="view_ids" eval="[
     (5, 0, 0),
     (0, 0, {'view_mode': 'tree', 'view_id': ref('dv_repair_equipment.account_view_account_view_tree')}),

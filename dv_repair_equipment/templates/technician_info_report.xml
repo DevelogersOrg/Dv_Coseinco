@@ -2,9 +2,6 @@
 <odoo>
 <template id="technician_info_report_document">
     <t t-call="web.external_layout">
-        <h4><u>INFORME TÉCNICO Nª 12345678</u></h4>
-        <br/>
-        <p>A continuación, presentamos el informe técnico del equipo con solicitud de servicio en el área de almacén</p>
         <style>
             .lst_products {
               border-collapse: collapse;
@@ -26,37 +23,78 @@
                 padding: 4px;
             }
         </style>
-        <table class="lst_products">
-            <thead>
-                <tr>
-                    <th>ITEM</th>
-                    <th>EQUIPO</th>
-                    <th>MARCA</th>
-                    <th>MODELO</th>
-                    <th>Nª SERIE</th>
-                    <th>ACTIVO</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                    <td>01</td>
-                    <td>IMPRESORA</td>
-                    <td>HP</td>
-                    <td>HP 1234</td>
-                    <td>123456789</td>
-                    <td>123456789</td>
-                </tr>
-              </tbody>
-        </table>
+        <h4 style="text-align: center;"><u>INFORME TÉCNICO 
+                <t t-if="doc.crm_lead_id">- <t t-esc="doc.crm_lead_id.name"/></t>
+        </u></h4>
+        <p>Cliente: <t t-esc="doc.crm_lead_id.partner_id.name"/></p>
+        <p style="text-align: right;">Atendido por: <t t-esc="doc.crm_lead_id.repair_user_id.name"/></p>
         <br/>
-        <h6 class="bordered">OBSERVACIONES:</h6>
-        <br/>
+        <p>A continuación, presentamos el informe técnico del equipo con solicitud de servicio en el área de almacén</p>
         <h6 class="bordered">FALLA REPORTADA:</h6>
+        <p>* <t t-esc="doc.equipment_failure_report"/></p>
+        <br/>
+        <h6 class="bordered">PRODUCTOS RECIBIDOS DEL CLIENTE:</h6>
+        <t t-if="doc.repair_order_components_ids">
+            <table class="lst_products">
+                <thead>
+                    <tr>
+                        <th>PRODUCTO</th>
+                        <th>DETALLES</th>
+                        <th>CANTIDAD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="doc.repair_order_components_ids" t-as="component">
+                        <tr>
+                            <td><t t-esc="component.product_id.name"/></td>
+                            <td><t t-esc="component.details"/></td>
+                            <td><t t-esc="component.quantity"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </t>
+        <t t-else="">
+            <p>No se recibieron productos del cliente</p>
+        </t>
         <br/>
         <h6 class="bordered">DIAGNOSTICO:</h6>
+        <p>* <t t-esc="doc.initial_diagnosis"/></p>
+        <br/>
+        <h6 class="bordered">PRODUCTOS ADQUIRIDOS:</h6>
+        <t t-if="doc.repair_product_required">
+            <table class="lst_products">
+                <thead>
+                    <tr>
+                        <th>PRODUCTO</th>
+                        <th>DETALLES</th>
+                        <th>CANTIDAD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="doc.repair_product_required" t-as="product">
+                        <tr>
+                            <td><t t-esc="product.product_id.name"/></td>
+                            <td><t t-esc="product.description"/></td>
+                            <td><t t-esc="product.quantity"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </t>
+        <t t-else="">
+            <p>No se adquirieron productos</p>
+        </t>
+        <br/>
+        <h6 class="bordered">OBSERVACIONES:</h6>
+        <t t-foreach="doc.repair_observation_detail_ids" t-as="observation">
+            <p>* <t t-esc="observation.name"/> - <t t-esc="observation.details"/> - <t t-esc="observation.date_of_observation"/></p>
+        </t>
         <br/>
         <h6 class="bordered">CONCLUSIÓN:</h6>
+        <p>* <t t-esc="doc.conclusion"/></p>
         <br/>
+        <p>Atentamente: </p>
     </t>
 </template>
 
