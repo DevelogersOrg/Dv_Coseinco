@@ -34,6 +34,46 @@
         <p>* <t t-esc="doc.equipment_failure_report"/></p>
         <br/>
         <h6 class="bordered">PRODUCTOS RECIBIDOS DEL CLIENTE:</h6>
+
+        <table class="lst_products">
+            <thead>
+                <tr>
+                    <th>Nª de activo</th>
+                    <th>Nª de serie</th>
+                    <th>Tipo de Equipo</th>
+                    <th>Modelo</th>
+                    <th>Accesorios</th>
+                    <th>Otros datos del equipo</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><t t-if="doc.crm_lead_id.n_active">
+                        <t t-esc="doc.crm_lead_id.n_active"/></t>
+                        <t t-else="">N/A</t></td>
+                    <td><t t-if="doc.crm_lead_id.n_serie">
+                        <t t-esc="doc.crm_lead_id.n_serie"/></t>
+                        <t t-else="">N/A</t></td>
+                    <td><t t-if="doc.crm_lead_id.repair_equipment_type_id.name">
+                        <t t-esc="doc.crm_lead_id.repair_equipment_type_id.name"/></t>
+                        <t t-else="">N/A</t></td>
+                    <td>
+                        <t t-if="doc.crm_lead_id.equipment_model">
+                            <t t-esc="doc.crm_lead_id.equipment_model"/></t>
+                        <t t-else="">N/A</t></td>
+                    <td>
+                        <t t-if="doc.crm_lead_id.equipment_accessories">
+                            <t t-esc="doc.crm_lead_id.equipment_accessories"/></t>
+                        <t t-else="">N/A</t></td>
+                    <td>
+                        <t t-if="doc.crm_lead_id.other_equipment_data">
+                            <t t-esc="doc.crm_lead_id.other_equipment_data"/></t>
+                        <t t-else="">N/A</t></td>
+                </tr>
+            </tbody>
+        </table><br/>
+
         <t t-if="doc.repair_order_components_ids">
             <table class="lst_products">
                 <thead>
@@ -61,6 +101,10 @@
         <h6 class="bordered">DIAGNOSTICO:</h6>
         <p>* <t t-esc="doc.initial_diagnosis"/></p>
         <br/>
+        <h6 class="bordered">OBSERVACIÓN INICIAL:</h6>
+        <p>* <t t-if="doc.crm_lead_id.comments"><t t-esc="doc.crm_lead_id.comments"/></t>
+            <t t-else="">No se ha especificado una observación inicial</t></p>
+        <br/>
         <h6 class="bordered">PRODUCTOS ADQUIRIDOS:</h6>
         <t t-if="doc.repair_product_required">
             <table class="lst_products">
@@ -86,16 +130,27 @@
             <p>No se adquirieron productos</p>
         </t>
         <br/>
-        <h6 class="bordered">OBSERVACIONES:</h6>
-        <t t-foreach="doc.repair_observation_detail_ids" t-as="observation">
-            <p>* <t t-esc="observation.name"/> - <t t-esc="observation.details"/> - <t t-esc="observation.date_of_observation"/></p>
+        <h6 class="bordered">OBSERVACIONES FINAL:</h6>
+        <t t-if="doc.repair_observation_detail_ids">
+            <t t-foreach="doc.repair_observation_detail_ids" t-as="observation">
+                <p>* <t t-esc="observation.name"/> - <t t-esc="observation.details"/> - <t t-esc="observation.date_of_observation"/></p>
+            </t>
+        </t>
+        <t t-else="">
+            <p>No se ha registrado ninguna observación final</p>
         </t>
         <br/>
         <h6 class="bordered">CONCLUSIÓN:</h6>
         <p>* <t t-esc="doc.conclusion"/></p>
         <br/>
         <p>Atentamente: </p>
-    </t>
+        <!-- Agregar firma del usuario -->
+        <div class="col-3 mb4">
+            <img t-if="user.x_default_user_singnature" t-att-src="image_data_uri(user.x_default_user_singnature)" style="max-height: 200px;"/>
+            <br/>
+            <p t-esc="user.name"/>
+        </div>
+        </t>
 </template>
 
 

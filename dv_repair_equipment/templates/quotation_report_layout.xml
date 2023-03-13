@@ -3,7 +3,7 @@
     <template id="report_saleorder_document" inherit_id="sale.report_saleorder_document">
         <xpath expr="//h2[1]" position="replace">
             <p>Estimad@:</p>
-            <p>Por intermedio dlepresente nos es grato dirigirnos a usted, con el propósito de hacerle llegar nuestra propuesta técnico-económica</p>
+            <p>Por intermedio del presente nos es grato dirigirnos a usted, con el propósito de hacerle llegar nuestra propuesta técnico-económica</p>
         </xpath>
 
         <!-- Sobrescribir la penultima linea que indica el plazo de pago -->
@@ -45,6 +45,12 @@
             </table>
             <br/>
             <p style="font-size: 12px;">Sin otro particular y en espera de sus gratas noticias, nos despedimos de usted.</p>
+            <p style="font-size: 12px;">Atentamente</p>
+            <div class="col-3 mb4">
+                <img t-if="user.x_default_user_singnature" t-att-src="image_data_uri(user.x_default_user_singnature)" style="max-height: 200px;"/>
+                <br/>
+                <p t-esc="user.name"/>
+            </div>
         </xpath>
     </template>
 </odoo>
