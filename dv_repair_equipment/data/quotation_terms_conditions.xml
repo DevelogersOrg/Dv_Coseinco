@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="terms_conditions_01" model="quotation.terms.conditions">
+            <field name="name">De ser aceptado nuestro presupuesto, deberá enviarse una orden de compra por parte de su empresa con firma y sello del personal encargado, y/o en su defecto, reenviar esta misma cotización sellada y firmada al email: venta@coseinco.com.pe
+            </field>
+        </record>
+    </data>
+</odoo>
