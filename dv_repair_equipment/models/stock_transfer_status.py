@@ -117,6 +117,7 @@ class StockTransferStatus(models.Model):
 
 
     def confirm_stock_pickings(self):
+        # TODO Error: Nada para lo que comprobar disponibilidad.
         if not self.purchase_order_id:
             return
 
