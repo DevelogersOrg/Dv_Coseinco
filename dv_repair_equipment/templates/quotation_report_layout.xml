@@ -24,23 +24,28 @@
             <table class="condiciones">
                 <tr>
                     <td>Aceptación del presupuesto</td>
-                    <td>De ser aceptado nuestro presupuesto, deberá enviarse una orden de compra por parte de su empresa con firma y sello del personal encargado, y/o en su defecto, reenviar esta misma cotización sellada y firmada al email: venta@coseinco.com.pe</td>
+                    <td><t t-if="doc.quotation_terms_conditions_id"><t t-esc="doc.quotation_terms_conditions_id.name"/></t>
+                        <t t-else="">No especificado</t></td>
                 </tr>
                 <tr>
                     <td>Forma de Pago</td>
-                    <td>Factura a 15 días</td>
+                    <td><t t-if="doc.quotation_time_period_for_payment_type_id"><t t-esc="doc.quotation_time_period_for_payment_type_id.name"/></t>
+                        <t t-else="">No especificado</t></td>
                 </tr>
                 <tr>
                     <td>Tiempo de Entrega</td>
-                    <td>24 horas</td>
+                    <td><t t-if="doc.quotation_time_period_for_shipping_time_id"><t t-esc="doc.quotation_time_period_for_shipping_time_id.name"/></t>
+                        <t t-else="">No especificado</t></td>
                 </tr>
                 <tr>
                     <td>Garantía</td>
-                    <td>1 año</td>
+                    <td><t t-if="doc.quotation_time_period_for_guarantee_id"><t t-esc="doc.quotation_time_period_for_guarantee_id.name"/></t>
+                        <t t-else="">No especificado</t></td>
                 </tr>
                 <tr>
                     <td>Validez de Cotización</td>
-                    <td>05 Días hábiles</td>
+                    <td><t t-if="doc.quotation_time_period_for_validity_id"><t t-esc="doc.quotation_time_period_for_validity_id.name"/></t>
+                        <t t-else="">No especificado</t></td>
                 </tr>
             </table>
             <br/>

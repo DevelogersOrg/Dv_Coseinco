@@ -9,6 +9,7 @@
     "website" : "https://www.develogers.com",
     "data": [
         'data/repair_order_type.xml',
+        'data/quotation_terms_conditions.xml',
         'security/security_groups.xml',
         'security/ir.model.access.csv',
         'views/res_users_views.xml',
