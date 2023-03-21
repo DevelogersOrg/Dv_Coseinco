@@ -1,6 +1,8 @@
 from odoo import models, fields, api
 from datetime import timedelta
 
+import logging
+_logger = logging.getLogger(__name__)
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
@@ -318,6 +320,20 @@ class CrmLead(models.Model):
         self.stock_transfter_status_id = self.env['stock.transfer.status'].create(stock_transfter_status)
 
     def create_account_move(self):
+        assigned_picking_ids = self.order_ids.picking_ids.filtered(lambda p: p.state == 'assigned')
+        if assigned_picking_ids:
+            _logger.info(f"self.order_ids: {self.order_ids}")
+            _logger.info(f"assigned_picking_ids: {assigned_picking_ids}")
+            for picking in assigned_picking_ids:
+                picking.action_assign()
+                picking.action_confirm()
+                for mv in picking.move_ids_without_package:
+                    mv.quantity_done = mv.product_uom_qty
+                picking.button_validate()
+        self.order_ids._create_invoices()
+        self.order_ids.invoice_ids.crm_lead_id = self.id
+        
+    def _create_account_move(self):
         if self.repair_state != 'ready' and self.product_or_service == 'service':
             return self.show_error_message('Error', 'El servicio debe estar listo para continuar')
         

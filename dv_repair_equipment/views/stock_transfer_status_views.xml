@@ -3,7 +3,6 @@
   <!-- _________________________________________________________ -->
   <!-- kanban -->
   <!-- _________________________________________________________ -->
-
   <!-- Almacen -->
   <record id="warehouse_view_stock_transfer_status_kanban" model="ir.ui.view">
     <field name="name">stock_transfer_status.kanban</field>
@@ -19,12 +18,20 @@
           <t t-name="kanban-box">
             <div class="oe_kanban_card oe_kanban_global_click">
               <div class="o_kanban_record_top  d-flex flex-column ml-1">
-                <h3 class="o_kanban_record_title" style="margin-bottom: 8px !important"><field name="crm_lead_id"/></h3>
+                <h3 class="o_kanban_record_title" style="margin-bottom: 8px !important">
+                  <field name="crm_lead_id"/>
+                </h3>
               </div>
               <div class="o_kanban_record_bottom" style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
                 <div class="text-muted">
-                    <span>Creado :<t t-esc="record.create_date.value" modifiers="{}"/></span><br/>
-                    <span>Actulizado: <t t-esc="record.__last_update.value" modifiers="{}"/></span><br/>
+                  <span>Creado :
+                    <t t-esc="record.create_date.value" modifiers="{}"/>
+                  </span>
+                  <br/>
+                  <span>Actulizado:
+                    <t t-esc="record.__last_update.value" modifiers="{}"/>
+                  </span>
+                  <br/>
                 </div>
               </div>
               <t t-if="record.transfer_state.raw_value == 'income'">
@@ -34,7 +41,7 @@
                 style="display: block !important; width: 100% !important; margin-top: 10px !important;">
                 Confirmar Entrega
                 </button>
-            </t>
+              </t>
               <t t-if="record.transfer_state.raw_value == 'new' and record.need_to_purchase.raw_value == false">
                 <button name="deliver_products"
                 type="object"
@@ -42,14 +49,13 @@
                 style="display: block !important; width: 100% !important; margin-top: 10px !important;">
                 Entregar Productos
                 </button>
-            </t>
+              </t>
             </div>
           </t>
         </templates>
       </kanban>
     </field>
   </record>
-
   <!-- Despacho -->
   <record id="pick_view_stock_transfer_status_kanban" model="ir.ui.view">
     <field name="name">stock_transfer_status.kanban</field>
@@ -62,10 +68,16 @@
           <t t-name="kanban-box">
             <div class="oe_kanban_global_click">
               <div class="oe_kanban_details d-flex flex-column">
-                <h3><field name="crm_lead_id"/></h3>
+                <h3>
+                  <field name="crm_lead_id"/>
+                </h3>
                 <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
-                <p>Creado el: <field name="create_date" widget="datetime"/></p>
-                <p>Actualizado al: <field name="__last_update" widget="datetime"/></p>
+                <p>Creado el:
+                  <field name="create_date" widget="datetime"/>
+                </p>
+                <p>Actualizado al:
+                  <field name="__last_update" widget="datetime"/>
+                </p>
               </div>
               <t t-if="record.picking_state.raw_value != 'delivered'">
                 <button name="change_picking_state"
@@ -74,18 +86,16 @@
                 style="display: block !important; width: 100% !important; margin-top: 10px !important;">
                 Confirmar
                 </button>
-            </t>
+              </t>
             </div>
           </t>
         </templates>
       </kanban>
     </field>
   </record>
-
   <!-- _________________________________________________________ -->
   <!-- tree -->
   <!-- _________________________________________________________ -->
-
   <!-- Almacen -->
   <record id="warehouse_view_stock_transfer_status_tree" model="ir.ui.view">
     <field name="name">stock.transfer.status.tree</field>
@@ -98,7 +108,6 @@
       </tree>
     </field>
   </record>
-
   <!-- Despacho -->
   <record id="pick_view_stock_transfer_status_tree" model="ir.ui.view">
     <field name="name">stock.transfer.status.tree</field>
@@ -111,7 +120,6 @@
       </tree>
     </field>
   </record>
-
   <!-- _________________________________________________________ -->
   <!-- form -->
   <!-- _________________________________________________________ -->
@@ -122,7 +130,9 @@
     <field name="arch" type="xml">
       <form string="Almacen">
         <sheet>
-          <h1>N : <field name="name"/></h1>
+          <h1>N :
+            <field name="name"/>
+          </h1>
           <group>
             <field name="repair_product_required_ids">
               <tree>
@@ -167,7 +177,6 @@
       </form>
     </field>
   </record>
-
   <!-- Despacho -->
   <record id="pick_view_stock_transfer_status_form" model="ir.ui.view">
     <field name="name">stock.transfer.status.form</field>
@@ -175,7 +184,9 @@
     <field name="arch" type="xml">
       <form string="Almacen">
         <sheet>
-          <h1>N : <field name="name"/></h1>
+          <h1>N :
+            <field name="name"/>
+          </h1>
           <group string="Productos a devolver">
             <field name="repair_products_to_return_ids">
               <tree>
@@ -193,7 +204,7 @@
                 </sheet>
               </form>
             </field>
-            <field name="given_products_state_probe_by_technician" widget="image" attrs="{'readonly': [('picking_state','=', 'confirmed')]}"/>
+            <field name="given_products_state_probe_by_technician" widget="binary" attrs="{'readonly': [('picking_state','=', 'confirmed')]}"/>
             <field name="repair_product_required_ids" invisible="1"/>
             <field name="picking_state" invisible="1"/>
             <field name="crm_lead_id" invisible="1"/>
@@ -202,24 +213,22 @@
             <field name="need_to_purchase" invisible="1"/>
             <notebook>
               <page name="ship_info" string="Información para despachar" attrs="{'invisible': [('picking_state', '!=', 'to_ship')]}">
-                <group name="name">
-                  <group string="Cliente">
-                    <field name="client_id"/>
-                  </group>
-                  <group attrs="{'invisible': [('company_id','=', False)]}" string="Empresa">
-                    <field name="company_id"/>
-                  </group>
-                  <group string="Receptor">
-                    <field name="reciever_name"/>
-                    <field name="reciever_function"/>
-                    <field name="reciever_phone"/>
-                    <field name="reciever_id"/>
-                    <field name="reciever_direction"/>
-                    <span>¡Si los campos estan vacios se usarán los valores del cliente!</span>
-                  </group>
-                  <group string="Datos de entrega">
-                    <field name="ship_date"/>
-                  </group>
+                <group string="Cliente">
+                  <field name="client_id"/>
+                </group>
+                <group attrs="{'invisible': [('company_id','=', False)]}" string="Empresa">
+                  <field name="company_id"/>
+                </group>
+                <group string="Receptor">
+                  <field name="reciever_name"/>
+                  <field name="reciever_function"/>
+                  <field name="reciever_phone"/>
+                  <field name="reciever_id"/>
+                  <field name="reciever_direction"/>
+                  <span>¡Si los campos estan vacios se usarán los valores del cliente!</span>
+                </group>
+                <group string="Datos de entrega">
+                  <field name="ship_date"/>
                 </group>
               </page>
               <page name="ship_info" string="Odoo delivery_boy" attrs="{'invisible': [('picking_state', '!=', 'shiped')]}">
@@ -228,17 +237,15 @@
                 </group>
               </page>
             </notebook>
-
           </group>
         </sheet>
       </form>
     </field>
   </record>
-
-    <!-- _________________________________________________________ -->
-    <!-- Acciones -->
-    <!-- _________________________________________________________ -->
-    <!-- Almacen -->
+  <!-- _________________________________________________________ -->
+  <!-- Acciones -->
+  <!-- _________________________________________________________ -->
+  <!-- Almacen -->
   <record id="warehouse_stock_transfer_status_action" model="ir.actions.act_window">
     <field name="name">Almacen</field>
     <field name="type">ir.actions.act_window</field>
@@ -257,8 +264,7 @@
         (0, 0, {'view_mode': 'tree', 'view_id': ref('dv_repair_equipment.warehouse_view_stock_transfer_status_tree')}),
         (0, 0, {'view_mode': 'form', 'view_id': ref('dv_repair_equipment.warehouse_view_stock_transfer_status_form')}),]"/>
   </record>
-
-    <!-- Despacho -->
+  <!-- Despacho -->
   <record id="pick_stock_transfer_status_action" model="ir.actions.act_window">
     <field name="name">Despacho</field>
     <field name="type">ir.actions.act_window</field>
