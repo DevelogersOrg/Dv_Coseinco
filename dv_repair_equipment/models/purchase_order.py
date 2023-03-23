@@ -11,8 +11,9 @@ class PurchaseOrder(models.Model):
 
     def validate_stock_pickings(self):
         self.ensure_one()
-        if self.picking_ids:
-            for picking in self.picking_ids:
+        to_validate_pickings = self.picking_ids.filtered(lambda p: p.state != 'done')
+        if to_validate_pickings:
+            for picking in to_validate_pickings:
                 picking.action_assign()
                 picking.action_confirm()
                 for mv in picking.move_ids_without_package:

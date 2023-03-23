@@ -49,3 +49,7 @@ class AccountMove(models.Model):
             'type': 'ir.actions.client',
             'tag': 'reload',
         }
+        
+    #def action_post(self):
+    #    res = super().sudo().action_post()
+    #    return res

@@ -301,8 +301,8 @@ class CrmLead(models.Model):
         if self.final_product_state and self.conclusion and self.reparation_proofs:
             self.repair_state = 'ready'
             self.crm_lead_state = 'confirmed'
-            self.create_order_to_picking()
-            self.create_account_move()
+            self.sudo().create_order_to_picking()
+            self.sudo().create_account_move()
 
             return self.reload_view()
 

@@ -10,10 +10,16 @@
           <t t-name="kanban-box">
             <div class="oe_kanban_global_click">
               <div class="oe_kanban_details d-flex flex-column">
-                <h3><field name="crm_lead_id"/></h3>
+                <h3>
+                  <field name="crm_lead_id"/>
+                </h3>
                 <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
-                <p>Creado el: <field name="create_date" widget="datetime"/></p>
-                <p>Actualizado al: <field name="__last_update" widget="datetime"/></p>
+                <p>Creado el:
+                  <field name="create_date" widget="datetime"/>
+                </p>
+                <p>Actualizado al:
+                  <field name="__last_update" widget="datetime"/>
+                </p>
               </div>
               <t t-if="record.move_state.raw_value == 'tb_invoiced'">
                 <button name="change_move_state"
@@ -22,21 +28,20 @@
                 style="display: block !important; width: 100% !important; margin-top: 10px !important;">
                 Confirmar
                 </button>
-            </t>
+              </t>
             </div>
           </t>
         </templates>
       </kanban>
     </field>
   </record>
-
   <record id="account_view_account_view_tree" model="ir.ui.view">
     <field name="name">account_move_view.tree</field>
     <field name="model">account.move</field>
     <field name="arch" type="xml">
       <tree string="Invoices" js_class="account_tree" sample="1" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" default_order='move_state'>
         <header>
-            <button name="action_register_payment" type="object" string="Register Payment" groups="account.group_account_user" invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'out_receipt', 'in_invoice', 'in_refund','in_receipt')"/>
+          <button name="action_register_payment" type="object" string="Register Payment" groups="account.group_account_user" invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'out_receipt', 'in_invoice', 'in_refund','in_receipt')"/>
         </header>
         <field name="name" decoration-bf="1"/>
         <field name="partner_id" invisible="1"/>
@@ -65,7 +70,6 @@
       </tree>
     </field>
   </record>
-
   <record id="account_view_account_view_form_inherit" model="ir.ui.view">
     <field name="name">account.move.form.herencia</field>
     <field name="model">account.move</field>
@@ -84,14 +88,14 @@
                 <field name="product_id"/>
                 <field name="description"/>
                 <field name="quantity"/>
-            </tree>
-            <form>
+              </tree>
+              <form>
                 <group>
-                    <field name="product_id"/>
-                    <field name="description"/>
-                    <field name="quantity"/>
+                  <field name="product_id"/>
+                  <field name="description"/>
+                  <field name="quantity"/>
                 </group>
-            </form>
+              </form>
             </field>
             <hr/>
             <field name="repair_order_components_ids" string="Productos entregados por el cliente">
@@ -99,12 +103,12 @@
                 <field name="product_id"/>
                 <field name="quantity"/>
                 <field name="details"/>
-            </tree>
+              </tree>
               <form>
                 <group>
-                    <field name="product_id"/>
-                    <field name="quantity"/>
-                    <field name="details"/>
+                  <field name="product_id"/>
+                  <field name="quantity"/>
+                  <field name="details"/>
                 </group>
               </form>
             </field>
@@ -116,11 +120,11 @@
                 <field name="date_of_observation"/>
               </tree>
               <form>
-                  <group>
-                      <field name="name"/>
-                      <field name="details"/>
-                      <field name="date_of_observation"/>
-                  </group>
+                <group>
+                  <field name="name"/>
+                  <field name="details"/>
+                  <field name="date_of_observation"/>
+                </group>
               </form>
             </field>
             <hr/>
@@ -135,7 +139,6 @@
       </xpath>
     </field>
   </record>
-
   <record id="account_move_action" model="ir.actions.act_window">
     <field name="name">Facturación</field>
     <field name="type">ir.actions.act_window</field>
@@ -148,9 +151,9 @@
     </field>
     <field name="domain">[('crm_lead_id', '!=', False)]</field>
     <field name="view_ids" eval="[
-    (5, 0, 0),
-    (0, 0, {'view_mode': 'tree', 'view_id': ref('dv_repair_equipment.account_view_account_view_tree')}),
-    (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.account_view_account_view_kanban')}),
-    (0, 0, {'view_mode': 'form', 'view_id': ref('account.view_move_form')}),]"/>
+      (5, 0, 0),
+      (0, 0, {'view_mode': 'tree', 'view_id': ref('dv_repair_equipment.account_view_account_view_tree')}),
+      (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.account_view_account_view_kanban')}),
+      (0, 0, {'view_mode': 'form', 'view_id': ref('account.view_move_form')}),]"/>
   </record>
 </odoo>
