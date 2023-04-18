@@ -9,3 +9,5 @@
 - Agregar los estados al form, con mensaje
 - mensajes de confirmación
 - agregar al kanba el creador del registro con su imagen
+
+Prueba para crear un build con runboat
