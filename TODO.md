@@ -11,3 +11,4 @@
 - agregar al kanba el creador del registro con su imagen
 
 Prueba para crear un build con runboat
+Segunda prueba para crear otra build
