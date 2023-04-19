@@ -106,7 +106,7 @@
             <t t-else="">No se ha especificado una observación inicial</t></p>
         <br/>
         <h6 class="bordered">PRODUCTOS ADQUIRIDOS:</h6>
-        <t t-if="doc.repair_product_required">
+        <t t-if="doc.repair_product_required_ids">
             <table class="lst_products">
                 <thead>
                     <tr>
@@ -116,7 +116,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <t t-foreach="doc.repair_product_required" t-as="product">
+                    <t t-foreach="doc.repair_product_required_ids" t-as="product">
                         <tr>
                             <td><t t-esc="product.product_id.name"/></td>
                             <td><t t-esc="product.description"/></td>

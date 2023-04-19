@@ -83,7 +83,7 @@
           <group>
             <field name="crm_lead_id"/>
             <field name="client_id"/>
-            <field name="repair_product_required" string="Productos comprados">
+            <field name="repair_product_required_ids" string="Productos comprados">
               <tree editable="bottom">
                 <field name="product_id"/>
                 <field name="description"/>

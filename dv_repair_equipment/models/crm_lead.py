@@ -105,11 +105,11 @@ class CrmLead(models.Model):
                     'details': repair_order_component.details,
                     'quantity': repair_order_component.quantity,
                 }))
-            for repair_product_required in record.repair_product_required_ids:
+            for repair_product_required_ids in record.repair_product_required_ids:
                 repair_products_to_return_ids.append((0, 0, {
-                    'product_id': repair_product_required.product_id.id,
-                    'details': repair_product_required.description,
-                    'quantity': repair_product_required.quantity,
+                    'product_id': repair_product_required_ids.product_id.id,
+                    'details': repair_product_required_ids.description,
+                    'quantity': repair_product_required_ids.quantity,
                 }))
             # eliminamos los productos que ya estan en la lista de productos a devolver
             record.repair_products_to_return_ids = [(5, 0, 0)]                
