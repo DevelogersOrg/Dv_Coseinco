@@ -3,7 +3,7 @@
     "name" : "Reparaciones - Coseinco SA",
     "version" : "14.0.1.0",
     "category" : "",
-    "depends" : ['purchase', 'stock', 'repair', 'sale_management', 'crm', 'account'],
+    "depends" : ['purchase', 'stock', 'repair', 'sale_management', 'crm', 'account', 'point_of_sale'],
     "author": "develogers",
     'summary': '',
     "website" : "https://www.develogers.com",
