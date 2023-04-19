@@ -16,9 +16,19 @@ class CrmLead(models.Model):
     is_displayed_in_both = fields.Boolean(string='Se muestra en ambos lados?', default=False)
     
     name = fields.Char(
-        'Asunto', index=True, 
-        compute='_compute_name', readonly=False, store=True, default=f'{fields.Datetime.now() - timedelta(hours=5)}')
-    repair_order_type_id = fields.Many2one('repair.order.type', string='Tipo de Servicio a Desarrollar', )
+        'Asunto', compute='_compute_name', default='Borrador')
+    
+    def name_get(self):
+        res = []
+        for record in self:
+            name = f'{(10 - len(str(record.id))) * "0"}{record.id}'
+            res.append((record.id, name))
+        return res
+    
+    def _compute_name(self):
+        for record in self:
+            record.name = f'{(10 - len(str(record.id))) * "0"}{record.id}'
+    repair_order_type_id = fields.Many2one('repair.order.type', string='Tipo de Servicio a Desarrollar')
 
     service_description = fields.Text(string='Descripción del Servicio', store=True)
 
@@ -367,12 +377,14 @@ class CrmLead(models.Model):
         self.crm_lead_state = 'dg_ready'
         return self.reload_view()
 
-    def gen_ticket_number(self):
-        for record in self:
-            record.name = f'{(10 - len(str(record.id))) * "0"}{record.id}'
-
     def reload_view(self):
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
         }
+        
+    quotation_terms_conditions_id = fields.Many2one('quotation.terms.conditions', string='Términos y condiciones')
+    quotation_time_period_for_payment_type_id = fields.Many2one('quotation.time.period', string='Forma de pago')
+    quotation_time_period_for_shipping_time_id = fields.Many2one('quotation.time.period', string='Tiempo de entrega')
+    quotation_time_period_for_guarantee_id = fields.Many2one('quotation.time.period', string='Garantía')
+    quotation_time_period_for_validity_id = fields.Many2one('quotation.time.period', string='Validez de la cotización')

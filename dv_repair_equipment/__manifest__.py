@@ -22,6 +22,7 @@
         'views/account_move_treasury_views.xml',
         'views/menu_items.xml',
         'templates/external_layout_standard.xml',
+        'templates/crml_lead_report.xml',
         'templates/quotation_report_layout.xml',
         'templates/technician_info_report.xml',
         'templates/ir_actions_report.xml',

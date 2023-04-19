@@ -114,7 +114,7 @@
 		<record id="client_app_group_user_rule1" model="ir.rule">
 			<field name="name">Permisos de usuario para la tabla de clientes</field>
 			<field ref="model_crm_lead" name="model_id"/>
-			<field name="domain_force">['|',('create_uid','=',user.env.user.id), ('repair_user_id', '=',user.env.user.id)]</field>
+			<field name="domain_force">['|',('create_uid','=',user.id), ('repair_user_id', '=',user.id)]</field>
 			<field name="groups" eval="[(4, ref('client_app_group_user'))]"/>
 		</record>
 		<record id="client_app_group_admin_rule1" model="ir.rule">
@@ -128,7 +128,7 @@
         <record id="technician_app_group_user_rule1" model="ir.rule">
             <field name="name">Permisos de usuario para la tabla de tecnico</field>
             <field ref="model_crm_lead" name="model_id"/>
-            <field name="domain_force">['|',('create_uid','=',user.env.user.id), ('repair_user_id', '=',user.env.user.id)]</field>
+            <field name="domain_force">['|',('create_uid','=',user.id), ('repair_user_id', '=',user.id)]</field>
             <field name="groups" eval="[(4, ref('technician_app_group_user'))]"/>
         </record>
         <record id="technician_app_group_admin_rule1" model="ir.rule">
@@ -141,7 +141,7 @@
         <record id="stock_rule_admin_lead" model="ir.rule">
             <field name="name">Stock Leads</field>
             <field ref="model_crm_lead" name="model_id"/>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">['|',('create_uid','=',user.id), ('repair_user_id', '=',user.id)]</field>
             <field name="groups" eval="[(4, ref('stock.group_stock_user'))]"/>
         </record>
 

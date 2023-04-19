@@ -133,6 +133,15 @@
             <field name="conclusion"/>
           </group>
         </page>
+        <page name="conditions" string="Terminos de la cotización">
+          <group>
+              <field name="quotation_terms_conditions_id"/>
+              <field name="quotation_time_period_for_payment_type_id"/>
+              <field name="quotation_time_period_for_shipping_time_id"/>
+              <field name="quotation_time_period_for_guarantee_id"/>
+              <field name="quotation_time_period_for_validity_id"/>
+          </group>
+      </page>
         <page name="data_view" string="Factura" attrs="{'invisible': [('move_state', '!=', 'invoiced')]}">
           <h4>Aqui aparecera la factura</h4>
         </page>

@@ -28,7 +28,7 @@
                             <div class="o_kanban_record_top  d-flex flex-column ml-1">
                                 <h3 class="o_kanban_record_title"
                                     style="margin-bottom: 8px !important">
-                                    <field name="name" />
+                                    <field name="display_name"/>
                                 </h3>
                             </div>
                             <div class="o_kanban_record_bottom"
@@ -84,7 +84,7 @@
                         <div class="oe_kanban_card oe_kanban_global_click">
                             <div class="o_kanban_record_top  d-flex flex-column ml-1">
                                 <h3 class="o_kanban_record_title"
-                                    style="margin-bottom: 8px !important">Nª <field name="name" /></h3>
+                                    style="margin-bottom: 8px !important">Nª <field name="display_name"/></h3>
                             </div>
                             <div class="o_kanban_record_bottom"
                                 style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
@@ -266,6 +266,15 @@
                     <field name="has_confirmed_quotation" invisible="1" />
                     <field name="has_quotation" invisible="1" />
                 </page>
+                <page name="conditions" attrs="{'invisible': [('client_state','!=','quoted')]}" string="Terminos de la cotización">
+                    <group>
+                        <field name="quotation_terms_conditions_id"/>
+                        <field name="quotation_time_period_for_payment_type_id"/>
+                        <field name="quotation_time_period_for_shipping_time_id"/>
+                        <field name="quotation_time_period_for_guarantee_id"/>
+                        <field name="quotation_time_period_for_validity_id"/>
+                    </group>
+                </page>
                 <page name="purchase_view" string="Venta de bienes"
                     attrs="{'invisible': [('product_or_service', '=', 'service')]}">
                     <group>
@@ -365,7 +374,7 @@
                 <group>
                     <field name="company_id" invisible="1" />
                     <field name="partner_id" string="Cliente *" />
-                    <field name="product_or_service" required="1" string="Bien/Servicio *" />
+                    <field name="product_or_service" required="1" string="Servicio/Bien *" />
                     <field name="repair_order_type_id" string="Modalidad del Servicio *"
                         attrs="{'invisible': [('product_or_service','=','product')], 'required': [('product_or_service','=','service')]}" />
                     <field name="service_description" string="Descr."

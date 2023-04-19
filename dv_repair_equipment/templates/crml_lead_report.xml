@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="technician_info_report_document_crm_lead">
+    <t t-call="web.external_layout">
+        <style>
+            .lst_products {
+              border-collapse: collapse;
+              margin: 0 auto;
+              text-align: center;
+              width: 100%;
+            }
+            .lst_products td, .lst_products th {
+              border: 1px solid black;
+              padding: 2px;
+              font-size: 14px;
+            }
+            .lst_products th{
+                background-color: #ffd966;
+            }
+            .bordered {
+                border: 1px solid black;
+                font-weight: bold;
+                padding: 4px;
+            }
+        </style>
+        <h4 style="text-align: center;"><u>INFORME TÉCNICO 
+            <t t-if="doc">- <t t-esc="doc.name"/></t>
+        </u></h4>
+        <p>Cliente: <t t-esc="doc.partner_id.name"/></p>
+        <p style="text-align: right;">Atendido por: <t t-esc="doc.repair_user_id.name"/></p>
+        <br/>
+        <p>A continuación, presentamos el informe técnico del equipo con solicitud de servicio en el área de almacén</p>
+        <h6 class="bordered">FALLA REPORTADA:</h6>
+        <p>* <t t-esc="doc.equipment_failure_report"/></p>
+        <br/>
+        <h6 class="bordered">PRODUCTOS RECIBIDOS DEL CLIENTE:</h6>
+
+        <table class="lst_products">
+            <thead>
+                <tr>
+                    <th>Nª de activo</th>
+                    <th>Nª de serie</th>
+                    <th>Tipo de Equipo</th>
+                    <th>Modelo</th>
+                    <th>Accesorios</th>
+                    <th>Otros datos del equipo</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><t t-if="doc.n_active">
+                        <t t-esc="doc.n_active"/></t>
+                        <t t-else="">N/A</t></td>
+                    <td><t t-if="doc.n_serie">
+                        <t t-esc="doc.n_serie"/></t>
+                        <t t-else="">N/A</t></td>
+                    <td><t t-if="doc.repair_equipment_type_id.name">
+                        <t t-esc="doc.repair_equipment_type_id.name"/></t>
+                        <t t-else="">N/A</t></td>
+                    <td>
+                        <t t-if="doc.equipment_model">
+                            <t t-esc="doc.equipment_model"/></t>
+                        <t t-else="">N/A</t></td>
+                    <td>
+                        <t t-if="doc.equipment_accessories">
+                            <t t-esc="doc.equipment_accessories"/></t>
+                        <t t-else="">N/A</t></td>
+                    <td>
+                        <t t-if="doc.other_equipment_data">
+                            <t t-esc="doc.other_equipment_data"/></t>
+                        <t t-else="">N/A</t></td>
+                </tr>
+            </tbody>
+        </table><br/>
+
+        <t t-if="doc.repair_order_components_ids">
+            <table class="lst_products">
+                <thead>
+                    <tr>
+                        <th>PRODUCTO</th>
+                        <th>DETALLES</th>
+                        <th>CANTIDAD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="doc.repair_order_components_ids" t-as="component">
+                        <tr>
+                            <td><t t-esc="component.product_id.name"/></td>
+                            <td><t t-esc="component.details"/></td>
+                            <td><t t-esc="component.quantity"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </t>
+        <t t-else="">
+            <p>No se recibieron productos del cliente</p>
+        </t>
+        <br/>
+        <h6 class="bordered">DIAGNOSTICO:</h6>
+        <p>* <t t-esc="doc.initial_diagnosis"/></p>
+        <br/>
+        <h6 class="bordered">OBSERVACIÓN INICIAL:</h6>
+        <p>* <t t-if="doc.comments"><t t-esc="doc.comments"/></t>
+            <t t-else="">No se ha especificado una observación inicial</t></p>
+        <br/>
+        <h6 class="bordered">PRODUCTOS ADQUIRIDOS:</h6>
+        <t t-if="doc.repair_product_required">
+            <table class="lst_products">
+                <thead>
+                    <tr>
+                        <th>PRODUCTO</th>
+                        <th>DETALLES</th>
+                        <th>CANTIDAD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="doc.repair_product_required" t-as="product">
+                        <tr>
+                            <td><t t-esc="product.product_id.name"/></td>
+                            <td><t t-esc="product.description"/></td>
+                            <td><t t-esc="product.quantity"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </t>
+        <t t-else="">
+            <p>No se adquirieron productos</p>
+        </t>
+        <br/>
+        <h6 class="bordered">OBSERVACIONES FINAL:</h6>
+        <t t-if="doc.repair_observation_detail_ids">
+            <t t-foreach="doc.repair_observation_detail_ids" t-as="observation">
+                <p>* <t t-esc="observation.name"/> - <t t-esc="observation.details"/> - <t t-esc="observation.date_of_observation"/></p>
+            </t>
+        </t>
+        <t t-else="">
+            <p>No se ha registrado ninguna observación final</p>
+        </t>
+        <br/>
+        <h6 class="bordered">CONCLUSIÓN:</h6>
+        <p>* <t t-esc="doc.conclusion"/></p>
+        <br/>
+        <p>Atentamente: </p>
+        <!-- Agregar firma del usuario -->
+        <div class="col-3 mb4">
+            <img t-if="user.x_default_user_singnature" t-att-src="image_data_uri(user.x_default_user_singnature)" style="max-height: 200px;"/>
+            <br/>
+            <p t-esc="user.name"/>
+        </div>
+        </t>
+</template>
+
+
+<template id="technician_info_report_crm_lead">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="dv_repair_equipment.technician_info_report_document_crm_lead"/>
+        </t>
+    </t>
+</template>
+</odoo>
