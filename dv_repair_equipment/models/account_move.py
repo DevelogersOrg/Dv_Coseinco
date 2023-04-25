@@ -9,6 +9,8 @@ class AccountMove(models.Model):
     move_state = fields.Selection([('in_process', 'En Proceso'), ('tb_invoiced', 'Por Facturar'), (
         'invoiced', 'Facturado')], string='Estado', default='in_process', group_expand='_expand_states', index=True)
     crm_lead_id = fields.Many2one('crm.lead', string='Cotización')
+    #crm_lead_client_state = fields.Selection(string='Estado de crm', related='crm_lead_id.client_state')
+    
     client_id = fields.Many2one(
         'res.partner', string="Cliente", related='crm_lead_id.partner_id')
     repair_product_required_ids = fields.One2many(

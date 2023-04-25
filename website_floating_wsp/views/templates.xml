@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <template id="assets_frontend" inherit_id="web.assets_frontend" name="Whatsapp Assets">
+		    <xpath expr="//link[last()]" position="after">
+		        <link rel="stylesheet" href="/website_floating_wsp/static/src/css/floating-wpp.css"/>
+
+		    </xpath>
+		    <xpath expr="//script[last()]" position="after">
+			<script type="text/javascript" src="/website_floating_wsp/static/src/js/floating-wpp.min.js"/>
+			<script>
+				$(function () {
+				$('#WhatsAppButton').floatingWhatsApp({
+					phone:  $('#phone').attr('name'),
+					message: $('#message').attr('name'),
+					popupMessage: $('#popupMessage').attr('name'),
+					autoOpenTimeout:$('#autoOpenTimeout').attr('name'),
+					showPopup: $('#showPopup').attr('name'),
+				    size: $('#size').attr('name'),
+					headerTitle: $('#headerTitle').attr('name'),
+					position: $('#position').attr('name'),
+					margin: $('#margin').attr('name'),
+					margin_bottom: $('#margin_bottom').attr('name'),
+				});});
+			</script>
+
+		    </xpath>
+		</template>
+		
+		 <template id="floating_watsapp" inherit_id="portal.frontend_layout" name="Whatsapp button">
+		 	<xpath expr="//div[@id='wrapwrap']" position="after">
+
+		 		<div id="WhatsAppButton"></div>
+				<div id="phone" t-att-name="website.phone"></div>
+				<div id="message" t-att-name="website.message"></div>
+				<div id="popupMessage" t-att-name="website.popup_message"></div>
+				<div id="showPopup" t-att-name="website.show_popup"></div>
+				<div id="headerTitle" t-att-name="website.header_title"></div>
+				<div id="size" t-att-name="website.size"></div>
+				<div id="autoOpenTimeout" t-att-name="website.auto_open_timeout"></div>
+				<div id="position" t-att-name="website.position"></div>
+				<div id="margin" t-att-name="website.margin"></div>
+				<div id="margin_bottom" t-att-name="website.margin_bottom"></div>
+		 	</xpath>
+		 </template>
+		
+</odoo>

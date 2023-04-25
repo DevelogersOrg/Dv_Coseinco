@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+         <record id="configurator_settings_whatsapp_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.whatsapp</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="10"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block"
+                        data-string="Whatsapp flotante"
+                         data-key="website_floating_wsp"
+                        string="Whatsapp flotante">
+                        <h2>Whatsapp flotante</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <group>
+                                   <field name="floating_wsp_id"/>
+                                </group>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

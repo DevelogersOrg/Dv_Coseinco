@@ -1,0 +1,205 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* website_floating_wsp
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-10-04 21:51+0000\n"
+"PO-Revision-Date: 2018-10-04 17:02-0500\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: es_MX\n"
+"X-Generator: Poedit 2.0.6\n"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_auto_open_timeout
+msgid "Auto Open Time Out"
+msgstr "Tiempo de retardo de apertura"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_background_color
+msgid "Background color"
+msgstr "Color de fondo"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_button_image
+msgid "Button Image"
+msgstr "Imágen del botón"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,help:website_floating_wsp.field_website_floating_wsp_button_image
+msgid "Button background image. Must be an img or svg in order to be displayed properly. <img src=\"burger.svg\" />"
+msgstr "Botón de imagen de fondo. Debe ser un img o svg para que se muestre correctamente"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_create_date
+msgid "Created on"
+msgstr "Creado en"
+
+#. module: website_floating_wsp
+#: model:ir.ui.view,arch_db:website_floating_wsp.view_floating_whatsapp_form
+msgid "Describe the theme..."
+msgstr "Describe el tema"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_display_name
+msgid "Display Name"
+msgstr "Nombre mostrado"
+
+#. module: website_floating_wsp
+#: model:ir.actions.act_window,name:website_floating_wsp.action_website_floating_wsp
+#: model:ir.ui.menu,name:website_floating_wsp.menu_website_floating_wsp
+#: model:ir.ui.view,arch_db:website_floating_wsp.view_floating_whatsapp_form
+#: model:ir.ui.view,arch_db:website_floating_wsp.website_floating_wsp_tree_view
+msgid "Floating WhatsApp"
+msgstr "WhatsApp flotante"
+
+#. module: website_floating_wsp
+#: model:ir.model,name:website_floating_wsp.model_website_floating_wsp
+#: model:ir.ui.view,arch_db:website_floating_wsp.res_config_settings_view_form
+msgid "Floating Whatsapp"
+msgstr "Whatsapp flotante"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_res_config_settings_floating_wsp_id
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_id
+#: model:ir.ui.view,arch_db:website_floating_wsp.view_floating_whatsapp_form
+msgid "Floating Whatsapp Theme"
+msgstr "Tema de  Whatsapp floyante"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_header_color
+msgid "Header Color"
+msgstr "Color del encabezado"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_header_title
+msgid "Header Title"
+msgstr "Título del encabezado"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_id_2908
+msgid "ID"
+msgstr "ID (identificación)"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp___last_update
+msgid "Last Modified on"
+msgstr "Última modificación en"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_write_uid
+msgid "Last Updated by"
+msgstr "Última actualización de"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_write_date
+msgid "Last Updated on"
+msgstr "Última actualización en"
+
+#. module: website_floating_wsp
+#: selection:website_floating_wsp,position:0
+msgid "Left"
+msgstr "Izquierda"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_message
+msgid "Message"
+msgstr "Mensaje"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,help:website_floating_wsp.field_website_floating_wsp_message
+msgid "Message to be sent. If showPopup is true, the input will be populated with this message."
+msgstr "Mensaje a enviar. Si showPopup es verdadero, la entrada se rellenará con este mensaje."
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,help:website_floating_wsp.field_website_floating_wsp_popup_message
+msgid "Message to be shown as a received message in the fake chat."
+msgstr "Mensaje que se mostrará como un mensaje recibido en el chat falso."
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_name
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_phone
+msgid "Name"
+msgstr "Nombre"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_popup_message
+msgid "Popup Message"
+msgstr "Mensaje pop up"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_position
+msgid "Position"
+msgstr "Posición"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,help:website_floating_wsp.field_website_floating_wsp_position
+msgid "Position of the button the screen."
+msgstr "Posición del botón de la pantalla."
+
+#. module: website_floating_wsp
+#: selection:website_floating_wsp,position:0
+msgid "Right"
+msgstr "Derecha"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,help:website_floating_wsp.field_website_floating_wsp_auto_open_timeout
+msgid "Set an amount of time in milliseconds for the popup to open automaticaly."
+msgstr "Set an amount of time in milliseconds for the popup to open automaticaly."
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_show_popup
+msgid "Show Popup"
+msgstr "Mostrar ventanas emergentes"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,help:website_floating_wsp.field_website_floating_wsp_show_popup
+msgid "Show a fake chat popup when the user hovers (on desktop) or clicks the button (on mobile)."
+msgstr "Muestra un mensaje emergente de chat falso cuando el usuario se desplaza (en el escritorio) o hace clic en el botón (en el móvil)."
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,field_description:website_floating_wsp.field_website_floating_wsp_size
+msgid "Size"
+msgstr "Tamaño"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,help:website_floating_wsp.field_website_floating_wsp_header_title
+msgid "Text to be displayed at the popup window title bar."
+msgstr "Texto que se mostrará en la barra de título de la ventana emergente."
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,help:website_floating_wsp.field_website_floating_wsp_size
+msgid "The size of the button."
+msgstr "El tamaño del botón."
+
+#. module: website_floating_wsp
+#: model:ir.ui.view,arch_db:website_floating_wsp.res_config_settings_view_form
+msgid "Theme"
+msgstr "Tema"
+
+#. module: website_floating_wsp
+#: model:ir.model,name:website_floating_wsp.model_website
+msgid "Website"
+msgstr "Sitio web"
+
+#. module: website_floating_wsp
+#: model:ir.model.fields,help:website_floating_wsp.field_website_floating_wsp_phone
+msgid "WhatsApp intenational number which will receive the message."
+msgstr "Número internacional de WhatsApp que recibirá el mensaje."
+
+#. module: website_floating_wsp
+#: model:ir.model,name:website_floating_wsp.model_res_config_settings
+msgid "res.config.settings"
+msgstr "res.config.settings"

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_website_whatsapp_public,website,model_website_floating_wsp,,1,0,0,0
+access_website_whatsapp_designer,website,model_website_floating_wsp,website.group_website_designer,1,1,1,1
