@@ -10,7 +10,7 @@
                 """,
     "summary": "Advance Material Backend Theme, Responsive Theme, Fully functional Theme, flexible Backend Theme, fast Backend Theme, lightweight Backend Theme, Animated Backend Theme, Modern multipurpose theme, Customizable Backend Theme, Multi Tab Backend Theme Odoo",
     "category": "Theme/Backend",
-    "version": "14.0.19",
+    "version": "14.0.1.0.0",
     "depends":
     [
         "web", "mail"

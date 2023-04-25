@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {   'name': 'WhatsApp Website',
-    'version': '13.0',
+    'version': "14.0.1.0.0",
     'author': "David Montero Crespo",
     'description': """
         Chat with your customers through WhatsApp, the most popular messaging app. Vital extension for your odoo website """,
