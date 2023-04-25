@@ -10,5 +10,16 @@
 - mensajes de confirmación
 - agregar al kanba el creador del registro con su imagen
 
-Prueba para crear un build con runboat
-Segunda prueba para crear otra build
+- Prueba para crear un build con runboat
+- Segunda prueba para crear otra build
+- Tercera prueba para crear una build
+- Cuarta prueba para agregar una build
+- quinta prueba para agregar una build
+- Sexta prueba para agregar una build
+- Septima prueba para agregar una build
+- Octava prueba para agregar una build
+- Novena prueba para agregar una build
+- Decima prueba para agregar una build
+- Onceava prueba para agregar una build
+- Doceava prueba para agregar una build
+- 
