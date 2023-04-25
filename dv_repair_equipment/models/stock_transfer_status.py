@@ -107,7 +107,9 @@ class StockTransferStatus(models.Model):
         self.transfer_state = 'request'
         self.need_to_purchase = False
         self.purchase_order_id = purchase_order.id
-        self.crm_lead_id.crm_lead_state = 'purchase'
+        self.crm_lead_id.sudo().write({
+            'crm_lead_state': 'purchase',
+        })
         return {
             'effect': {
             'fadeout': 'slow',
