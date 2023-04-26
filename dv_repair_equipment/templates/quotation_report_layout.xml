@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//h2[1]" position="replace">
+            <p>Estimad@:</p>
+            <p>Por intermedio del presente nos es grato dirigirnos a usted, con el propósito de hacerle llegar nuestra propuesta técnico-económica</p>
+        </xpath>
+
+        <!-- Sobrescribir la penultima linea que indica el plazo de pago -->
+        <xpath expr="//p[last() - 1]" position="replace">
+            <style>
+                .condiciones {
+                  border-collapse: collapse;
+                  margin: 0 auto;
+                  text-align: center;
+                }
+                .condiciones td, .condiciones th {
+                  border: 1px solid black;
+                  padding: 2px;
+                  font-size: 12px;
+                }
+            </style>
+            <h6><u>CONDICIONES COMERCIALES</u></h6>
+            <table class="condiciones">
+                <tr>
+                    <td>Aceptación del presupuesto</td>
+                    <td><t t-if="doc.quotation_terms_conditions_id"><t t-esc="doc.quotation_terms_conditions_id.name"/></t>
+                        <t t-else="">No especificado</t></td>
+                </tr>
+                <tr>
+                    <td>Forma de Pago</td>
+                    <td><t t-if="doc.quotation_time_period_for_payment_type_id"><t t-esc="doc.quotation_time_period_for_payment_type_id.name"/></t>
+                        <t t-else="">No especificado</t></td>
+                </tr>
+                <tr>
+                    <td>Tiempo de Entrega</td>
+                    <td><t t-if="doc.quotation_time_period_for_shipping_time_id"><t t-esc="doc.quotation_time_period_for_shipping_time_id.name"/></t>
+                        <t t-else="">No especificado</t></td>
+                </tr>
+                <tr>
+                    <td>Garantía</td>
+                    <td><t t-if="doc.quotation_time_period_for_guarantee_id"><t t-esc="doc.quotation_time_period_for_guarantee_id.name"/></t>
+                        <t t-else="">No especificado</t></td>
+                </tr>
+                <tr>
+                    <td>Validez de Cotización</td>
+                    <td><t t-if="doc.quotation_time_period_for_validity_id"><t t-esc="doc.quotation_time_period_for_validity_id.name"/></t>
+                        <t t-else="">No especificado</t></td>
+                </tr>
+            </table>
+            <br/>
+            <p style="font-size: 12px;">Sin otro particular y en espera de sus gratas noticias, nos despedimos de usted.</p>
+            <p style="font-size: 12px;">Atentamente</p>
+            <div class="col-3 mb4">
+                <img t-if="user.x_default_user_singnature" t-att-src="image_data_uri(user.x_default_user_singnature)" style="max-height: 200px;"/>
+                <br/>
+                <p t-esc="user.name"/>
+            </div>
+        </xpath>
+    </template>
+</odoo>

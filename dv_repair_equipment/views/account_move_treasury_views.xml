@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <record id="account_move_treasury_view_kanban" model="ir.ui.view">
+    <field name="name">account_move_view.kanban</field>
+    <field name="model">account.move</field>
+    <field name="arch" type="xml">
+      <kanban class="o_kanban_mobile" sample="1" default_group_by="treasury_state" records_draggable="false">
+        <field name="treasury_state"/>
+        <templates>
+          <t t-name="kanban-box">
+            <div class="oe_kanban_global_click">
+              <div class="oe_kanban_details d-flex flex-column">
+                <h3><field name="crm_lead_id"/></h3>
+                <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
+                <p>Creado el: <field name="create_date" widget="datetime"/></p>
+                <p>Actualizado al: <field name="__last_update" widget="datetime"/></p>
+              </div>
+              <t t-if="record.treasury_state != 'paid'">
+                <button name="action_treasury_state_pay"
+                type="object"
+                class="btn btn-primary"
+                style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                Confirmar
+                </button>
+            </t>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
+
+
+  <record id="invoice_action" model="ir.actions.act_window">
+    <field name="name">Tesoreria</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">account.move</field>
+    <field name="view_mode">tree,kanban,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+          No hay registros para mostrar
+      </p>
+    </field>
+    <field name="view_ids" eval="[
+    (5, 0, 0),
+    (0, 0, {'view_mode': 'tree', 'view_id': ref('account.view_invoice_tree')}),
+    (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.account_move_treasury_view_kanban')}),
+    (0, 0, {'view_mode': 'form', 'view_id': ref('account.view_move_form')}),]"/>
+  </record>
+</odoo>

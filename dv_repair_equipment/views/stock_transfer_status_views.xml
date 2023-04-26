@@ -1,0 +1,286 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <!-- _________________________________________________________ -->
+  <!-- kanban -->
+  <!-- _________________________________________________________ -->
+  <!-- Almacen -->
+  <record id="warehouse_view_stock_transfer_status_kanban" model="ir.ui.view">
+    <field name="name">stock_transfer_status.kanban</field>
+    <field name="model">stock.transfer.status</field>
+    <field name="arch" type="xml">
+      <kanban class="o_kanban_mobile" sample="1" default_group_by="transfer_state" records_draggable="false">
+        <field name="transfer_state" />
+        <field name="crm_lead_id"/>
+        <field name="create_date"/>
+        <field name="__last_update"/>
+        <field name="need_to_purchase"/>
+        <templates>
+          <t t-name="kanban-box">
+            <div class="oe_kanban_card oe_kanban_global_click">
+              <div class="o_kanban_record_top  d-flex flex-column ml-1">
+                <h3 class="o_kanban_record_title" style="margin-bottom: 8px !important">
+                  <field name="crm_lead_id"/>
+                </h3>
+              </div>
+              <div class="o_kanban_record_bottom" style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
+                <div class="text-muted">
+                  <span>Creado :
+                    <t t-esc="record.create_date.value" modifiers="{}"/>
+                  </span>
+                  <br/>
+                  <span>Actulizado:
+                    <t t-esc="record.__last_update.value" modifiers="{}"/>
+                  </span>
+                  <br/>
+                </div>
+              </div>
+              <t t-if="record.transfer_state.raw_value == 'income'">
+                <button name="confirm_stock_pickings"
+                type="object"
+                class="btn btn-primary"
+                style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                Confirmar Entrega
+                </button>
+              </t>
+              <t t-if="record.transfer_state.raw_value == 'new' and record.need_to_purchase.raw_value == false">
+                <button name="deliver_products"
+                type="object"
+                class="btn btn-primary"
+                style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                Entregar Productos
+                </button>
+              </t>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+  <!-- Despacho -->
+  <record id="pick_view_stock_transfer_status_kanban" model="ir.ui.view">
+    <field name="name">stock_transfer_status.kanban</field>
+    <field name="model">stock.transfer.status</field>
+    <field name="arch" type="xml">
+      <kanban class="o_kanban_mobile" sample="1" default_group_by="picking_state" records_draggable="false">
+        <field name="picking_state" />
+        <field name="crm_lead_id"/>
+        <templates>
+          <t t-name="kanban-box">
+            <div class="oe_kanban_global_click">
+              <div class="oe_kanban_details d-flex flex-column">
+                <h3>
+                  <field name="crm_lead_id"/>
+                </h3>
+                <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
+                <p>Creado el:
+                  <field name="create_date" widget="datetime"/>
+                </p>
+                <p>Actualizado al:
+                  <field name="__last_update" widget="datetime"/>
+                </p>
+              </div>
+              <t t-if="record.picking_state.raw_value != 'delivered'">
+                <button name="change_picking_state"
+                type="object"
+                class="btn btn-primary"
+                style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                Confirmar
+                </button>
+              </t>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+  <!-- _________________________________________________________ -->
+  <!-- tree -->
+  <!-- _________________________________________________________ -->
+  <!-- Almacen -->
+  <record id="warehouse_view_stock_transfer_status_tree" model="ir.ui.view">
+    <field name="name">stock.transfer.status.tree</field>
+    <field name="model">stock.transfer.status</field>
+    <field name="arch" type="xml">
+      <tree string="Almacen">
+        <field name="name"/>
+        <field name="repair_product_required_ids"/>
+        <field name="transfer_state"/>
+      </tree>
+    </field>
+  </record>
+  <!-- Despacho -->
+  <record id="pick_view_stock_transfer_status_tree" model="ir.ui.view">
+    <field name="name">stock.transfer.status.tree</field>
+    <field name="model">stock.transfer.status</field>
+    <field name="arch" type="xml">
+      <tree string="Almacen">
+        <field name="name"/>
+        <field name="repair_product_required_ids"/>
+        <field name="transfer_state"/>
+      </tree>
+    </field>
+  </record>
+  <!-- _________________________________________________________ -->
+  <!-- form -->
+  <!-- _________________________________________________________ -->
+  <!-- Almacen -->
+  <record id="warehouse_view_stock_transfer_status_form" model="ir.ui.view">
+    <field name="name">stock.transfer.status.form</field>
+    <field name="model">stock.transfer.status</field>
+    <field name="arch" type="xml">
+      <form string="Almacen">
+        <sheet>
+          <h1>N :
+            <field name="name"/>
+          </h1>
+          <group>
+            <field name="repair_product_required_ids">
+              <tree>
+                <field name="product_id"/>
+                <field name="description"/>
+                <field name="quantity"/>
+                <field name="product_qty_available" string="Cantidad disponible"/>
+              </tree>
+              <form>
+                <sheet>
+                  <group>
+                    <field name="product_id"/>
+                    <field name="description"/>
+                    <field name="quantity"/>
+                    <field name="product_qty_available" string="Cantidad disponible"/>
+                  </group>
+                </sheet>
+              </form>
+            </field>
+            <field name="purchase_order_id" readonly="1" attrs="{'invisible': [('purchase_order_id','=', False)]}"/>
+            <field name="crm_lead_id" invisible="1"/>
+            <field name="sale_order_id" invisible="1"/>
+            <field name="transfer_state" invisible="1"/>
+            <field name="need_to_purchase" invisible="1"/>
+            <field name="client_id" invisible="1"/>
+            <field name="company_id" invisible="1"/>
+            <field name="reciever_name" invisible="1"/>
+            <field name="reciever_phone" invisible="1"/>
+            <field name="reciever_id" invisible="1"/>
+            <field name="reciever_direction" invisible="1"/>
+            <field name="repair_products_to_return_ids" invisible="1"/>
+          </group>
+          <group attrs="{'invisible': [('need_to_purchase','=', False)]}">
+            <button name="create_purchase_orders"
+            type="object"
+            class="btn btn-primary"
+            attrs="{'invisible': [('transfer_state','!=', 'new')]}">
+            Comprar productos faltantes      
+            </button>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <!-- Despacho -->
+  <record id="pick_view_stock_transfer_status_form" model="ir.ui.view">
+    <field name="name">stock.transfer.status.form</field>
+    <field name="model">stock.transfer.status</field>
+    <field name="arch" type="xml">
+      <form string="Almacen">
+        <sheet>
+          <h1>N :
+            <field name="name"/>
+          </h1>
+          <group string="Productos a devolver">
+            <field name="repair_products_to_return_ids">
+              <tree>
+                <field name="product_id"/>
+                <field name="details"/>
+                <field name="quantity"/>
+              </tree>
+              <form>
+                <sheet>
+                  <group>
+                    <field name="product_id"/>
+                    <field name="details"/>
+                    <field name="quantity"/>
+                  </group>
+                </sheet>
+              </form>
+            </field>
+            <field name="given_products_state_probe_by_technician" widget="binary" attrs="{'readonly': [('picking_state','=', 'confirmed')]}"/>
+            <field name="repair_product_required_ids" invisible="1"/>
+            <field name="picking_state" invisible="1"/>
+            <field name="crm_lead_id" invisible="1"/>
+            <field name="sale_order_id" invisible="1"/>
+            <field name="transfer_state" invisible="1"/>
+            <field name="need_to_purchase" invisible="1"/>
+            <notebook>
+              <page name="ship_info" string="Información para despachar" attrs="{'invisible': [('picking_state', '!=', 'to_ship')]}">
+                <group string="Cliente">
+                  <field name="client_id"/>
+                </group>
+                <group attrs="{'invisible': [('company_id','=', False)]}" string="Empresa">
+                  <field name="company_id"/>
+                </group>
+                <group string="Receptor">
+                  <field name="reciever_name"/>
+                  <field name="reciever_function"/>
+                  <field name="reciever_phone"/>
+                  <field name="reciever_id"/>
+                  <field name="reciever_direction"/>
+                  <span>¡Si los campos estan vacios se usarán los valores del cliente!</span>
+                </group>
+                <group string="Datos de entrega">
+                  <field name="ship_date"/>
+                </group>
+              </page>
+              <page name="ship_info" string="Odoo delivery_boy" attrs="{'invisible': [('picking_state', '!=', 'shiped')]}">
+                <group>
+                  <h4>Aqui se creará la solicitud de Odoo delivery boy</h4>
+                </group>
+              </page>
+            </notebook>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <!-- _________________________________________________________ -->
+  <!-- Acciones -->
+  <!-- _________________________________________________________ -->
+  <!-- Almacen -->
+  <record id="warehouse_stock_transfer_status_action" model="ir.actions.act_window">
+    <field name="name">Almacen</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">stock.transfer.status</field>
+    <field name="view_mode">kanban,tree,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+            No hay registros para mostrar
+        </p>
+    </field>
+    <field name="domain">[('is_a_warehouse_order', '=', True)]</field>
+    <field name="context">{'default_is_a_warehouse_order': True}</field>
+    <field name="view_ids" eval="[
+        (5, 0, 0),
+        (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.warehouse_view_stock_transfer_status_kanban')}),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('dv_repair_equipment.warehouse_view_stock_transfer_status_tree')}),
+        (0, 0, {'view_mode': 'form', 'view_id': ref('dv_repair_equipment.warehouse_view_stock_transfer_status_form')}),]"/>
+  </record>
+  <!-- Despacho -->
+  <record id="pick_stock_transfer_status_action" model="ir.actions.act_window">
+    <field name="name">Despacho</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">stock.transfer.status</field>
+    <field name="view_mode">kanban,tree,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+            No hay registros para mostrar
+        </p>
+    </field>
+    <field name="domain">[('is_now_picking_order', '=', True)]</field>
+    <field name="context">{'default_is_a_warehouse_order': False}</field>
+    <field name="view_ids" eval="[
+        (5, 0, 0),
+        (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.pick_view_stock_transfer_status_kanban')}),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('dv_repair_equipment.pick_view_stock_transfer_status_tree')}),
+        (0, 0, {'view_mode': 'form', 'view_id': ref('dv_repair_equipment.pick_view_stock_transfer_status_form')}),]"/>
+  </record>
+</odoo>

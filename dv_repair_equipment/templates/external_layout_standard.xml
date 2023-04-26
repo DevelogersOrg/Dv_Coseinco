@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="external_layout_standard" inherit_id="web.external_layout_standard">
+        <xpath expr="//div[1]" position="replace">
+            <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+                <div class="row">
+                    <div class="col-3 mb4">
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 90px;" alt="Logo"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 text-end" name="company_address">
+                        <p style="margin-left: 100px; font-size: 14px">
+                            <strong>Venta Alquiler, Mantenimiento y Reparación de Equipos de Cómputo y Aire Acondicionado</strong>
+                        </p>
+                        <p style="text-align: right; font-size: 16px">
+                            La Victoria, 
+                            <t t-esc="datetime.datetime.now().strftime('%d de')"/>
+                            <t t-esc="datetime.datetime.now().strftime('%m')
+                            .replace('01','Enero')
+                            .replace('02','Febrero')
+                            .replace('03','Marzo')
+                            .replace('04','Abril')
+                            .replace('05','Mayo')
+                            .replace('06','Junio')
+                            .replace('07','Julio')
+                            .replace('08','Agosto')
+                            .replace('09','Septiembre')
+                            .replace('10','Octubre')
+                            .replace('11','Noviembre')
+                            .replace('12','Diciembre')"/>
+                            <t t-esc="datetime.datetime.now().strftime('del %Y')"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <br/>
+        </xpath>
+
+    </template>
+
+</odoo>

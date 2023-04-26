@@ -1,0 +1,438 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <!-- _________________________________________________________________________ -->
+    <!-- KANBAN -->
+    <!-- _________________________________________________________________________ -->
+
+
+    <!-- Kanban para cliente -->
+    <record id="crm_lead_client_kanban_view" model="ir.ui.view">
+        <field name="name">crm.lead.view.kanban</field>
+        <field name="model">crm.lead</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="client_state"
+                class="o_kanban_small_column o_kanban_project_tasks" on_create="quick_create"
+                quick_create_view="dv_repair_equipment.quick_create_crm_lead_form"
+                records_draggable="false">
+                <field name="client_state" />
+                <field name="partner_id" />
+                <field name="repair_user_id" />
+                <field name="is_displayed_in_both" />
+                <field name="create_date" />
+                <field name="__last_update" />
+                <field name="product_or_service" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top  d-flex flex-column ml-1">
+                                <h3 class="o_kanban_record_title"
+                                    style="margin-bottom: 8px !important">
+                                    <field name="display_name"/>
+                                </h3>
+                            </div>
+                            <div class="o_kanban_record_bottom"
+                                style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
+                                <div class="text-muted">
+                                    <span>Creado :<t t-esc="record.create_date.value" modifiers="{}" /></span>
+                                    <br />
+                                    <span>Actulizado: <t t-esc="record.__last_update.value"
+                                            modifiers="{}" /></span>
+                                    <br />
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="crm_lead_state" widget="label_selection"
+                                        options="{'classes': {'new': 'success', 'assigned': 'danger', 'dg_ready': 'warning',
+                                    'dg_ready_ready': 'danger', 'quoted' : 'warning','warehouse': 'warning','purchase': 'warning','ready_to_repair':'warning','repairing':'warning','confirmed': 'success'}}"
+                                        modifiers="{'readonly':true}" />
+                                </div>
+                            </div>
+                            <t t-if="record.is_displayed_in_both.raw_value == false">
+                                <button name="action_change_both_state"
+                                    type="object"
+                                    class="btn btn-primary"
+                                    style="display: block !important; width: 100% !important; margin-top: 10px !important;"
+                                    attrs="{'invisible': [('client_state', '=', 'confirmed')]}">
+                                    Confirmar
+                                </button>
+                            </t>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+
+    <!-- Kanban para tecnico -->
+    <record id="crm_lead_technician_kanban_view" model="ir.ui.view">
+        <field name="name">crm.lead.view.kanban</field>
+        <field name="model">crm.lead</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="repair_state"
+                class="o_kanban_small_column o_kanban_project_tasks" on_create="quick_create"
+                quick_create_view="dv_repair_equipment.quick_create_crm_lead_form"
+                records_draggable="false">
+                <field name="repair_state" />
+                <field name="partner_id" />
+                <field name="repair_user_id" />
+                <field name="is_displayed_in_both" />
+                <field name="create_date" />
+                <field name="__last_update" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top  d-flex flex-column ml-1">
+                                <h3 class="o_kanban_record_title"
+                                    style="margin-bottom: 8px !important">Nª <field name="display_name"/></h3>
+                            </div>
+                            <div class="o_kanban_record_bottom"
+                                style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
+                                <div class="text-muted">
+                                    <span>Creado :<t t-esc="record.create_date.value" modifiers="{}" /></span>
+                                    <br />
+                                    <span>Actulizado: <t t-esc="record.__last_update.value"
+                                            modifiers="{}" /></span>
+                                    <br />
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="crm_lead_state" widget="label_selection"
+                                        options="{'classes': {'new': 'success', 'assigned': 'warning', 'dg_ready': 'danger',
+                                    'dg_ready_ready': 'warning', 'quoted' : 'warning','warehouse': 'warning','purchase': 'warning','ready_to_repair':'danger','repairing':'warning','confirmed': 'success'}}"
+                                        modifiers="{'readonly':true}" />
+                                </div>
+                            </div>
+                            <t t-if="record.is_displayed_in_both.raw_value == false">
+                                <button name="action_change_both_state"
+                                    type="object"
+                                    class="btn btn-primary"
+                                    style="display: block !important; width: 100% !important; margin-top: 10px !important;"
+                                    attrs="{'invisible': [('repair_state', '=', 'ready')]}">
+                                    Confirmar
+                                </button>
+                            </t>
+                            <t t-if="record.repair_state.raw_value == 'confirmed'">
+                                <button name="do_repair"
+                                    type="object"
+                                    class="btn btn-primary"
+                                    style="display: block !important; width: 100% !important; margin-top: 10px !important;">
+                                    Comenzar reparación
+                                </button>
+                            </t>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+
+    <!-- _________________________________________________________________________ -->
+    <!-- FORM -->
+    <!-- _________________________________________________________________________ -->
+
+
+    <!-- Formulario para cliente -->
+    <record id="crm_lead_form_view_inherited" model="ir.ui.view">
+        <field name="name">crm.lead.view.form.inherited</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='active']" position="after">
+                <field name="client_state" invisible="1" />
+                <field name="repair_state" invisible="1" />
+                <field name="crm_lead_state" invisible="1" />
+                <field name="is_now_in_client_view" invisible="1" />
+                <field name="product_or_service" invisible="1" />
+            </xpath>
+            <xpath expr="//group[@name='lead_partner']" position="after">
+                <group>
+                    <field name="repair_order_type_id"
+                        attrs="{'required': [('product_or_service','=','service')]}" />
+                    <field name="service_description" />
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='lead']" position="after">
+                <page name="assigned_view" string="Detalles del diagnóstico"
+                    attrs="{'invisible': [('client_state', '!=', 'assigned'), ('client_state', '!=', 'dg_ready')]}">
+                    <group>
+                        <group string="Cliente" nolabel="1">
+                            <field name="partner_id"
+                                attrs="{'required': [('client_state','=','assigned')], 'readonly': [('client_state', '!=', 'assigned')]}"
+                                string="Cliente *" />
+                        </group>
+                        <group string="Tecnico" nolabel="1">
+                            <field name="repair_user_id"
+                                attrs="{'required': [('client_state','=','assigned')], 'readonly': [('client_state', '!=', 'assigned')]}"
+                                string="Técnico *" />
+                        </group>
+                    </group>
+                    <group string="Equipo">
+                        <!-- attrs="{'readonly': [('n_active', '!=', False), ('client_state', '!=', 'assigned')]}"  -->
+                        <field name="n_active" string="Nª de activo (t)"/>
+                        <field name="n_serie" string="Nª de serie (ac)"/>
+                        <field name="repair_equipment_type_id"/>
+                        <field name="equipment_model" />
+                        <field name="equipment_accessories"/>
+                        <field name="equipment_failure_report"
+                            attrs="{'required': [('client_state','=','assigned')]}"
+                            string="Reporte de Falla *" />
+                        <field name="other_equipment_data" />
+                        <field name="repair_order_components_ids">
+                            <tree editable="bottom">
+                                <field name="product_id" />
+                                <field name="quantity" />
+                                <field name="details" />
+                            </tree>
+                            <form>
+                                <group>
+                                    <field name="product_id" />
+                                    <field name="quantity" />
+                                    <field name="details" />
+                                </group>
+                            </form>
+                        </field>
+                        <field name="given_products_state_probe_by_client" widget="image" attrs="{'invisible': [('repair_order_components_ids','=', False)]}" />
+                    </group>
+                    <span>Campos obligatorios (*)</span>
+                    <br />
+                </page>
+                <page name="dg_ready_view" string="Diagnóstico inicial"
+                    attrs="{'invisible': [('client_state','!=','dg_ready')]}">
+                    <group>
+                        <field name="equipment_failure_report_for_tech"
+                            attrs="{'readonly': [('is_now_in_client_view','=', True)]}" />
+                        <field name="initial_diagnosis"
+                            attrs="{'readonly': [('is_now_in_client_view','=', True)]}"
+                            string="Diagnóstico Inicial *" />
+                        <field name="repair_product_required_ids"
+                            attrs="{'readonly': [('is_now_in_client_view','=', True)]}">
+                            <tree editable="bottom">
+                                <field name="product_id" />
+                                <field name="description" />
+                                <field name="quantity" />
+                                <field name="product_qty_available" string="Cantidad disponible" />
+                                <field name="qty_to_order" />
+                            </tree>
+                            <form>
+                                <group>
+                                    <field name="product_id" />
+                                    <field name="description" />
+                                    <field name="quantity" />
+                                    <field name="product_qty_available" string="Cantidad disponible" />
+                                    <field name="qty_to_order" />
+                                </group>
+                            </form>
+                        </field>
+                        <field name="comments"
+                            attrs="{'readonly': [('is_now_in_client_view','=', True)]}" />
+                        <field name="is_diagnosis_ready" invisible="1" />
+                    </group>
+                    <group string="Diagnóstico externo" attrs="{'invisible': [('crm_lead_state','!=', 'ext_technician')]}">
+                        <field name="need_external_diagnosis" invisible="1"/>
+                        <field name="external_technician_id"/>
+                    </group>
+                    <group attrs="{'invisible': [('is_now_in_client_view','=', True)]}">
+                        <button
+                            name="start_external_diagnosis"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': [('need_external_diagnosis','=', True)]}">
+                            Necesita diagnóstico externo
+                        </button>
+                        <br/>
+                        <button
+                            name="stop_external_diagnosis"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': [('crm_lead_state','!=', 'ext_technician')]}">
+                            Diagnóstico externo terminado
+                        </button>
+                    </group>
+                    <group attrs="{'invisible': [('is_now_in_client_view','=', True)]}">
+                        <button name="set_diagnosis_ready"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': [('is_diagnosis_ready','=', True)]}">
+                            Terminar diagnóstico
+                        </button>
+                    </group>
+                    <br />
+                    <span>Campos obligatorios (*)</span>
+                    <br />
+                </page>
+                <page name="quoted_view" string="Cotizado"
+                    attrs="{'invisible': [('client_state','!=','quoted')]}">
+                    <field name="has_confirmed_quotation" invisible="1" />
+                    <field name="has_quotation" invisible="1" />
+                </page>
+                <page name="conditions" attrs="{'invisible': [('client_state','!=','quoted')]}" string="Terminos de la cotización">
+                    <group>
+                        <field name="quotation_terms_conditions_id"/>
+                        <field name="quotation_time_period_for_payment_type_id"/>
+                        <field name="quotation_time_period_for_shipping_time_id"/>
+                        <field name="quotation_time_period_for_guarantee_id"/>
+                        <field name="quotation_time_period_for_validity_id"/>
+                    </group>
+                </page>
+                <page name="purchase_view" string="Venta de bienes"
+                    attrs="{'invisible': [('product_or_service', '=', 'service')]}">
+                    <group>
+                        <field name="repair_product_required_ids">
+                            <tree editable="bottom">
+                                <field name="product_id" />
+                                <field name="description" />
+                                <field name="quantity" />
+                                <field name="product_qty_available" string="Cantidad disponible"/>
+                                <field name="qty_to_order" />
+                            </tree>
+                            <form>
+                                <group>
+                                    <field name="product_id" />
+                                    <field name="description" />
+                                    <field name="quantity" />
+                                    <field name="product_qty_available" string="Cantidad disponible"/>
+                                    <field name="qty_to_order" />
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+                </page>
+                <page name="reparation_view" string="Reparando"
+                    attrs="{'invisible': [('crm_lead_state','!=','repairing')], 'readonly': [('is_now_in_client_view','=', True)]}">
+                    <group>
+                        <field name="repair_observation_detail_ids">
+                            <tree editable="bottom">
+                                <field name="name" />
+                                <field name="details" />
+                                <field name="date_of_observation" />
+                            </tree>
+                            <form>
+                                <group>
+                                    <field name="name" />
+                                    <field name="details" />
+                                    <field name="date_of_observation" />
+                                </group>
+                            </form>
+                        </field>
+                        <field name="given_products_state_probe_by_warehouse" widget="image"/>
+                        <button name="set_repair_to_concluded"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': [('crm_lead_state','!=', 'repairing')]}">
+                            Terminar reparación
+                        </button>
+                    </group>
+                </page>
+                <page name="reparation_conclusion" string="Concluir reparación"
+                    attrs="{'invisible': [('crm_lead_state','!=','to_finish')], 'readonly': [('is_now_in_client_view','=', True)]}">
+                    <group>
+                        <field name="final_product_state"
+                            attrs="{'required': [('crm_lead_state','=','to_finish')]}" />
+                        <field name="conclusion"
+                            attrs="{'required': [('crm_lead_state','=','to_finish')]}" />
+                        <field name="reparation_proofs" widget="image"
+                            attrs="{'required': [('crm_lead_state','=','to_finish')]}" />
+                        <field name="repair_products_to_return_ids">
+                            <tree>
+                                <field name="product_id" />
+                                <field name="details" />
+                                <field name="quantity" />
+                            </tree>
+                            <form>
+                                <group>
+                                    <field name="product_id" />
+                                    <field name="details" />
+                                    <field name="quantity" />
+                                </group>
+                            </form>
+                        </field>
+                        <button name="conclude_repair"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': [('crm_lead_state','!=', 'to_finish')]}">
+                            Confirmar conclusion de reparación
+                        </button>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+
+    <!-- _________________________________________________________________________ -->
+    <!-- QUICK CREATE -->
+    <!-- _________________________________________________________________________ -->
+
+
+    <record id="quick_create_crm_lead_form" model="ir.ui.view">
+        <field name="name">crm.lead.form.quick_create</field>
+        <field name="model">crm.lead</field>
+        <field name="priority">1000</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="company_id" invisible="1" />
+                    <field name="partner_id" string="Cliente *" />
+                    <field name="product_or_service" required="1" string="Servicio/Bien *" />
+                    <field name="repair_order_type_id" string="Modalidad del Servicio *"
+                        attrs="{'invisible': [('product_or_service','=','product')], 'required': [('product_or_service','=','service')]}" />
+                    <field name="service_description" string="Descr."
+                        placeholder="Reparación de ..." />
+                    <field name="create_date" invisible="1" />
+                    <span>Campos Obligatorios (*)</span>
+                    <br />
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- _________________________________________________________________________ -->
+    <!-- ACCIONES -->
+    <!-- _________________________________________________________________________ -->
+
+
+    <!-- Acción de atención al cliente -->
+    <record id="crm_lead_action_client" model="ir.actions.act_window">
+        <field name="name">Atención al Cliente</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay registros para mostrar
+            </p>
+        </field>
+        <field name="domain">['|',('is_from_client_view', '=', True),('is_displayed_in_both', '=',
+            True)]</field>
+        <field name="context">{'default_is_from_client_view': True}</field>
+        <field name="view_ids"
+            eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.crm_lead_client_kanban_view')}),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_lead_view_form')}),]" />
+    </record>
+
+    <!-- Acción para el tecnico -->
+    <record id="crm_lead_action_technician" model="ir.actions.act_window">
+        <field name="name">Tecnico</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay registros para mostrar
+            </p>
+        </field>
+        <field name="domain">['|',('is_from_client_view', '=', False),('is_displayed_in_both', '=',
+            True)]</field>
+        <field name="context">{'default_is_from_client_view': False}</field>
+        <field name="view_ids"
+            eval="[
+          (5, 0, 0),
+          (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.crm_lead_technician_kanban_view')}),
+          (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
+          (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_lead_view_form')}),]" />
+    </record>
+</odoo>
