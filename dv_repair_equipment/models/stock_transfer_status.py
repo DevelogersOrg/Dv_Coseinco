@@ -1,4 +1,5 @@
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class StockTransferStatus(models.Model):
@@ -13,6 +14,8 @@ class StockTransferStatus(models.Model):
                                 'repair.products.to.return', string='Productos a devolver', compute='_compute_repair_products_to_return_ids', store=True)
 
     client_id = fields.Many2one('res.partner', string="Cliente", related='crm_lead_id.partner_id')
+    delivery_address_id = fields.Many2one('res.partner', string='Direccion Delivery')
+    
     company_id = fields.Many2one('res.partner', string="Empresa", related='crm_lead_id.partner_id.parent_id')
     reciever_name = fields.Char(string="Nombre del receptor")
     reciever_phone = fields.Char(string="Teléfono del receptor")
@@ -158,7 +161,37 @@ class StockTransferStatus(models.Model):
             'type': 'ir.actions.client',
             'tag': 'reload',
         }
+        
+    picking_type_id = fields.Many2one('stock.picking.type', string='Tipo de operacion')
+    stock_picking_id = fields.Many2one('stock.picking', string="Trasnferencia")
+    def create_stock_picking(self):
+        if not self.picking_type_id:
+            raise UserError("Seleccione un tipo de operacion")
+        
+        if self.picking_type_id.code == 'outgoing':
+            pick = {
+                'picking_type_id': self.picking_type_id.id,
+                'partner_id': self.client_id.id,
+                'origin': self.name,
+                'location_dest_id': self.client_id.id,
+                'location_id': self.picking_type_id.default_location_src_id.id,
+                'delivery_boy_partner_id': self.delivery_boy_partner_id.id,
+                #'move_type': 'direct'
+            }
+        if self.picking_type_id.code == 'incoming':
+            pick = {
+                'picking_type_id': self.picking_type_id.id,
+                'partner_id': self.partner_id.id,
+                'origin': self.name,
+                'location_dest_id': self.picking_type_id.default_location_dest_id.id,
+                'location_id': self.client_id.id,
+                'delivery_boy_partner_id': self.delivery_boy_partner_id.id,
+                #'move_type': 'direct'
+            }
 
+        picking = self.env['stock.picking'].create(pick)
+        
+        
     def change_picking_state(self):
         if self.picking_state == False:
             self.picking_state = 'tb_confirmed'
@@ -171,6 +204,7 @@ class StockTransferStatus(models.Model):
         self.picking_state = STATES[STATES.index(self.picking_state) + 1] if self.picking_state != 'delivered' else 'delivered'
         if self.picking_state in 'to_ship':
             self.change_account_move_state()
+            self.create_stock_picking()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
@@ -182,3 +216,5 @@ class StockTransferStatus(models.Model):
             account_move.move_state = 'tb_invoiced'
 
 
+    # DELIVERY BOY
+    delivery_boy_partner_id = fields.Many2one(string="Delivery Boy", comodel_name="res.partner")

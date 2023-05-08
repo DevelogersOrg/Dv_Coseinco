@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<template id="report_guias_en_factura" inherit_id="solse_pe_cpe.cpe_body_print">
+        <xpath expr="//div[@id='div_fecha_vencimiento']" position="after">
+        	<div class="linea-h1"/>
+        	<div style="width: 20%;">
+                Guía Remisión <br/>
+                <t t-esc="o.guide_number"/>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

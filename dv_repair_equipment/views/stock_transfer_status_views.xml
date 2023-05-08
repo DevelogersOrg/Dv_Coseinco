@@ -134,6 +134,12 @@
             <field name="name"/>
           </h1>
           <group>
+            <field name="delivery_boy_partner_id" domain="[('is_delivery_boy','=',True)]"
+												options="{'no_create': True, 'no_open': True}"/>
+            <field name="picking_type_id"/>
+            <field name="stock_picking_id"/>
+          </group>
+          <group>
             <field name="repair_product_required_ids">
               <tree>
                 <field name="product_id"/>
@@ -187,6 +193,12 @@
           <h1>N :
             <field name="name"/>
           </h1>
+          <group>
+            <field name="delivery_boy_partner_id" domain="[('is_delivery_boy','=',True)]"
+												options="{'no_create': True, 'no_open': True}"/>
+            <field name="picking_type_id"/>
+            <field name="stock_picking_id"/>
+          </group>
           <group string="Productos a devolver">
             <field name="repair_products_to_return_ids">
               <tree>
@@ -220,22 +232,26 @@
                   <field name="company_id"/>
                 </group>
                 <group string="Receptor">
+                  <field name="delivery_address_id"/>
+                </group>
+                <!--
+                <group string="Receptor">
                   <field name="reciever_name"/>
                   <field name="reciever_function"/>
                   <field name="reciever_phone"/>
                   <field name="reciever_id"/>
                   <field name="reciever_direction"/>
                   <span>¡Si los campos estan vacios se usarán los valores del cliente!</span>
-                </group>
+                </group>-->
                 <group string="Datos de entrega">
                   <field name="ship_date"/>
                 </group>
               </page>
-              <page name="ship_info" string="Odoo delivery_boy" attrs="{'invisible': [('picking_state', '!=', 'shiped')]}">
+              <!--<page name="ship_info" string="Odoo delivery_boy" attrs="{'invisible': [('picking_state', '!=', 'shiped')]}">
                 <group>
                   <h4>Aqui se creará la solicitud de Odoo delivery boy</h4>
                 </group>
-              </page>
+              </page>-->
             </notebook>
           </group>
         </sheet>

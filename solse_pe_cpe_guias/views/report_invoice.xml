@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@name='reference']" position="after">
+            <div class="col-xs-2" t-if="o.guide_number">
+                <strong>Guía de referencia:</strong>
+                <p t-field="o.guide_number" />
+            </div>
+            <div class="col-xs-2" t-if="o.pe_stock_name">
+                <strong>Guía interna:</strong>
+                <p t-field="o.pe_stock_name" />
+            </div>
+        </xpath>
+    </template>
+</odoo>

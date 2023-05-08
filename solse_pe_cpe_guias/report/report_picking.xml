@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<template id="report_delivery_document" inherit_id="stock.report_delivery_document">
+		<!-- <xpath expr="//div[@name='partner_header']" position="after">
+			<t t-if="o.sudo().partner_id.parent_id.vat">RUC: <span t-field="o.sudo().partner_id.parent_id.doc_number"/><br /></t>
+			<t t-if="not o.sudo().partner_id.parent_id">RUC: <span t-field="o.sudo().partner_id.doc_number"/></t>
+		</xpath> -->
+
+		<xpath expr="//h2" position="replace">
+			<h2 style="font-size: 1.5em" class="text-center">
+				<t t-if="o.pe_is_eguide">
+					<span>Electronic Remission Guide Sender </span><span t-field="o.pe_guide_number" />
+				</t>
+				<t t-if="not o.pe_is_eguide">
+					<span t-field="o.name"/>
+				</t>
+            </h2>
+            <div class="row">
+			<table class="text-transform:capitalize; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+							<th t-attf-style="width: 70%">
+                            	<strong>Departure address</strong>
+                            </th>
+							<th t-attf-style="width: 30%;">
+                                <strong>Reason for transfer</strong>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <span t-field="o.picking_type_id.warehouse_id.partner_id.street"/>
+                            </td>
+                            <td>
+                               <span t-field="o.pe_transfer_code"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+	        </div>
+		</xpath>
+		
+		<xpath expr="//table[@name='stock_move_line_table']" position="after">
+			<p t-field="o.note"/>
+			<t t-if="o.pe_is_eguide">
+				<div class="row">
+					<div class="col-xs-7">
+						<t t-if="o.pe_transport_mode=='01'">
+							<span>Transport Company</span><br />
+							<table class="table table-condensed">
+								<tr >
+									<td t-attf-style="background-color: #ffffff; color: black">
+										<span>Name:</span>
+									</td>
+									<td t-attf-style="background-color: #ffffff; color: black">
+										<span t-field="o.pe_carrier_id"/>
+									</td>
+									<td t-attf-style="background-color: #ffffff; color: black">
+										<span>RUC:</span>
+									</td>
+									<td t-attf-style="background-color: #ffffff; color: black">
+										<span t-field="o.pe_carrier_id.doc_number"/>
+									</td>
+								</tr>
+							</table>
+							
+						</t>
+						<t t-if="o.pe_transport_mode=='02'">
+							<span>Private Transport</span><br />
+							<table class="table table-condensed">
+								<tr t-foreach="o.pe_fleet_ids" t-as="fleet_id">
+									<td>
+										<span>Name:</span>
+									</td>
+									<td>
+										<span t-field="fleet_id.driver_id"/>
+									</td>
+									<td>
+										<span>DNI:</span>
+									</td>
+									<td>
+										<span t-field="fleet_id.driver_id.doc_number"/>
+									</td>
+									<td>
+										<span>Placa:</span>
+									</td>
+									<td>
+										<span t-field="fleet_id.name"/>
+									</td>
+								</tr>
+							</table>
+						</t>
+		                <p t-if="o.pe_is_eguide" ><strong>Summary: </strong> <br />
+			                <span t-field="o.pe_digest"/>
+			            </p>
+		            </div>
+			        
+					<div class="col-xs-5" t-if="o.pe_is_eguide and o.pe_guide_number!='/'" >
+						<img t-if="o.sunat_pdf417_code" t-att-src="'data:image/png;base64,%s' % to_text(o.sunat_pdf417_code)" 
+						class="img-responsive center-block" style="width: 320px;  height: 65px;" />
+					</div>
+		        </div>
+			</t>
+    	</xpath>
+	</template>
+
+</odoo>

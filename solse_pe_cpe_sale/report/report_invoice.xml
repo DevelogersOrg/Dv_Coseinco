@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<template id="report_ventas_en_factura" inherit_id="solse_pe_cpe.cpe_body_print">
+        <xpath expr="//div[@id='div_orden_compra']" position="replace">
+        	<div style="width: 20%;" id="div_orden_compra">
+                Orden de compra <br/>
+                <t t-esc="o.orden_compra"/>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>
