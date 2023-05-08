@@ -111,8 +111,7 @@ class StockTransferStatus(models.Model):
         self.transfer_state = 'request'
         self.need_to_purchase = False
         self.purchase_order_id = purchase_order.id
-        raise models.ValidationError('Prueba de hasta donde llega el error')
-        self.env['crm.lead'].browse(self.crm_lead_id.id).sudo().write({
+        self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).write({
             'crm_lead_state': 'purchase',
         })
         return {
@@ -138,16 +137,16 @@ class StockTransferStatus(models.Model):
         }
     
     def deliver_products(self):
-        if self.crm_lead_id.product_or_service == 'service':
+        if self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).crm_lead_state == 'service':
             return self.deliver_products_to_tech()
-        if self.crm_lead_id.product_or_service == 'product':
+        if self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).crm_lead_state == 'product':
             return self.deliver_products_to_customer()
         else:
             raise models.ValidationError('No se puede entregar el producto, si el error persiste contacte al desarrollador')
 
     def deliver_products_to_tech(self):
         self.transfer_state = 'delivery'
-        self.env['crm.lead'].browse(self.crm_lead_id.id).sudo().write({
+        self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).write({
             'crm_lead_state': 'ready_to_repair',
             'repair_state': 'confirmed',
         })
@@ -158,11 +157,11 @@ class StockTransferStatus(models.Model):
 
     def deliver_products_to_customer(self):
         self.transfer_state = 'delivery'
-        self.env['crm.lead'].browse(self.crm_lead_id.id).sudo().write({
+        self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).write({
             'crm_lead_state': 'confirmed',
         })
-        self.crm_lead_id.sudo().create_order_to_picking()
-        self.crm_lead_id.sudo().create_account_move()
+        self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).create_order_to_picking()
+        self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).create_account_move()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
