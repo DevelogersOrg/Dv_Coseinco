@@ -88,6 +88,7 @@ class StockTransferStatus(models.Model):
         
         products_to_buy = [product for product in self.repair_product_required_ids if product.qty_to_order > 0]
         order_line = []
+
         for product in products_to_buy:
             order_line.append((0, 0, {
                     'product_id': product.product_id.id,
@@ -97,7 +98,7 @@ class StockTransferStatus(models.Model):
                     'product_uom': product.product_id.uom_id.id,
                     }))
         purchase_order_data ={
-                'partner_id': self.env['crm.lead'].browse(self.crm_lead_id.id).partner_id.id,
+                'partner_id': self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).partner_id.id,
                 'stock_transfer_status_id': self.id,
                 'purchase_state': 'required',
                 'order_line': order_line,
