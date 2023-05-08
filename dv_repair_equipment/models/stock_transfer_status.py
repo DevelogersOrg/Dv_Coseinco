@@ -99,7 +99,7 @@ class StockTransferStatus(models.Model):
                     'product_uom': product.product_id.uom_id.id,
                     }))
         purchase_order_data ={
-                'partner_id': self.crm_lead_id.partner_id.id,
+                'partner_id': self.env['crm.lead'].browse(self.crm_lead_id.id).partner_id.id,
                 'stock_transfer_status_id': self.id,
                 'purchase_state': 'required',
                 'order_line': order_line,
