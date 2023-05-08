@@ -1,4 +1,5 @@
 from odoo import api, fields, models
+from odoo.tools import sudo
 
 
 class StockTransferStatus(models.Model):
@@ -82,7 +83,6 @@ class StockTransferStatus(models.Model):
             record.need_to_purchase = False
 
     def create_purchase_orders(self):
-        raise models.ValidationError('Prueba de actualizacion')
         if not self.need_to_purchase:
             return
         
@@ -108,7 +108,8 @@ class StockTransferStatus(models.Model):
         self.transfer_state = 'request'
         self.need_to_purchase = False
         self.purchase_order_id = purchase_order.id
-        self.crm_lead_id.sudo().write({
+        raise models.ValidationError('Prueba de hasta donde llega el error')
+        self.env['crm.lead'].browse(self.crm_lead_id.id).sudo().write({
             'crm_lead_state': 'purchase',
         })
         return {
@@ -143,7 +144,7 @@ class StockTransferStatus(models.Model):
 
     def deliver_products_to_tech(self):
         self.transfer_state = 'delivery'
-        self.crm_lead_id.sudo().write({
+        self.env['crm.lead'].browse(self.crm_lead_id.id).sudo().write({
             'crm_lead_state': 'ready_to_repair',
             'repair_state': 'confirmed',
         })
@@ -154,7 +155,7 @@ class StockTransferStatus(models.Model):
 
     def deliver_products_to_customer(self):
         self.transfer_state = 'delivery'
-        self.crm_lead_id.sudo().write({
+        self.env['crm.lead'].browse(self.crm_lead_id.id).sudo().write({
             'crm_lead_state': 'confirmed',
         })
         self.crm_lead_id.sudo().create_order_to_picking()
