@@ -140,7 +140,8 @@ class StockTransferStatus(models.Model):
         if self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).crm_lead_state == 'product':
             return self.deliver_products_to_customer()
         else:
-            raise models.ValidationError(f"No se puede entregar el producto, si el error persiste contacte al desarrollador, estado del crm {self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).crm_lead_state}")
+            raise models.ValidationError(f"El estado del crm {self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).crm_lead_state} \
+                                        no coincide con los valores esperados (service, product)")
 
     def deliver_products_to_tech(self):
         self.transfer_state = 'delivery'
