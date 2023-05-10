@@ -163,7 +163,7 @@
                         </group>
                         <group string="Tecnico" nolabel="1">
                             <field name="repair_user_id"
-                                attrs="{'required': [('client_state','=','assigned')], 'readonly': [('client_state', '!=', 'assigned')]}"
+                                attrs="{'required': [('client_state','=','assigned')], 'readonly': [('user_id', '!=', 'uid')]}"
                                 string="Técnico *" />
                         </group>
                     </group>
