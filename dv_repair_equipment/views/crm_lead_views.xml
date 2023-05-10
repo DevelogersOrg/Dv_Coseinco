@@ -300,8 +300,9 @@
                 </page>
                 <page name="reparation_view" string="Reparando"
                     attrs="{'invisible': [('crm_lead_state','!=','repairing')], 'readonly': [('is_now_in_client_view','=', True)]}">
+                    <group col="1">
                     <group>
-                        <field name="repair_observation_detail_ids">
+                        <field name="repair_observation_detail_ids" nolabel="1">
                             <tree editable="bottom">
                                 <field name="name" />
                                 <field name="details" />
@@ -315,13 +316,16 @@
                                 </group>
                             </form>
                         </field>
-                        <field name="given_products_state_probe_by_warehouse" widget="image"/>
+                    </group>
+                    <group>
+                    <field name="given_products_state_probe_by_warehouse" widget="image"/>
                         <button name="set_repair_to_concluded"
                             type="object"
                             class="btn btn-primary"
                             attrs="{'invisible': [('crm_lead_state','!=', 'repairing')]}">
                             Terminar reparación
                         </button>
+                    </group>
                     </group>
                 </page>
                 <page name="reparation_conclusion" string="Concluir reparación"

@@ -5,10 +5,6 @@ class RepairObservationDetail(models.Model):
 
   crm_lead_id = fields.Many2one('crm.lead')
   name = fields.Char(string="Observación", required=True)
-  date_of_observation = fields.Datetime(string="Fecha de observación", readonly=True)
   details = fields.Text(string="Detalles")
+  date_of_observation = fields.Datetime(string="Fecha de observación", readonly=True, default=fields.Datetime.now, store=True)
 
-  @api.model
-  def create(self, vals):
-      vals['date_of_observation'] = fields.Datetime.now()
-      return super(RepairObservationDetail, self).create(vals)

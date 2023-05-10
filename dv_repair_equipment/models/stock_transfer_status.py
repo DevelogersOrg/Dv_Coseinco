@@ -1,5 +1,5 @@
 from odoo import api, fields, models
-from odoo.tools import sudo
+# from odoo.tools import sudo
 
 
 class StockTransferStatus(models.Model):
