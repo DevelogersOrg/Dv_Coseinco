@@ -37,7 +37,7 @@ class CrmLead(models.Model):
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.", )
     repair_user_id = fields.Many2one(
-        'res.users', string="Tecnico", check_company=True, )
+        'res.users', string="Tecnico", check_company=True, tracking=True)
 
     # Esta variable deternima si el cliente está en la vista de cliente o en la vista de técnico
     is_now_in_client_view = fields.Boolean(string='Está en la vista de cliente?', compute='_compute_is_in_client_view', store=False)
