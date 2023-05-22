@@ -454,39 +454,39 @@ pe_cpe_catalog53_6,,54,OTROS CARGOS RELACIONADOS AL SERVICIO,,,PE.CPE.CATALOG53,
 pe_cpe_catalog53_7,,55,OTROS CARGOS NO RELACIONADOS AL SERVICIO,,,PE.CPE.CATALOG53,,
 pe_cpe_catalog54_1,,001,Azúcar,,,PE.CPE.CATALOG54,,
 pe_cpe_catalog54_2,,003,Alcohol etílico,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_3,,004,Recursos hidrobiológicos,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_4,,005,Maíz amarillo duro,,,PE.CPE.CATALOG54,,
+pe_cpe_catalog54_3,,004,Recursos hidrobiológicos,,,PE.CPE.CATALOG54,,4
+pe_cpe_catalog54_4,,005,Maíz amarillo duro,,,PE.CPE.CATALOG54,,4
 pe_cpe_catalog54_5,,006,Algodón,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_6,,007,Caña de azúcar,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_7,,008,Madera,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_8,,009,Arena y piedra.,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_9,,010,"Residuos, subproductos, desechos, recortes y desperdicios",,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_10,,011,Bienes del inciso A) del Apéndice I de la Ley del IGV,,,PE.CPE.CATALOG54,,
+pe_cpe_catalog54_6,,007,Caña de azúcar,,,PE.CPE.CATALOG54,,10
+pe_cpe_catalog54_7,,008,Madera,,,PE.CPE.CATALOG54,,4
+pe_cpe_catalog54_8,,009,Arena y piedra.,,,PE.CPE.CATALOG54,,10
+pe_cpe_catalog54_9,,010,"Residuos, subproductos, desechos, recortes y desperdicios",,,PE.CPE.CATALOG54,,15
+pe_cpe_catalog54_10,,011,Bienes del inciso A) del Apéndice I de la Ley del IGV,,,PE.CPE.CATALOG54,,10
 pe_cpe_catalog54_11,,012,Intermediación laboral y tercerización,,,PE.CPE.CATALOG54,,
 pe_cpe_catalog54_12,,013,Animales vivos,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_13,,014,Carnes y despojos comestibles,,,PE.CPE.CATALOG54,,
+pe_cpe_catalog54_13,,014,Carnes y despojos comestibles,,,PE.CPE.CATALOG54,,4
 pe_cpe_catalog54_14,,015,"Abonos, cueros y pieles de origen animal",,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_15,,016,Aceite de pescado,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_16,,017,"Harina, polvo y “pellets” de pescado, crustáceos, moluscos y demás invertebrados acuáticos",,,PE.CPE.CATALOG54,,
+pe_cpe_catalog54_15,,016,Aceite de pescado,,,PE.CPE.CATALOG54,,10
+pe_cpe_catalog54_16,,017,"Harina, polvo y “pellets” de pescado, crustáceos, moluscos y demás invertebrados acuáticos",,,PE.CPE.CATALOG54,,4
 pe_cpe_catalog54_17,,018,Embarcaciones pesqueras,,,PE.CPE.CATALOG54,,
 pe_cpe_catalog54_18,,019,Arrendamiento de bienes muebles,,,PE.CPE.CATALOG54,,
 pe_cpe_catalog54_19,,020,Mantenimiento y reparación de bienes muebles,,,PE.CPE.CATALOG54,,
 pe_cpe_catalog54_20,,021,Movimiento de carga,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_21,,022,Otros servicios empresariales,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_22,,023,Leche,,,PE.CPE.CATALOG54,,
+pe_cpe_catalog54_21,,022,Otros servicios empresariales,,,PE.CPE.CATALOG54,,12
+pe_cpe_catalog54_22,,023,Leche,,,PE.CPE.CATALOG54,,4
 pe_cpe_catalog54_23,,024,Comisión mercantil,,,PE.CPE.CATALOG54,,
 pe_cpe_catalog54_24,,025,Fabricación de bienes por encargo,,,PE.CPE.CATALOG54,,
 pe_cpe_catalog54_25,,026,Servicio de transporte de personas,,,PE.CPE.CATALOG54,,
 pe_cpe_catalog54_26,,029,Algodón en rama sin desmontar,,,PE.CPE.CATALOG54,,
 pe_cpe_catalog54_27,,030,Contratos de construcción,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_28,,031,Oro gravado con el IGV,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_29,,032,Páprika y otros frutos de los géneros capsicum o pimienta,,,PE.CPE.CATALOG54,,
+pe_cpe_catalog54_28,,031,Oro gravado con el IGV,,,PE.CPE.CATALOG54,,10
+pe_cpe_catalog54_29,,032,Páprika y otros frutos de los géneros capsicum o pimienta,,,PE.CPE.CATALOG54,,10
 pe_cpe_catalog54_30,,033,Espárragos,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_31,,034,Minerales metálicos no auríferos,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_32,,035,Bienes exonerados del IGV,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_33,,036,Oro y demás minerales metálicos exonerados del IGV,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_34,,037,Demás servicios gravados con el IGV,,,PE.CPE.CATALOG54,,
-pe_cpe_catalog54_35,,039,Minerales no metálicos,,,PE.CPE.CATALOG54,,
+pe_cpe_catalog54_31,,034,Minerales metálicos no auríferos,,,PE.CPE.CATALOG54,,10
+pe_cpe_catalog54_32,,035,Bienes exonerados del IGV,,,PE.CPE.CATALOG54,,1.5
+pe_cpe_catalog54_33,,036,Oro y demás minerales metálicos exonerados del IGV,,,PE.CPE.CATALOG54,,1.5
+pe_cpe_catalog54_34,,037,Demás servicios gravados con el IGV,,,PE.CPE.CATALOG54,,12
+pe_cpe_catalog54_35,,039,Minerales no metálicos,,,PE.CPE.CATALOG54,,10
 pe_cpe_catalog54_36,,040,Bien inmueble gravado con IGV,,,PE.CPE.CATALOG54,,
 pe_cpe_catalog55_1,,3002,Detracciones: Recursos Hidrobiológicos - Nombre y Matrícula de la Embarcación,,,PE.CPE.CATALOG55,,
 pe_cpe_catalog55_2,,3003,Detracciones: Cantidad de Especies Marinas,,,PE.CPE.CATALOG55,,

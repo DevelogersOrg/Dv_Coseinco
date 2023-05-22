@@ -13,7 +13,7 @@
 	'author': "F & M Solutions Service S.A.C",
 	'website': "https://www.solse.pe",
 	'category': 'Financial',
-	'version': "14.0.1.0.0",
+	'version': '14.1.2.29',
 
 	'depends': [
 		'account',

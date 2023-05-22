@@ -103,6 +103,7 @@ class PeruSunatCpe(models.Model):
 			code_sunat = int(code_sunat_p)
 		except:
 			return '01'
+
 		if code_sunat == 0:
 			rpt = '11' if self.is_voided or self.type == 'ra' else '05'
 		else:
@@ -320,7 +321,8 @@ class PeruSunatCpe(models.Model):
 			if description != -1:
 				res_desc = description.text
 			self.response = "%s - %s" % (res_code, res_desc)
-			self.estado_sunat = self.getEstadoSunat(res_code)
+			#self.estado_sunat = self.getEstadoSunat(res_code)
+			self.estado_sunat = self.getEstadoSunatItem(res_code)
 			notes = sunat_response.xpath(".//cbc:Note", namespaces={'cbc': 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2'})
 			res_note = ""
 			for note in notes:
@@ -337,6 +339,9 @@ class PeruSunatCpe(models.Model):
 				cpe_ids = self.summary_ids.mapped('pe_cpe_id').ids
 				resumen = self.search([('id', 'in', cpe_ids)])
 				for reg in resumen:
+					reg.write({
+						"estado_sunat": estado_sunat_item
+					})
 					reg.estado_sunat = estado_sunat_item
 
 		except Exception as e:
@@ -441,7 +446,10 @@ class PeruSunatCpe(models.Model):
 		response_status, response, response_file = get_ticket_status(self.ticket, client)
 		state = None			
 		if not response:
-			raise Warning('No se pudo obtener respuesta del ticket '+ self.ticket)
+			ticket = ''
+			if self.ticket:
+				ticket = self.ticket
+			raise Warning('No se pudo obtener respuesta del ticket '+ ticket)
 		if response_status:
 			file_name = self.get_document_name()
 			self.datas_response = response_file

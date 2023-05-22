@@ -11,6 +11,7 @@ class AccountTax(models.Model):
 	pe_tax_code = fields.Selection("_get_pe_tax_code", string="Codigo SUNAT (base)")
 	pe_tier_range = fields.Selection(selection="_get_pe_tier_range", string="Tipo de sistema", help='Tipo de sistema al ISC')
 	pe_is_charge = fields.Boolean("Cambio")
+	incluir_monto_completo = fields.Boolean("Incluir monto completo")
 
 	@api.depends('l10n_pe_edi_tax_code')
 	def _compute_pe_tax_type(self):

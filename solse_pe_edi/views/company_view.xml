@@ -21,5 +21,19 @@
       </field>
     </record>
 
+    <record model="ir.ui.view" id="view_currency_form">
+      <field name="name">res.currency.form.cpe</field>
+      <field name="model">res.currency</field>
+      <field name="inherit_id" ref="base.view_currency_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='name']" position="after">
+          <field name="singular_name" />
+          <field name="plural_name" />
+          <field name="mostrar_monto_ingles" />
+        </xpath>
+
+      </field>
+    </record>
+
   </data>
 </odoo>

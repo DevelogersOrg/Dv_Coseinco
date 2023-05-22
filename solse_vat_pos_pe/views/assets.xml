@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <template id="assets_backend" name="solse_vat_pos_pe_assets" inherit_id="point_of_sale.assets">
+    <xpath expr="." position="inside">
+      <script type="text/javascript" src="/solse_vat_pos_pe/static/src/js/screen.js"/>
+      <script type="text/javascript" src="/solse_vat_pos_pe/static/src/js/ClientDetailsEdit.js"/>
+    </xpath>
+  </template>
+  
+</odoo>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-extend="Chrome" t-inherit="point_of_sale.Chrome" t-inherit-mode="extension" owl="1">
+        <xpath expr="//img[hasclass('pos-logo')]" position="replace">
+            <img src='/web/binary/company_logo' class="pos-logo" style="position: relative; top: 45%; transform: translateY(-50%);"/>
+        </xpath>
+    </t>
+    
+    <t t-name="SaleInvoiceJournal">
+        <t t-if="widget.pos.config.iface_journals">
+            <t t-foreach="widget.pos.l10n_latam_document_type_ids" t-as="doc_venta_id" t-key="doc_venta_id.id">
+                <div class="button js_sale_journal" t-att-data-id="doc_venta_id.id">
+                    <i class="fa fa-file-text-o" />
+                    <t t-esc="doc_venta_id.name" />
+                </div>
+            </t>
+        </t>
+    </t>
+    <t t-name="TabConnecting">
+        <div class="tab-loading text-center">
+            <span class="text-warning fa fa-spin fa-spinner fa-fw" />
+            Synchronizing journal sequence
+        </div>
+    </t>
+
+    <t t-extend="OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension" owl="1">
+        <xpath expr="//t[@t-if='receipt.company.logo']" position="after">
+            <div t-if="order.get_cpe_type()" class="pos-receipt-center-align" style="text-align:center">
+                <t t-if="order.get_cpe_type()=='01'">Factura </t>
+                <t t-if="order.get_cpe_type()=='03'">Boleta Electronica</t><br/>
+            </div>
+            <div t-if="order.get_number()" class="pos-receipt-center-align" style="text-align:center">
+                <b>
+                    <t t-esc="order.get_number()" />
+                </b>
+            </div>
+        </xpath>
+        
+        <xpath expr="//t[@t-if='receipt.company.vat']" position="replace">
+            <t t-if='receipt.company.vat'>
+                <div>RUC:<t t-esc='receipt.company.vat' /></div>
+            </t>
+            <t t-if='receipt.company.street'>
+                <div>Dirección: <t t-esc="receipt.company.street"/></div>
+            </t>
+        </xpath>
+        
+        <xpath expr="//t[@t-if='receipt.header_html']" position="before">
+            <div class="receipt-partner" t-if="order.get('client')">
+                <br />
+                <t t-esc="order.get('client').name"/><br />
+                <t t-if="order.get_doc_number()">
+                    RUC/DNI: <t t-esc="order.get_doc_number()"/><br />
+
+                </t>
+                <t t-if="order.get('client').street">
+                    Dirección: <t t-esc="order.get('client').street"/><br />
+                </t>
+                
+            </div>
+        </xpath>
+
+        <xpath expr="//t[@t-if='receipt.total_rounded != receipt.total_with_tax']" position="after">
+            <div>
+                SON <t t-esc="order.get_amount_text()" />
+            </div>
+            <br/>
+        </xpath>
+
+        <xpath expr="//div[hasclass('pos-receipt-order-data')]" position="inside">
+            <div style="text-align:center">
+                <t t-if="order.get_cpe_type()">
+                    <br />
+                    <div>
+                        <strong>Tipo de pago: </strong>
+                        Contado
+                    </div>
+                    <br />
+                    <t t-if="receipt.sunat_qr_code">
+                        <div class="qr-code" id="qr-code" style="display: flex; justify-content: center;">
+                            <canvas width="128" height="128" style="display: none;"></canvas>
+                            <img alt="Scan me!" style="display: block;" t-att-src='receipt.sunat_qr_code' />
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="qr-code" id="qr-code" style="display: flex; justify-content: center;"></div>
+                    </t>
+                    
+                    <br />
+                    <b class="doc-sunat">Representación impresa de 
+                    <t t-if="order.get_cpe_type()=='01'">Factura </t>
+                    <t t-if="order.get_cpe_type()=='03'">Boleta de Venta </t>
+                    Electrónica consulte en <t t-esc="order.pos.company.website || ''"/> </b>
+                </t>
+            </div>
+        </xpath>
+    </t>
+</templates>

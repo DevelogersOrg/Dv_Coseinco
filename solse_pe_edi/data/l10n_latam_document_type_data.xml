@@ -94,6 +94,7 @@
             <field name="report_name">Liquidación de compra</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -104,6 +105,7 @@
             <field name="report_name">Boletos de Transporte Aéreo (BME)</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -114,6 +116,7 @@
             <field name="name">Carta de porte aéreo</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -134,6 +137,7 @@
             <field name="name">Recibo por Arrendamiento</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -144,6 +148,7 @@
             <field name="name">Póliza emitida por las Bolsas autorizadas por SMV</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -154,6 +159,7 @@
             <field name="name">Ticket o cinta emitido por máquina registradora</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -164,6 +170,7 @@
             <field name="name">Documentos emitidos por empresas sistema financiero bajo control SBS</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -174,6 +181,7 @@
             <field name="name">Recibo por servicios públicos</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -184,6 +192,7 @@
             <field name="name">Boletos emitidos por transporte terrestre regular urbano</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -194,6 +203,7 @@
             <field name="name">Boletos de viaje de empresas transporte nacional de pasajeros (BVME)</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -204,6 +214,7 @@
             <field name="name">Documento emitido por la Iglesia Católica</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -224,6 +235,7 @@
             <field name="name">Boleto o entrada por atracciones y espectáculos públicos</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -234,6 +246,7 @@
             <field name="name">Conocimiento de embarque por el servicio de transporte de carga marítima</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -244,6 +257,7 @@
             <field name="name">Comprobante por Operaciones No Habituales</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -254,6 +268,7 @@
             <field name="name">Pólizas de Adjudicación emitidas con ocasión del remate</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -264,6 +279,7 @@
             <field name="name">Certificado de pago de regalías emitidas por PERUPETRO S.A</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -274,6 +290,7 @@
             <field name="name">Documento de Atribución (LIGV, Art. 19º, últ.párrafo, R.S.N° 022-98-SUNAT)</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -284,6 +301,7 @@
             <field name="name">Recibo por el Pago de la Tarifa por Uso de Agua Superficial con fines agrarios</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -294,6 +312,7 @@
             <field name="name">Seguro Complementario de Trabajo de Riesgo</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -304,6 +323,7 @@
             <field name="name">Documentos emitidos servicios aeroportuarios mediante mecanismo etiquetas autoadhesivas</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -314,6 +334,7 @@
             <field name="name">Documentos emitidos por la COFOPRI</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -324,6 +345,7 @@
             <field name="name">Documentos emitidos por empresas adquirentes en los sistemas de pago tarjetas de crédito y débito</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -344,6 +366,7 @@
             <field name="name">Documentos emitidos empresas recaudadoras Red Principal a la que hace referencia el numeral 7.6 del artículo 7° de la Ley N° 27133 – Ley de Promoción del Desarrollo de la Industria del Gas Natural</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -354,6 +377,7 @@
             <field name="name">Manifiesto de Pasajeros</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -364,6 +388,7 @@
             <field name="name">Documento del Operador</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -374,6 +399,7 @@
             <field name="name">Documento del Partícipe</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -384,6 +410,7 @@
             <field name="name">Recibo de Distribución de Gas Natural</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -394,6 +421,7 @@
             <field name="name">Documentos emitan concesionarios servicio de revisiones técnicas vehiculares</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -404,6 +432,7 @@
             <field name="name">Comprobante de Percepción - Venta interna</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -414,6 +443,7 @@
             <field name="name">Documentos emitidos por las empresas que desempeñan el rol adquiriente en los sistemas de pago mediante tarjetas de crédito emitidas por ellas mismas</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -424,6 +454,7 @@
             <field name="name">Boletos emitidos por las Compañías de Aviación Comercial que prestan servicios de transporte aéreo no regular de pasajeros y transporte aéreo especial de pasajeros</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -434,6 +465,7 @@
             <field name="name">Billetes de lotería, rifas y apuestas</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -444,6 +476,7 @@
             <field name="name">Documentos emitidos por centros educativos y culturales, universidades, asociaciones y fundaciones, en lo referente a actividades no gravadas con tributos administrados por la SUNAT</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -454,6 +487,7 @@
             <field name="name">Formulario de Declaración - pago o Boleta de pago de tributos Internos</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -464,6 +498,7 @@
             <field name="name">Comprobante de Operaciones - Ley N° 29972</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -474,6 +509,7 @@
             <field name="name">Constancia de Depósito - IVAP (Ley 28211)</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -484,6 +520,7 @@
             <field name="name">Declaración Única de Aduanas - Importación definitiva</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -494,6 +531,7 @@
             <field name="name">Póliza o DUI Fraccionada</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -504,6 +542,7 @@
             <field name="name">Despacho Simplificado - Importación Simplificada</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -514,6 +553,7 @@
             <field name="name">Declaración de Mensajería o Courier</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -524,6 +564,7 @@
             <field name="name">Liquidación de Cobranza</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -534,6 +575,7 @@
             <field name="name">BVME para transporte ferroviario de pasajeros</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -544,6 +586,7 @@
             <field name="name">Comprobante de pago SEAE</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -554,6 +597,7 @@
             <field name="name">Nota de Crédito Especial</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -564,6 +608,7 @@
             <field name="name">Nota de Débito Especial</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -574,6 +619,7 @@
             <field name="name">Nota de Ajuste de Operaciones - Ley N° 29972</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -584,6 +630,7 @@
             <field name="name">Comprobante de No Domiciliado</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -594,6 +641,7 @@
             <field name="name">Exceso de crédito fiscal por retiro de bienes</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -604,6 +652,7 @@
             <field name="name">Nota de Crédito - No Domiciliado</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 
@@ -614,6 +663,7 @@
             <field name="name">Nota de Débito - No Domiciliado</field>
             <field name='country_id' ref='base.pe'/>
             <field name='doc_code_prefix'>F</field>
+            <field name='active'>False</field>
             <field name='internal_type'/>
         </record>
 </odoo>

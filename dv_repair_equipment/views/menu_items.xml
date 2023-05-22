@@ -17,5 +17,34 @@
             groups="dv_repair_equipment.invoicing_app_group_user" sequence="6"/>
   <menuitem name="Tesoreria" id="charge_menu" parent="app_menu_root" action="invoice_action"
             groups="dv_repair_equipment.invoicing_app_group_user" sequence="7"/>
+
+    <menuitem id="delivery_boy_sub_menu_root"
+      parent="app_menu_root"
+      name="Delivery Boy"
+      groups="delivery_boy.group_delivery_boy_manager,delivery_boy.group_delivery_boy_user"
+      sequence="5"
+          />
+
+		<menuitem id="delivery_boy_sub_menu_delivery_boys"
+      parent="delivery_boy_sub_menu_root"
+      name="Delivery Boys"
+      groups="delivery_boy.group_delivery_boy_manager,delivery_boy.group_delivery_boy_user"
+      action='delivery_boy.delivery_boys_action'
+      />
+  <!-- FCM Menus -->
+    <menuitem id="delivery_boy_fcm_registered_devices_sub_menu"
+      parent="stock.menu_stock_config_settings"
+      name="FCM Reg. Devices"
+      groups="delivery_boy.group_delivery_boy_manager,delivery_boy.group_delivery_boy_user"
+      action='delivery_boy.delivery_boy_fcm_registered_devices_action'
+      />
+
+  
+<menuitem id="delivery_boy_pickings_sub_menu"
+      parent="delivery_boy_sub_menu_root"
+      name="Envíos"
+      groups="delivery_boy.group_delivery_boy_manager,delivery_boy.group_delivery_boy_user"
+      action='delivery_boy.delivery_boy_pickings_action'
+      />
 </odoo>
 <!-- repair.menu_repair_order -->

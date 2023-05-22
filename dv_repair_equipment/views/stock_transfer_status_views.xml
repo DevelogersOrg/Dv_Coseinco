@@ -137,7 +137,8 @@
             <field name="delivery_boy_partner_id" domain="[('is_delivery_boy','=',True)]"
 												options="{'no_create': True, 'no_open': True}"/>
             <field name="picking_type_id"/>
-            <field name="stock_picking_id"/>
+            <button name="create_stock_picking" type="object" class="btn btn-primary" attrs="{'invisible': [('stock_picking_id','!=', False)]}">Crear Transferencia</button>
+            <field name="stock_picking_id" attrs="{'invisible': [('stock_picking_id','=', False)]}"/>
           </group>
           <group>
             <field name="repair_product_required_ids">
@@ -197,7 +198,8 @@
             <field name="delivery_boy_partner_id" domain="[('is_delivery_boy','=',True)]"
 												options="{'no_create': True, 'no_open': True}"/>
             <field name="picking_type_id"/>
-            <field name="stock_picking_id"/>
+            <button name="create_stock_picking" type="object" class="btn btn-primary" attrs="{'invisible': [('stock_picking_id','!=', False)]}">Crear Transferencia</button>
+            <field name="stock_picking_id" attrs="{'invisible': [('stock_picking_id','=', False)]}"/>
           </group>
           <group string="Productos a devolver">
             <field name="repair_products_to_return_ids">

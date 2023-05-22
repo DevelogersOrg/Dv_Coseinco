@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
+ctx = ssl.create_default_context()
+ctx.options &= ~ssl.OP_NO_SSLv3
+
+
 from lxml import etree
 from io import StringIO, BytesIO
 import xmlsec
 from collections import OrderedDict
-from pysimplesoap.client import SoapClient, SoapFault, fetch
+from pysimplesoap.client import SoapFault, fetch
 import base64, zipfile
 from datetime import date, datetime, timedelta
 from pysimplesoap.simplexml import SimpleXMLElement
@@ -15,6 +22,8 @@ from binascii import hexlify
 import dateutil.parser
 import pytz
 from dateutil.tz import gettz
+from .client_soap import SoapClientLocal as SoapClient
+#from pysimplesoap.client import SoapClient
 
 _logging = logging.getLogger(__name__)
 
@@ -69,7 +78,8 @@ class Document(object):
 			else:
 				res = self._response
 				self._response_status = False
-				self._response = {'faultcode':res['status'].get('statusCode', False),  'faultstring':''}
+				if res and 'status' in res:
+					self._response = {'faultcode':res['status'].get('statusCode', False),  'faultstring':''}
 		elif self._type == 'status':
 			self._response_data = self._response.get('statusCdr', {}).get('content', None)
 			if not self._response_data:
@@ -181,11 +191,11 @@ class Client(object):
 				return (False, {'faultcode':ex.faultcode,  'faultstring':ex.faultstring})
 		try:
 			xml = self._soapenv % (self._username, self._password, self._xml_method)
-			#_logging.info("======================= xml de envio")
-			#_logging.info(xml)
 
-			return self._call_ws(xml)
+			datos = self._call_ws(xml)
+			return datos
 		except Exception as e:
+			_logging.info(e)
 			return (False, {})
 
 	def send_bill(self, filename, content_file):

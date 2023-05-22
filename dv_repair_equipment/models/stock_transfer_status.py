@@ -169,11 +169,24 @@ class StockTransferStatus(models.Model):
         
     picking_type_id = fields.Many2one('stock.picking.type', string='Tipo de operacion')
     stock_picking_id = fields.Many2one('stock.picking', string="Trasnferencia")
+    
     def create_stock_picking(self):
+        """
+            Crea una transferencia de stock al crear un despacho
+        """
         if not self.picking_type_id:
             raise UserError("Seleccione un tipo de operacion")
         
+            
         if self.picking_type_id.code == 'outgoing':
+            move_ids_without_package = []
+            for product in self.repair_products_to_return_ids:
+                move_ids_without_package.append((0, 0, {
+                    'name': product.product_id.name,
+                    'product_id': product.product_id.id,
+                    'product_uom_qty': product.qty_to_return,
+                    'product_uom': product.product_id.uom_id.id,
+                }))
             pick = {
                 'picking_type_id': self.picking_type_id.id,
                 'partner_id': self.client_id.id,
@@ -181,23 +194,38 @@ class StockTransferStatus(models.Model):
                 'location_dest_id': self.client_id.id,
                 'location_id': self.picking_type_id.default_location_src_id.id,
                 'delivery_boy_partner_id': self.delivery_boy_partner_id.id,
+                'location_id': self.picking_type_id.default_location_src_id.id,
+                'move_ids_without_package': move_ids_without_package,
                 #'move_type': 'direct'
             }
         if self.picking_type_id.code == 'incoming':
+            move_ids_without_package = []
+            for product in self.repair_product_required_ids:
+                move_ids_without_package.append((0, 0, {
+                    'name': product.product_id.name,
+                    'product_id': product.product_id.id,
+                    'product_uom_qty': product.qty_to_return,
+                    'product_uom': product.product_id.uom_id.id,
+                }))
             pick = {
                 'picking_type_id': self.picking_type_id.id,
-                'partner_id': self.partner_id.id,
+                'partner_id': self.client_id.id,
                 'origin': self.name,
                 'location_dest_id': self.picking_type_id.default_location_dest_id.id,
                 'location_id': self.client_id.id,
                 'delivery_boy_partner_id': self.delivery_boy_partner_id.id,
+                'location_id': self.picking_type_id.default_location_dest_id.id,
+                'move_ids_without_package': move_ids_without_package,
                 #'move_type': 'direct'
             }
 
-        picking = self.env['stock.picking'].create(pick)
+        self.stock_picking_id = self.env['stock.picking'].create(pick)
         
         
     def change_picking_state(self):
+        """
+            Cambia el estado de la transferencia de stock
+        """
         if self.picking_state == False:
             self.picking_state = 'tb_confirmed'
             return {
@@ -209,7 +237,8 @@ class StockTransferStatus(models.Model):
         self.picking_state = STATES[STATES.index(self.picking_state) + 1] if self.picking_state != 'delivered' else 'delivered'
         if self.picking_state in 'to_ship':
             self.change_account_move_state()
-            self.create_stock_picking()
+            if not self.stock_picking_id:
+                self.create_stock_picking()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',

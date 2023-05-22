@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <template id="assets_backend" name="solse_pe_cpe_pos_assets" inherit_id="point_of_sale.assets">
+    <xpath expr="." position="inside">
+      <script type="text/javascript" src="/solse_pe_cpe_pos/static/src/js/screen.js"/>
+      <script type="text/javascript" src="/solse_pe_cpe_pos/static/src/js/PaymentScreen.js"/>
+      <script type="text/javascript" src="/solse_pe_cpe_pos/static/src/js/InvoiceButton.js"/>
+      <script type="text/javascript" src="/solse_pe_cpe_pos/static/src/js/OrderReceipt.js"/>
+      <script type="text/javascript" src="/solse_pe_cpe_pos/static/src/js/ClientListScreen.js"/>
+      <script type="text/javascript" src="/solse_pe_cpe_pos/static/src/js/ClientDetailsEdit.js"/>
+
+      <script type="text/javascript" src="/solse_pe_cpe_pos/static/src/lib/String.js"></script>
+      <script type="text/javascript" src="/solse_pe_cpe_pos/static/src/lib/NumeroALetras.js"></script>
+      <script type="text/javascript" src="/solse_pe_cpe_pos/static/src/lib/qrcode.js"></script>
+      <script type="text/javascript" src="/solse_pe_cpe_pos/static/src/lib/Blob.js"></script>
+      <script type="text/javascript" src="/solse_pe_cpe_pos/static/src/lib/FileSaver.js"></script>
+    </xpath>
+  </template>
+  
+</odoo>

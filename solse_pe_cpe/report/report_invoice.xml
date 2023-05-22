@@ -283,7 +283,14 @@
                     <div class="row texto-12">
                         <div style="font-weight: bold;" class="col-3 text-left"> Neto a Pagar</div>
                         <div class="text-right"> 
-                            <t t-esc="o.currency_id.symbol"/> <span class="text-nowrap" t-esc="'%.2f'%(o.monto_neto_pagar_base)"/> 
+                            <t t-esc="o.currency_id.symbol"/>
+                            <t t-if="o.currency_id.id == o.company_id.currency_id.id">
+                                <span class="text-nowrap" t-esc="'%.2f'%(o.monto_neto_pagar)"/> 
+                            </t>
+                            <t t-else="">
+                                <span class="text-nowrap" t-esc="'%.2f'%(o.monto_neto_pagar_base)"/> 
+                            </t>
+                             
                         </div>
                     </div>
                 </div>

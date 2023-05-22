@@ -33,3 +33,12 @@
 # 28/01/2023
 * Se permite mostrar el monto en letras en idioma ingles, opcion creada en solse_pe_edi
 * Se crea campo para modulo de pos offline
+
+# 25/02/2023
+* Se utiliza una adaptacion de la libreria pysimplesoap para poder trabajar en versiones que tengan httplib2 instalado
+
+# 03/03/2023
+* Se mejora validacion para facturas de exportacion
+
+# 13/03/2032
+* Se mejora validacion para facturas de exportacion en el xml

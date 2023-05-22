@@ -12,7 +12,7 @@
 	'author': "F & M Solutions Service S.A.C",
 	'website': "https://www.solse.pe",
 	'category': 'account',
-	'version': '0.1.3',
+	'version': '14.0.1.6',
 
 	'depends': [
 		'base',

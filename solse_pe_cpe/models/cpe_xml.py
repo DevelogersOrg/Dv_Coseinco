@@ -400,32 +400,37 @@ class CPE:
 		bienes siempre que: Se trate de ventas itinerantes y no figure el punto de llegada en la
 		guía de remisión – remitente que realice el traslado de los bienes.
 		"""
-		if invoice_id.partner_id.id != invoice_id.partner_shipping_id.id:
+		if invoice_id.partner_shipping_id and invoice_id.partner_id.id != invoice_id.partner_shipping_id.id:
 			partner_id = invoice_id.partner_shipping_id
 		else:
 			partner_id = invoice_id.company_id.partner_id
-		tag = etree.QName(self._cac, 'Delivery')
+		tag = etree.QName(self._cac, 'DeliveryTerms')
 		delivery = etree.SubElement((self._root), (tag.text), nsmap={'cac': tag.namespace})
 		tag = etree.QName(self._cac, 'DeliveryLocation')
 		location = etree.SubElement(delivery, (tag.text), nsmap={'cac': tag.namespace})
 		tag = etree.QName(self._cac, 'Address')
 		address = etree.SubElement(location, (tag.text), nsmap={'cac': tag.namespace})
-		tag = etree.QName(self._cac, 'AddressLine')
-		address_line = etree.SubElement(address, (tag.text), nsmap={'cac': tag.namespace})
-		tag = etree.QName(self._cbc, 'Line')
-		etree.SubElement(address, (tag.text), nsmap={'cbc': tag.namespace}).text = partner_id.street[:200]
+		tag = etree.QName(self._cbc, 'StreetName')
+		direccion = ""
+		if partner_id.street:
+			if len(partner_id.street) > 200:
+				direccion = partner_id.street[:200]
+			else:
+				direccion = partner_id.street
+		etree.SubElement(address, (tag.text), nsmap={'cbc': tag.namespace}).text = direccion
 		tag = etree.QName(self._cbc, 'CitySubdivisionName')
 		etree.SubElement(address, (tag.text), nsmap={'cbc': tag.namespace}).text = partner_id.street2 and partner_id.street2[:25] or ''
-		tag = etree.QName(self._cbc, 'ID')
-		etree.SubElement(address, (tag.text), schemeAgencyName='PE:INEI', schemeName='Ubigeos', nsmap={'cbc': tag.namespace}).text = partner_id.l10n_pe_district.code
+		tag = etree.QName(self._cbc, 'PostalZone')
+		etree.SubElement(address, (tag.text), nsmap={'cbc': tag.namespace}).text = partner_id.l10n_pe_district.code if partner_id.l10n_pe_district else '0000'
 		tag = etree.QName(self._cbc, 'CountrySubentity')
 		etree.SubElement(address, (tag.text), nsmap={'cbc': tag.namespace}).text = partner_id.state_id.name or '-'
 		tag = etree.QName(self._cbc, 'District')
-		etree.SubElement(address, (tag.text), nsmap={'cbc': tag.namespace}).text = partner_id.l10n_pe_district.name or '-'
+		etree.SubElement(address, (tag.text), nsmap={'cbc': tag.namespace}).text = (partner_id.l10n_pe_district.name or '-') if partner_id.l10n_pe_district else '-'
 		tag = etree.QName(self._cac, 'Country')
 		country = etree.SubElement(address, (tag.text), nsmap={'cac': tag.namespace})
 		tag = etree.QName(self._cbc, 'IdentificationCode')
-		etree.SubElement(country, (tag.text), listID='ISO 3166-1', listAgencyName='United Nations Economic Commission for Europe', listName='Country', nsmap={'cbc': tag.namespace}).text = partner_id.country_id.code or '-'
+		etree.SubElement(country, (tag.text), listName='Country', nsmap={'cbc': tag.namespace}).text = partner_id.country_id.code or '-'
+	
 	
 	# (21) Información de descuentos Globales
 	def _agregar_informacion_descuentos_globales(self, invoice_id):
@@ -1241,6 +1246,7 @@ class CPE:
 		self._agregar_informacion_certificado(invoice_id)
 		self._agregar_informacion_empresa(invoice_id)
 		self._agregar_informacion_cliente(invoice_id)
+		self._agregar_informacion_lugar_entrega(invoice_id)
 		self._agregar_informacion_detraccion(invoice_id)
 		self._agregar_informacion_tipo_transaccion(invoice_id)
 		self._agregar_informacion_anticipos(invoice_id)

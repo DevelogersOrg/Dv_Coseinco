@@ -1,0 +1,1 @@
+* necesito agregar en el reporte el tipo de moneda  y tipo  de cambio que  se  uso en las ventas
