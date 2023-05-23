@@ -186,7 +186,7 @@ class StockTransferStatus(models.Model):
                 move_ids_without_package.append((0, 0, {
                     'name': product.product_id.name,
                     'product_id': product.product_id.id,
-                    'product_uom_qty': product.qty_to_return,
+                    'product_uom_qty': product.quantity,
                     'product_uom': product.product_id.uom_id.id,
                 }))
             pick = {
@@ -206,7 +206,7 @@ class StockTransferStatus(models.Model):
                 move_ids_without_package.append((0, 0, {
                     'name': product.product_id.name,
                     'product_id': product.product_id.id,
-                    'product_uom_qty': product.qty_to_return,
+                    'product_uom_qty': product.quantity,
                     'product_uom': product.product_id.uom_id.id,
                 }))
             pick = {
