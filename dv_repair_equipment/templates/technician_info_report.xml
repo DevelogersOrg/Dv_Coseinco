@@ -130,7 +130,7 @@
             <p>No se adquirieron productos</p>
         </t>
         <br/>
-        <h6 class="bordered">OBSERVACIONES FINAL:</h6>
+        <h6 class="bordered">LABORES EJECUTADAS:</h6>
         <t t-if="doc.repair_observation_detail_ids">
             <t t-foreach="doc.repair_observation_detail_ids" t-as="observation">
                 <p>* <t t-esc="observation.name"/> - <t t-esc="observation.details"/> - <t t-esc="observation.date_of_observation"/></p>
