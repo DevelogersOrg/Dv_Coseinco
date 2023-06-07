@@ -53,10 +53,12 @@ class PurchaseOrder(models.Model):
             Si se modifica el campo de purchase_state, se modifican los estados de las ordenes de compra relacionadas
         """
         original_purchase_order_id = self.env['purchase.order'].search([('related_purchase_order_ids', 'in', self.id)])
+
         if 'purchase_state' in vals:
             if self.related_purchase_order_ids:
-                self.related_purchase_order_ids.purchase_state = vals['purchase_state']
+                self.related_purchase_order_ids.write({'purchase_state': vals['purchase_state']})
             elif original_purchase_order_id:
-                original_purchase_order_id.purchase_state = vals['purchase_state']
+                original_purchase_order_id.write({'purchase_state': vals['purchase_state']})
+
         return super(PurchaseOrder, self).write(vals)
             
