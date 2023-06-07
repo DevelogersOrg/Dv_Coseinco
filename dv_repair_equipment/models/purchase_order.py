@@ -46,3 +46,17 @@ class PurchaseOrder(models.Model):
             'tag': 'reload',
         }
 
+    related_purchase_order_ids = fields.Many2many('purchase.order','purchase_order_purchase_order_rel','purchase_order_id','related_purchase_order_id', string="Ordenes de Compra Relacionadas")
+    
+    def write(self, vals):
+        """
+            Si se modifica el campo de purchase_state, se modifican los estados de las ordenes de compra relacionadas
+        """
+        original_purchase_order_id = self.env['purchase.order'].search([('related_purchase_order_ids', 'in', self.id)])
+        if 'purchase_state' in vals:
+            if self.related_purchase_order_ids:
+                self.related_purchase_order_ids.purchase_state = vals['purchase_state']
+            elif original_purchase_order_id:
+                original_purchase_order_id.purchase_state = vals['purchase_state']
+        return super(PurchaseOrder, self).write(vals)
+            

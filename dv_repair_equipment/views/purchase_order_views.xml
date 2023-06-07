@@ -2,9 +2,9 @@
 <odoo>
     <!-- Vista kanban -->
     <record id="purchase_order_kanban_view" model="ir.ui.view">
-		<field name="name">purchase.order.view.kanban</field>
-		<field name="model">purchase.order</field>
-		<field name="arch" type="xml">
+        <field name="name">purchase.order.view.kanban</field>
+        <field name="model">purchase.order</field>
+        <field name="arch" type="xml">
             <kanban default_group_by="purchase_state" class="o_kanban_small_column o_kanban_project_tasks" records_draggable="false">
                 <field name="create_date"/>
                 <field name="__last_update"/>
@@ -12,43 +12,52 @@
                 <field name="stock_transfer_status_id"/>
                 <templates>
                     <t t-name="kanban-box">
-                    <div class="oe_kanban_card oe_kanban_global_click">
-                        <div class="o_kanban_record_top  d-flex flex-column ml-1">
-                            <h3 class="o_kanban_record_title" style="margin-bottom: 8px !important"><field name="stock_transfer_status_id"/></h3>
-                        </div>
-                        <div class="o_kanban_record_bottom" style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
-                            <div class="text-muted">
-                                <span>Creado :<t t-esc="record.create_date.value" modifiers="{}"/></span><br/>
-                                <span>Actulizado: <t t-esc="record.__last_update.value" modifiers="{}"/></span><br/>
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top  d-flex flex-column ml-1">
+                                <h3 class="o_kanban_record_title" style="margin-bottom: 8px !important">
+                                    <field name="stock_transfer_status_id"/>
+                                </h3>
                             </div>
-                          </div>
-                          <t t-if="record.purchase_state.raw_value == 'required'">
-                            <button name="button_confirm"
+                            <div class="o_kanban_record_bottom" style="border-top: 1px solid #e0e0e0 !important; padding-top: 16px !important;">
+                                <div class="text-muted">
+                                    <span>Creado :
+                                        <t t-esc="record.create_date.value" modifiers="{}"/>
+                                    </span>
+                                    <br/>
+                                    <span>Actulizado:
+                                        <t t-esc="record.__last_update.value" modifiers="{}"/>
+                                    </span>
+                                    <br/>
+                                </div>
+                            </div>
+                            <t t-if="record.purchase_state.raw_value == 'required'">
+                                <button name="button_confirm"
                             type="object"
                             class="btn btn-primary"
                             style="display: block !important; width: 100% !important; margin-top: 10px !important;">
                             Confirmar Compra
                             </button>
-                          </t>
+                            </t>
                         </div>
                     </t>
                 </templates>
             </kanban>
-		</field>
-	</record>
-
+        </field>
+    </record>
     <!-- Formulario -->
     <record id="purchase_order_form_view_inherited" model="ir.ui.view">
-		<field name="name">purchase.order.view.form.inherited</field>
-		<field name="model">purchase.order</field>
+        <field name="name">purchase.order.view.form.inherited</field>
+        <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
-		<field name="arch" type="xml">
+        <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
                 <field name="purchase_state" invisible="1"/>
             </xpath>
-		</field>
-	</record>
-
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="related_purchase_order_ids" widget="many2many_tags" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
+            </xpath>
+        </field>
+    </record>
     <!-- Acción -->
     <record id="purchase_order_action" model="ir.actions.act_window">
         <field name="name">Compras</field>
@@ -56,7 +65,7 @@
         <field name="res_model">purchase.order</field>
         <field name="view_mode">kanban,tree,form</field>
         <field name="help" type="html">
-          <p class="o_view_nocontent_smiling_face">
+            <p class="o_view_nocontent_smiling_face">
               No hay registros para mostrar
           </p>
         </field>
@@ -66,5 +75,5 @@
           (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.purchase_order_kanban_view')}),
           (0, 0, {'view_mode': 'tree', 'view_id': ref('purchase.purchase_order_tree')}),
           (0, 0, {'view_mode': 'form', 'view_id': ref('purchase.purchase_order_form')}),]"/>
-      </record>
-  </odoo>
+    </record>
+</odoo>

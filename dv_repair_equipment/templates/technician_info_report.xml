@@ -133,7 +133,7 @@
         <h6 class="bordered">LABORES EJECUTADAS:</h6>
         <t t-if="doc.repair_observation_detail_ids">
             <t t-foreach="doc.repair_observation_detail_ids" t-as="observation">
-                <p>* <t t-esc="observation.name"/> - <t t-esc="observation.details"/> - <t t-esc="observation.date_of_observation"/></p>
+                <p>* <t t-esc="observation.name"/> - <t t-esc="observation.details"/></p>
             </t>
         </t>
         <t t-else="">
