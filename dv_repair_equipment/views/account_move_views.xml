@@ -78,6 +78,9 @@
       <xpath expr="//field[1]" position="after">
         <field name="move_state" invisible="1"/>
       </xpath>
+      <xpath expr="//field[@name='ref']" position="after">
+          <field name="quotation_id" widget="many2many_tags" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
+      </xpath>
       <xpath expr="//page[1]" position="after">
         <page name="data_view" string="Detalles de Facturación" attrs="{'invisible': [('move_state', '=', 'invoiced')]}">
           <group>
@@ -145,6 +148,9 @@
         <page name="data_view" string="Factura" attrs="{'invisible': [('move_state', '!=', 'invoiced')]}">
           <h4>Aqui aparecera la factura</h4>
         </page>
+      </xpath>
+      <xpath expr="//field[@name='price_subtotal']" position="after">
+          <field name="related_account_move_line_id" optional="hide"/>
       </xpath>
     </field>
   </record>

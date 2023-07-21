@@ -62,3 +62,53 @@ class PurchaseOrder(models.Model):
 
         return super(PurchaseOrder, self).write(vals)
             
+    related_buy_order_ids = fields.Many2many('purchase.order','related_buy_order_rel','rel_purchase_order_id', 
+                                             string="Compra Relacionadas", domain="[('purchase_state', '=', 'required')]")
+
+    @api.onchange('related_buy_order_ids')
+    def _onchange_related_buy_order_ids(self):
+        # Obtener las líneas de pedido de compra relacionadas previamente agregadas
+        previous_related_lines = self.order_line.filtered(lambda line: line.related_purchase_order_line_id)
+
+        # Obtener las líneas de pedido de compra relacionadas que ya no están presentes
+        lines_to_remove = previous_related_lines - self.related_buy_order_ids.mapped('order_line').mapped('related_purchase_order_line_id')
+
+        # Eliminar las líneas de pedido de compra relacionadas que ya no están presentes
+        self.order_line -= lines_to_remove
+
+        # Crear una lista temporal para almacenar las nuevas líneas de pedido de compra
+        new_lines = []
+
+        # Copiar las líneas de pedido de compra de los pedidos relacionados
+        for buy_order in self.related_buy_order_ids:
+            for line in buy_order.order_line:
+                # Verificar si la línea ya ha sido agregada previamente
+                if line.related_purchase_order_line_id not in previous_related_lines:
+                    vals = {
+                        'order_id': self.id,
+                        'product_id': line.product_id.id,
+                        'name': line.name,
+                        'product_qty': line.product_qty,
+                        'price_unit': line.price_unit,
+                        'product_uom': line.product_uom.id,
+                        'date_planned': line.date_planned,
+                        'related_purchase_order_line_id': line.id,
+                    }
+                    new_lines.append((0, 0, vals))
+
+        # Agregar todas las líneas de pedido de compra a self.order_line
+        self.order_line = new_lines
+    
+    def write(self, vals):
+        # Obtener el estado anterior de la compra original
+        previous_state = self.purchase_state
+
+        # Actualizar el estado de la compra original
+        res = super(PurchaseOrder, self).write(vals)
+
+        # Verificar si el estado ha cambiado
+        if 'purchase_state' in vals and self.purchase_state != previous_state:
+            # Actualizar el estado de las compras relacionadas
+            self.related_buy_order_ids.write({'purchase_state': self.purchase_state})
+
+        return res

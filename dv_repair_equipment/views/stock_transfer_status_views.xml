@@ -219,6 +219,8 @@
               </form>
             </field>
             <field name="given_products_state_probe_by_technician" widget="binary" attrs="{'readonly': [('picking_state','=', 'confirmed')]}"/>
+            <field name="stock_transfer_attachment" widget="many2many_binary"/>
+            <field name="preview_images" widget="html" readonly="1" class="oe_lightbox"/>
             <field name="repair_product_required_ids" invisible="1"/>
             <field name="picking_state" invisible="1"/>
             <field name="crm_lead_id" invisible="1"/>

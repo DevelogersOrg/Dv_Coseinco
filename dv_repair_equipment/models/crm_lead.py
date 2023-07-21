@@ -1,5 +1,9 @@
 from odoo import models, fields, api
 from datetime import timedelta
+import base64
+import io
+import os
+from PIL import Image
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -243,7 +247,7 @@ class CrmLead(models.Model):
 
         if self.product_or_service == 'service':
             # Agregar una sección de mano de obra
-            order_lines.append((0, 0, {'display_type': 'line_section', 'name': 'Mano de Obra',}))
+            # order_lines.append((0, 0, {'display_type': 'line_section', 'name': 'Mano de Obra',}))
             action['context']['default_comments'] = self.comments
             action['context']['default_initial_diagnosis'] = self.initial_diagnosis,
             action['context']['default_equipment_failure_report'] = self.equipment_failure_report,
@@ -389,3 +393,78 @@ class CrmLead(models.Model):
     quotation_time_period_for_shipping_time_id = fields.Many2one('quotation.time.period', string='Tiempo de entrega')
     quotation_time_period_for_guarantee_id = fields.Many2one('quotation.time.period', string='Garantía')
     quotation_time_period_for_validity_id = fields.Many2one('quotation.time.period', string='Validez de la cotización')
+
+    #Adjuntar archivos en diagnóstico
+    diagnostic_attachment = fields.Many2many('ir.attachment', string='Archivos Adjuntos')
+    diagnostic_preview_images = fields.Html(compute='_compute_diagnostic_preview_images', string='Vista previa de imágenes en diagnóstico')
+
+    def _compute_diagnostic_preview_images(self):
+        for record in self:
+            images = record.diagnostic_attachment.filtered(lambda attachment: attachment.mimetype.startswith('image/'))
+            if images:
+                image_tags = []
+                for image in images:
+                    image_tags.append(f'<a class="oe_lightbox" href="/web/image/{image.id}/preview"><img src="/web/image/{image.id}/preview" alt="{image.name}" style="height: 100px; margin: 0 10px 10px 0;"></a>')
+                image_gallery = '<div class="image-gallery">' + ''.join(image_tags) + '</div>'
+                record.diagnostic_preview_images = image_gallery
+                record.other_diagnostic_preview_images = image_gallery
+            else:
+                record.diagnostic_preview_images = False
+                record.other_diagnostic_preview_images = False
+    
+    other_diagnostic_attachment = fields.Many2many('ir.attachment', 'diagnostic_attachment_rel', string='Archivos Adjuntos', compute='_compute_other_diagnostic_attachment', store=True)
+    other_diagnostic_preview_images = fields.Html(compute='_compute_diagnostic_preview_images', string='Vista previa de imágenes')
+    @api.depends('diagnostic_attachment')
+    def _compute_other_diagnostic_attachment(self):
+        for record in self:
+            record.other_diagnostic_attachment = record.diagnostic_attachment
+
+    #Adjuntar archivos en reparacion
+    reparation_attachment = fields.Many2many('ir.attachment', 'reparation_attachment_rel', string='Archivos Adjuntos')
+    reparation_preview_images = fields.Html(compute='_compute_reparation_preview_images', string='Vista previa de imágenes en reparación')
+
+    def _compute_reparation_preview_images(self):
+        for record in self:
+            images = record.reparation_attachment.filtered(lambda attachment: attachment.mimetype.startswith('image/'))
+            if images:
+                image_tags = []
+                for image in images:
+                    image_tags.append(f'<a class="oe_lightbox" href="/web/image/{image.id}/preview"><img src="/web/image/{image.id}/preview" alt="{image.name}" style="height: 100px; margin: 0 10px 10px 0;"></a>')
+                image_gallery = '<div class="image-gallery">' + ''.join(image_tags) + '</div>'
+                record.reparation_preview_images = image_gallery
+                record.other_reparation_preview_images = image_gallery
+            else:
+                record.reparation_preview_images = False
+                record.other_reparation_preview_images = False
+    
+    other_reparation_attachment = fields.Many2many('ir.attachment', 'other_reparation_attachment_rel', string='Archivos Adjuntos', compute='_compute_other_reparation_attachment', store=True)
+    other_reparation_preview_images = fields.Html(compute='_compute_reparation_preview_images', string='Vista previa de imágenes')
+    @api.depends('reparation_attachment')
+    def _compute_other_reparation_attachment(self):
+        for record in self:
+            record.other_reparation_attachment = record.reparation_attachment
+    
+    #Adjuntar archivos en confirmacion
+    confirmation_attachment = fields.Many2many('ir.attachment', 'confirmation_attachment_rel', string='Archivos Adjuntos')
+    confirmation_preview_images = fields.Html(compute='_compute_confirmation_preview_images', string='Vista previa de imágenes')
+
+    def _compute_confirmation_preview_images(self):
+        for record in self:
+            images = record.confirmation_attachment.filtered(lambda attachment: attachment.mimetype.startswith('image/'))
+            if images:
+                image_tags = []
+                for image in images:
+                    image_tags.append(f'<a class="oe_lightbox" href="/web/image/{image.id}/preview"><img src="/web/image/{image.id}/preview" alt="{image.name}" style="height: 100px; margin: 0 10px 10px 0;"></a>')
+                image_gallery = '<div class="image-gallery">' + ''.join(image_tags) + '</div>'
+                record.confirmation_preview_images = image_gallery
+                record.other_confirmation_preview_images = image_gallery
+            else:
+                record.confirmation_preview_images = False
+                record.other_confirmation_preview_images = False
+    
+    other_confirmation_attachment = fields.Many2many('ir.attachment', 'other_confirmation_attachment_rel', string='Archivos Adjuntos', compute='_compute_other_confirmation_attachment', store=True)
+    other_confirmation_preview_images = fields.Html(compute='_compute_confirmation_preview_images', string='Vista previa de imágenes')
+    @api.depends('confirmation_attachment')
+    def _compute_other_confirmation_attachment(self):
+        for record in self:
+            record.other_confirmation_attachment = record.confirmation_attachment

@@ -1,5 +1,9 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
+import base64
+import io
+import os
+from PIL import Image
 # from odoo.tools import sudo
 
 
@@ -254,3 +258,19 @@ class StockTransferStatus(models.Model):
 
     # DELIVERY BOY
     delivery_boy_partner_id = fields.Many2one(string="Delivery Boy", comodel_name="res.partner")
+
+    #Adjuntar archivos
+    stock_transfer_attachment = fields.Many2many('ir.attachment', string='Archivos Adjuntos')
+    preview_images = fields.Html(compute='_compute_preview_images', string='Vista previa de imágenes')
+    
+    def _compute_preview_images(self):
+        for record in self:
+            images = record.stock_transfer_attachment.filtered(lambda attachment: attachment.mimetype.startswith('image/'))
+            if images:
+                image_tags = []
+                for image in images:
+                    image_tags.append(f'<a class="oe_lightbox" href="/web/image/{image.id}/preview"><img src="/web/image/{image.id}/preview" alt="{image.name}" style="height: 100px; margin: 0 10px 10px 0;"></a>')
+                image_gallery = '<div class="image-gallery">' + ''.join(image_tags) + '</div>'
+                record.preview_images = image_gallery
+            else:
+                record.preview_images = False
