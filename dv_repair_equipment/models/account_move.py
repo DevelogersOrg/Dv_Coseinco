@@ -107,44 +107,51 @@ class AccountMove(models.Model):
                                     string='Enlace cotizaciones', domain=[('state', '!=', 'draft'), ('treasury_state', '=', 'to_pay'), ('amount_untaxed_signed', '!=', '0')])
     
     
-    # @api.onchange('quotation_id')
-    # def _onchange_quotation_id(self):
-    #     # Obtener las líneas de factura relacionadas previamente agregadas
-    #     previous_related_lines = self.invoice_line_ids.filtered(lambda line: line.related_account_move_line_id)
+    @api.onchange('quotation_id')
+    def _onchange_quotation_id(self):
+        # Obtener las líneas de factura relacionadas previamente agregadas
+        previous_related_lines = self.invoice_line_ids.filtered(lambda line: line.related_account_move_line_id)
 
-    #     # Obtener las líneas de factura relacionadas que ya no están presentes
-    #     lines_to_remove = previous_related_lines - self.quotation_id.mapped('invoice_line_ids').mapped('related_account_move_line_id')
+        # Obtener las líneas de factura relacionadas que ya no están presentes
+        lines_to_remove = previous_related_lines - self.quotation_id.mapped('invoice_line_ids').mapped('related_account_move_line_id')
 
-    #     # Eliminar las líneas de factura relacionadas que ya no están presentes
-    #     self.invoice_line_ids -= lines_to_remove
+        # Eliminar las líneas de factura relacionadas que ya no están presentes
+        self.invoice_line_ids -= lines_to_remove
 
-    #     # Crear una lista temporal para almacenar las nuevas líneas de factura
-    #     new_lines = []
+        # Crear una lista temporal para almacenar las nuevas líneas de factura
+        new_lines = []
 
-    #     # Copiar las líneas de factura de las cotizaciones relacionadas
-    #     for quotation in self.quotation_id:
-    #         for line in quotation.invoice_line_ids:
-    #             # Verificar si la línea ya ha sido agregada previamente
-    #             if line.related_account_move_line_id not in previous_related_lines:
-    #                 vals = {
-    #                     'move_id': self.id,
-    #                     'account_id': line.account_id.id,
-    #                     'product_id': line.product_id.id,
-    #                     'name': line.name,
-    #                     # 'quantity': line.quantity,
-    #                     # 'price_total': line.price_total,
-    #                     # 'price_unit': line.price_unit,
-    #                     # 'tax_ids': line.tax_ids.ids,
-    #                     # 'price_subtotal': line.price_subtotal,
-    #                     'related_account_move_line_id': line.id,
-    #                     # 'balance': line.balance,
-    #                     # 'amount_currency': line.amount_currency,
-    #                     # 'credit': line.credit,
-    #                     # 'debit': line.debit,
-    #                     # 'company_currency_id': line.company_currency_id.id,
-    #                     # 'currency_id': line.currency_id.id,
-    #                 }
-    #                 new_lines.append((0, 0, vals))
+        # Copiar las líneas de factura de las cotizaciones relacionadas
+        for quotation in self.quotation_id:
+            for line in quotation.invoice_line_ids:
+                # Verificar si la línea ya ha sido agregada previamente
+                if line.related_account_move_line_id not in previous_related_lines:
+                    vals = {
+                        'move_id': self.id,
+                        'account_id': line.account_id.id,
+                        'product_id': line.product_id.id,
+                        'name': line.name,
+                        'quantity': line.quantity,
+                        #'price_total': line.price_total,
+                        'price_unit': line.price_unit,
+                        'tax_ids': line.tax_ids.ids,
+                        #'price_subtotal': line.price_subtotal,
+                        'related_account_move_line_id': line.id,
+                        # 'balance': line.balance,
+                        'amount_currency': line.amount_currency,
+                        #'credit': line.credit,
+                        #'debit': line.debit,
+                        # 'company_currency_id': line.company_currency_id.id,
+                        'currency_id': line.currency_id.id,
+                    }
+                    new_lines.append((0, 0, vals))
 
-    #     # Agregar todas las líneas de factura a self.invoice_line_ids
-    #     self.invoice_line_ids = new_lines
+        # Agregar todas las líneas de factura a self.invoice_line_ids
+        self.invoice_line_ids = new_lines
+        self._onchange_invoice_line_ids()
+        for line in self.line_ids:
+            line._onchange_account_id()
+            line._onchange_price_subtotal()
+            #line._onchange_currency()
+            #line._onchange_credit()
+            #line._onchange_debit()
