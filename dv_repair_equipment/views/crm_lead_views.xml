@@ -377,7 +377,7 @@
                     <field name="other_reparation_attachment" string="" widget="many2many_binary"/>
                     <field name="other_reparation_preview_images" widget="html" readonly="1" class="oe_lightbox"/>
                 </group>
-                <group string="Archivos adjuntos de pruebas de Reparación"
+                <group string="Archivos adjuntos de Pruebas de Reparación"
                 attrs="{'invisible': [('crm_lead_state','!=', 'confirmed')]}">
                     <field name="other_confirmation_attachment" string="" widget="many2many_binary"/>
                     <field name="other_confirmation_preview_images" widget="html" readonly="1" class="oe_lightbox"/>
