@@ -127,31 +127,22 @@ class AccountMove(models.Model):
                 # Verificar si la línea ya ha sido agregada previamente
                 if line.related_account_move_line_id not in previous_related_lines:
                     vals = {
-                        'move_id': self.id,
                         'account_id': line.account_id.id,
                         'product_id': line.product_id.id,
                         'name': line.name,
                         'quantity': line.quantity,
-                        #'price_total': line.price_total,
                         'price_unit': line.price_unit,
-                        'tax_ids': line.tax_ids.ids,
-                        #'price_subtotal': line.price_subtotal,
-                        'related_account_move_line_id': line.id,
-                        # 'balance': line.balance,
+                        'discount': line.discount,
+                        'price_subtotal': line.price_subtotal,
+                        'price_total': line.price_total,
+                        'debit': line.debit,
+                        'credit': line.credit,
+                        'tax_ids': [(6, 0, line.tax_ids.ids)],
+                        'related_account_move_line_id': line._origin.id,
                         'amount_currency': line.amount_currency,
-                        #'credit': line.credit,
-                        #'debit': line.debit,
-                        # 'company_currency_id': line.company_currency_id.id,
                         'currency_id': line.currency_id.id,
                     }
                     new_lines.append((0, 0, vals))
-
-        # Agregar todas las líneas de factura a self.invoice_line_ids
+        _logger.info(f"new_lines: {new_lines}")
         self.invoice_line_ids = new_lines
         self._onchange_invoice_line_ids()
-        for line in self.line_ids:
-            line._onchange_account_id()
-            line._onchange_price_subtotal()
-            #line._onchange_currency()
-            #line._onchange_credit()
-            #line._onchange_debit()
