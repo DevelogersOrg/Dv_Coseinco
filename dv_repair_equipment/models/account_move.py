@@ -77,6 +77,8 @@ class AccountMove(models.Model):
     quotation_time_period_for_validity_id = fields.Many2one(
         'quotation.time.period', string='Validez de la cotización')
 
+    quotation_related = fields.Boolean(string='Tiene cotización relacionada')
+    
     def get_report_files(self):
         pdf = self.env.ref(
             'dv_repair_equipment.action_report_account_move')._render_qweb_pdf(self.id)[0]
@@ -107,8 +109,8 @@ class AccountMove(models.Model):
                                     string='Enlace cotizaciones', domain=[('state', '!=', 'draft'), ('treasury_state', '=', 'to_pay'), ('amount_untaxed_signed', '!=', '0')])
     
     
-    @api.onchange('quotation_id')
-    def _onchange_quotation_id(self):
+    #@api.onchange('quotation_id')
+    def onchange_quotation_id(self):
         # Obtener las líneas de factura relacionadas previamente agregadas
         previous_related_lines = self.invoice_line_ids.filtered(lambda line: line.related_account_move_line_id)
 
@@ -138,8 +140,8 @@ class AccountMove(models.Model):
                         'debit': line.debit,
                         'credit': line.credit,
                         'tax_ids': [(6, 0, line.tax_ids.ids)],
-                        'related_account_move_line_id': line._origin.id,
-                        # 'number_id': ,
+                        'related_account_move_line_id': line.id,
+                        #'number_id': line.ids[0],
                         'amount_currency': line.amount_currency,
                         'currency_id': line.currency_id.id,
                     }
@@ -147,4 +149,5 @@ class AccountMove(models.Model):
         _logger.info(f"new_lines: {new_lines}")
         self.invoice_line_ids = new_lines
         self._onchange_invoice_line_ids()
+        self.quotation_related = True
         _logger.info(f"new_lines: {new_lines}")

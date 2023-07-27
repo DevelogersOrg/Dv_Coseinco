@@ -79,7 +79,12 @@
         <field name="move_state" invisible="1"/>
       </xpath>
       <xpath expr="//field[@name='ref']" position="after">
+        <label for="quotation_id"/>
+        <div class="o_row">
+          <field name="quotation_related" invisible="1"/>
           <field name="quotation_id" widget="many2many_tags" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
+          <button name="onchange_quotation_id" type="object" string="Actualizar" class="btn-link mb-1 px-0" icon="fa-refresh" attrs="{'invisible': ['|',('quotation_id', '=', False), ('quotation_related', '=', True)]}"/>
+        </div>
       </xpath>
       <xpath expr="//page[1]" position="after">
         <page name="data_view" string="Detalles de Facturación" attrs="{'invisible': [('move_state', '=', 'invoiced')]}">
@@ -138,23 +143,21 @@
         </page>
         <page name="conditions" string="Terminos de la cotización">
           <group>
-              <field name="quotation_terms_conditions_id"/>
-              <field name="quotation_time_period_for_payment_type_id"/>
-              <field name="quotation_time_period_for_shipping_time_id"/>
-              <field name="quotation_time_period_for_guarantee_id"/>
-              <field name="quotation_time_period_for_validity_id"/>
+            <field name="quotation_terms_conditions_id"/>
+            <field name="quotation_time_period_for_payment_type_id"/>
+            <field name="quotation_time_period_for_shipping_time_id"/>
+            <field name="quotation_time_period_for_guarantee_id"/>
+            <field name="quotation_time_period_for_validity_id"/>
           </group>
-      </page>
+        </page>
         <page name="data_view" string="Factura" attrs="{'invisible': [('move_state', '!=', 'invoiced')]}">
           <h4>Aqui aparecera la factura</h4>
         </page>
       </xpath>
-
       <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='price_subtotal']" position="after">
-          <field name="related_account_move_line_id" optional="hide"/>
-          <field name="number_id"/>
+        <field name="related_account_move_line_id" optional="hide"/>
+        <field name="number_id"/>
       </xpath>
-
       <!-- <xpath expr="//field[@name='line_ids']/tree/field[@name='account_id']" position="after">
           <field name="related_account_move_line_id" invisible="1"/>
           <field name="number_id" invisible="1"/>
