@@ -149,9 +149,16 @@
           <h4>Aqui aparecera la factura</h4>
         </page>
       </xpath>
-      <xpath expr="//field[@name='price_subtotal']" position="after">
+
+      <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='price_subtotal']" position="after">
           <field name="related_account_move_line_id" optional="hide"/>
+          <field name="number_id"/>
       </xpath>
+
+      <!-- <xpath expr="//field[@name='line_ids']/tree/field[@name='account_id']" position="after">
+          <field name="related_account_move_line_id" invisible="1"/>
+          <field name="number_id" invisible="1"/>
+      </xpath> -->
     </field>
   </record>
   <record id="account_move_action" model="ir.actions.act_window">

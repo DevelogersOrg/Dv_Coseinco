@@ -63,7 +63,7 @@ class PurchaseOrder(models.Model):
         return super(PurchaseOrder, self).write(vals)
             
     related_buy_order_ids = fields.Many2many('purchase.order','related_buy_order_rel','rel_purchase_order_id', 
-                                             string="Compra Relacionadas", domain="[('purchase_state', '=', 'required')]")
+                                             string="Compra Relacionadas", domain=[('purchase_state', '=', 'required'),(related_purchase_order_ids, '=', False)])
 
     @api.onchange('related_buy_order_ids')
     def _onchange_related_buy_order_ids(self):

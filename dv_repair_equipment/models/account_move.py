@@ -139,6 +139,7 @@ class AccountMove(models.Model):
                         'credit': line.credit,
                         'tax_ids': [(6, 0, line.tax_ids.ids)],
                         'related_account_move_line_id': line._origin.id,
+                        # 'number_id': ,
                         'amount_currency': line.amount_currency,
                         'currency_id': line.currency_id.id,
                     }
@@ -146,3 +147,4 @@ class AccountMove(models.Model):
         _logger.info(f"new_lines: {new_lines}")
         self.invoice_line_ids = new_lines
         self._onchange_invoice_line_ids()
+        _logger.info(f"new_lines: {new_lines}")
