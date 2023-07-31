@@ -83,8 +83,9 @@
         <div class="o_row">
           <field name="quotation_related" invisible="1"/>
           <field name="quotation_id" widget="many2many_tags" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
-          <button name="onchange_quotation_id" type="object" string="Actualizar" class="btn-link mb-1 px-0" icon="fa-refresh" attrs="{'invisible': ['|',('quotation_id', '=', False), ('quotation_related', '=', True)]}"/>
+          <button name="onchange_quotation_id" type="object" string="Actualizar" class="btn-link mb-1 px-0" icon="fa-refresh" />
         </div>
+        <field name="crm_lead_id" invisible="1"/>
       </xpath>
       <xpath expr="//page[1]" position="after">
         <page name="data_view" string="Detalles de Facturación" attrs="{'invisible': [('move_state', '=', 'invoiced')]}">

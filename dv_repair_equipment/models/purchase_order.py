@@ -63,10 +63,11 @@ class PurchaseOrder(models.Model):
         return super(PurchaseOrder, self).write(vals)
             
     related_buy_order_ids = fields.Many2many('purchase.order','related_buy_order_rel','rel_purchase_order_id', 
-                                             string="Compra Relacionadas", domain=[('purchase_state', '=', 'required'),(related_purchase_order_ids, '=', False)])
+                                             string="Compra Relacionadas", domain=[('purchase_state', '=', 'required'),('related_buy_order_ids', '=', False)])
+    purchase_related = fields.Boolean(string='Tiene compra relacionada')
 
-    @api.onchange('related_buy_order_ids')
-    def _onchange_related_buy_order_ids(self):
+    # @api.onchange('related_buy_order_ids')
+    def onchange_related_buy_order_ids(self):
         # Obtener las líneas de pedido de compra relacionadas previamente agregadas
         previous_related_lines = self.order_line.filtered(lambda line: line.related_purchase_order_line_id)
 
@@ -98,7 +99,14 @@ class PurchaseOrder(models.Model):
 
         # Agregar todas las líneas de pedido de compra a self.order_line
         self.order_line = new_lines
-    
+
+    # @api.onchange('related_buy_order_ids')
+    # def onchange_purchase_related(self):
+    #     if self.related_buy_order_ids:
+    #         self.purchase_related = True
+    #     else:
+    #         self.purchase_related = False
+            
     def write(self, vals):
         # Obtener el estado anterior de la compra original
         previous_state = self.purchase_state

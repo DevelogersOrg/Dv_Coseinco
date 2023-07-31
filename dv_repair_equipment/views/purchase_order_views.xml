@@ -54,8 +54,13 @@
                 <field name="purchase_state" invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='currency_id']" position="after">
-                <field name="related_purchase_order_ids" widget="many2many_tags" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
-                <field name="related_buy_order_ids" widget="many2many_tags" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
+                <!-- <field name="related_purchase_order_ids" widget="many2many_tags" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/> -->
+                <label for="related_buy_order_ids"/>
+                <div class="o_row">
+                    <field name="purchase_related" invisible="1"/>
+                    <field name="related_buy_order_ids" widget="many2many_tags" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
+                    <button name="onchange_related_buy_order_ids" type="object" string="Actualizar" class="btn-link mb-1 px-0" icon="fa-refresh" />
+                </div>
             </xpath>
             <xpath expr="//field[@name='price_subtotal']" position="after">
                 <field name="related_purchase_order_line_id" optional="hide"/>

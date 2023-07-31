@@ -2,6 +2,7 @@ from odoo import models, fields, api, _
 import base64
 import logging
 from odoo.exceptions import UserError
+from odoo.tools.misc import formatLang, format_date, get_lang
 _logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
@@ -106,7 +107,8 @@ class AccountMove(models.Model):
 
     #Enlace de cotizacion con factura
     quotation_id = fields.Many2many('account.move', 'account_move_account_move_rel','account_move_id','related_account_move_id', 
-                                    string='Enlace cotizaciones', domain=[('state', '!=', 'draft'), ('treasury_state', '=', 'to_pay'), ('amount_untaxed_signed', '!=', '0')])
+                                    string='Enlace cotizaciones', 
+                                    domain=[('treasury_state', '=', 'to_pay'), ('amount_untaxed_signed', '!=', '0'),('crm_lead_id', '!=', False)])
     
     
     #@api.onchange('quotation_id')
@@ -149,5 +151,44 @@ class AccountMove(models.Model):
         _logger.info(f"new_lines: {new_lines}")
         self.invoice_line_ids = new_lines
         self._onchange_invoice_line_ids()
-        self.quotation_related = True
+        if self.quotation_id:
+            self.quotation_related = True
+        else:
+            self.quotation_related = False
         _logger.info(f"new_lines: {new_lines}")
+    
+    # @api.onchange('quotation_id')
+    # def onchange_quotation_related(self):
+    #     if self.quotation_id:
+    #         self.quotation_related = True
+    #     else:
+    #         self.quotation_related = False
+
+    def name_get(self):
+        result = []
+        for move in self:
+            if self._context.get('name_groupby'):
+                name = '**%s**, %s' % (self.env['account.move'].format_date(move.date), move._get_move_display_name())
+                if move.ref:
+                    name += '     (%s)' % move.ref
+                if move.partner_id.name:
+                    name += ' - %s' % move.partner_id.name
+            else:
+                name = move._get_move_display_name(show_ref=True)
+            if move.crm_lead_id:
+                name = f"{move.crm_lead_id.display_name} / {name}"
+            result.append((move.id, name))
+        return result
+    
+    def write(self, vals):
+        # Obtener el estado anterior de la compra original
+        previous_state = self.move_state
+
+        # Actualizar el estado de la compra original
+        res = super(AccountMove, self).write(vals)
+
+        # Verificar si el estado ha cambiado
+        if 'move_state' in vals and self.move_state != previous_state:
+            # Actualizar el estado de las compras relacionadas
+            self.quotation_id.write({'move_state': self.move_state})
+        return res
