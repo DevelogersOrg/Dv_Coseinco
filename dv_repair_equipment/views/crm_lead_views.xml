@@ -152,6 +152,13 @@
                     <field name="service_description" />
                 </group>
             </xpath>
+            <xpath expr="//field[@name='team_id']" position="after">
+                <group string="Datos del técnico" attrs="{'invisible': [('client_state','!=','confirmed')]}">
+                    <field name="repair_user_id"/>
+                </group>
+                <!-- <button string="Pasar imagenes" name="transfer_attachments_for_leads" type="object" class="btn btn-primary"/>
+                <button string="Eliminar imagenes" name="delete_attachment" type="object" class="btn btn-primary"/> -->
+            </xpath>
             <xpath expr="//page[@name='lead']" position="after">
                 <page name="assigned_view" string="Detalles del diagnóstico"
                     attrs="{'invisible': [('client_state', '!=', 'assigned'), ('client_state', '!=', 'dg_ready')]}">
@@ -192,7 +199,7 @@
                                 </group>
                             </form>
                         </field>
-                        <field name="given_products_state_probe_by_client" widget="image" attrs="{'invisible': [('repair_order_components_ids','=', False)]}" />
+                        <!-- <field name="given_products_state_probe_by_client" widget="image" attrs="{'invisible': [('repair_order_components_ids','=', False)]}" /> -->
                         <field name="diagnostic_attachment" widget="many2many_binary"/>
                         <field name="diagnostic_preview_images" widget="html" readonly="1" class="oe_lightbox"/>
                     </group>
@@ -320,7 +327,7 @@
                         </field>
                     </group>
                     <group>
-                    <field name="given_products_state_probe_by_warehouse" widget="image"/>
+                    <!-- <field name="given_products_state_probe_by_warehouse" widget="image"/> -->
                     <field name="reparation_attachment" widget="many2many_binary"/>
                     <field name="reparation_preview_images" widget="html" readonly="1" class="oe_lightbox"/>
                         <button name="set_repair_to_concluded"
@@ -339,7 +346,7 @@
                             attrs="{'required': [('crm_lead_state','=','to_finish')]}" />
                         <field name="conclusion"
                             attrs="{'required': [('crm_lead_state','=','to_finish')]}" />
-                        <field name="reparation_proofs" widget="image" />
+                        <!-- <field name="reparation_proofs" widget="image" /> -->
                         <field name="confirmation_attachment" widget="many2many_binary" attrs="{'required': [('crm_lead_state','=','to_finish')]}"/>
                         <field name="confirmation_preview_images" widget="html" readonly="1" class="oe_lightbox"/>
                         <field name="repair_products_to_return_ids">

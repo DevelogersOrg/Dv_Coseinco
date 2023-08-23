@@ -218,7 +218,9 @@
                 </sheet>
               </form>
             </field>
-            <field name="given_products_state_probe_by_technician" widget="binary" attrs="{'readonly': [('picking_state','=', 'confirmed')]}"/>
+            <!-- <button string="Pasar imagenes" name="transfer_attachments_for_leads" type="object" class="btn btn-primary"/>
+            <button string="Eliminar imagenes" name="delete_attachment" type="object" class="btn btn-primary"/> -->
+            <!-- <field name="given_products_state_probe_by_technician" widget="binary" attrs="{'readonly': [('picking_state','=', 'confirmed')]}"/> -->
             <field name="stock_transfer_attachment" widget="many2many_binary"/>
             <field name="preview_images" widget="html" readonly="1" class="oe_lightbox"/>
             <field name="repair_product_required_ids" invisible="1"/>

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <!-- #Vista de lista -->
+    <record id="report_time_tree_view" model="ir.ui.view">
+        <field name="name">report_time_type.view.tree</field>
+        <field name="model">report.time</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="name"/>
+                <field name="module"/>
+                <field name="stage"/>
+            </tree>
+        </field>
+    </record>
+    <!-- #Accion de ventana -->
+    <record id="report_time_type_action" model="ir.actions.act_window">
+        <field name="name">Reporte de Tiempos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">report.time</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

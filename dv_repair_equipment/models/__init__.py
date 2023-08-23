@@ -17,3 +17,5 @@ from . import repair_products_to_return
 
 from . import quotation_terms_conditions
 from . import quotation_time_period
+from . import report
+from . import report_time

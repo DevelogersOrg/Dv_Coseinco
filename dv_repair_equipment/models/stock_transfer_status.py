@@ -274,3 +274,30 @@ class StockTransferStatus(models.Model):
                 record.preview_images = image_gallery
             else:
                 record.preview_images = False
+
+    def transfer_binary_to_many2many(self):
+        for record in self:
+            #Si hay given_products_state_probe_by_technician
+            if record.given_products_state_probe_by_technician:
+                attachment_data = {
+                    'name': 'img_despacho',
+                    'type': 'binary',
+                    'datas': record.given_products_state_probe_by_technician,
+                    'res_model': self._name,
+                    'res_id': record.id,
+                }
+                attachment = self.env['ir.attachment'].create(attachment_data)
+                record.stock_transfer_attachment = [(4, attachment.id)]
+    
+    def transfer_attachments_for_leads(self):
+        #Busca todos los leads que tengan given_products_state_probe_by_client
+        leads_with_binary = self.search([('given_products_state_probe_by_technician', '!=', False)])
+        if leads_with_binary:
+            for lead in leads_with_binary:
+                lead.transfer_binary_to_many2many()
+    
+    #Eliminar archivos adjuntos
+    def delete_attachment(self):
+        all_records = self.env['stock.transfer.status'].search([])
+        for record in all_records:
+            record.given_products_state_probe_by_technician = False

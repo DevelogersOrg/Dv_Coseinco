@@ -468,3 +468,75 @@ class CrmLead(models.Model):
     def _compute_other_confirmation_attachment(self):
         for record in self:
             record.other_confirmation_attachment = record.confirmation_attachment
+
+    
+    def transfer_binary_to_many2many(self):
+        for record in self:
+            #Si hay given_products_state_probe_by_client
+            if record.given_products_state_probe_by_client:
+                attachment_data = {
+                    'name': 'img_diagnóstico',
+                    'type': 'binary',
+                    'datas': record.given_products_state_probe_by_client,
+                    'res_model': self._name,
+                    'res_id': record.id,
+                }
+                attachment = self.env['ir.attachment'].create(attachment_data)
+                record.diagnostic_attachment = [(4, attachment.id)]
+            #Si hay given_products_state_probe_by_warehouse
+            if record.given_products_state_probe_by_warehouse:
+                attachment_data = {
+                    'name': 'img_reparación',
+                    'type': 'binary',
+                    'datas': record.given_products_state_probe_by_warehouse,
+                    'res_model': self._name,
+                    'res_id': record.id,
+                }
+                attachment = self.env['ir.attachment'].create(attachment_data)
+                record.reparation_attachment = [(4, attachment.id)]
+            #Si hay reparation_proofs
+            if record.reparation_proofs:
+                attachment_data = {
+                    'name': 'img_reparado',
+                    'type': 'binary',
+                    'datas': record.reparation_proofs,
+                    'res_model': self._name,
+                    'res_id': record.id,
+                }
+                attachment = self.env['ir.attachment'].create(attachment_data)
+                record.confirmation_attachment = [(4, attachment.id)]
+    
+    def transfer_attachments_for_leads(self):
+        #Busca todos los leads que tengan given_products_state_probe_by_client
+        leads_with_binary = self.search([('given_products_state_probe_by_client', '!=', False)])
+        if leads_with_binary:
+            for lead in leads_with_binary:
+                lead.transfer_binary_to_many2many()
+        #Busca todos los leads que tengan given_products_state_probe_by_warehouse
+        leads_with_binary = self.search([('given_products_state_probe_by_warehouse', '!=', False)])
+        if leads_with_binary:
+            for lead in leads_with_binary:
+                lead.transfer_binary_to_many2many()
+        #Busca todos los leads que tengan reparation_proofs
+        leads_with_binary = self.search([('reparation_proofs', '!=', False)])
+        if leads_with_binary:
+            for lead in leads_with_binary:
+                lead.transfer_binary_to_many2many()
+    
+    #Eliminar archivos adjuntos
+    def delete_attachment(self):
+        all_records = self.env['crm.lead'].search([])
+        for record in all_records:
+            record.given_products_state_probe_by_client = False
+            record.given_products_state_probe_by_warehouse = False
+            record.reparation_proofs = False
+    
+    @api.model_create_single
+    def create(self, values):
+        lead = super(CrmLead, self).create(values)
+        report_time = self.env['report.time'].create({
+            'name': lead.display_name,
+            'module': 'Atención al Cliente',
+            'stage': lead.client_state,
+        })
+        return lead

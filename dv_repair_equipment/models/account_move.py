@@ -2,7 +2,15 @@ from odoo import models, fields, api, _
 import base64
 import logging
 from odoo.exceptions import UserError
+from datetime import datetime
 from odoo.tools.misc import formatLang, format_date, get_lang
+from werkzeug.wrappers import Response
+from odoo.http import request
+from odoo.modules.module import get_module_resource
+import io
+import os
+import xlsxwriter
+
 _logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
@@ -110,6 +118,18 @@ class AccountMove(models.Model):
                                     string='Enlace cotizaciones', 
                                     domain=[('treasury_state', '=', 'to_pay'), ('amount_untaxed_signed', '!=', '0'),('crm_lead_id', '!=', False)])
     
+    #Dominio de quotation_id
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        if self.partner_id:
+            return {'domain': {'quotation_id': [('partner_id', '=', self.partner_id.id),
+                                                ('treasury_state', '=', 'to_pay'),
+                                                ('amount_untaxed_signed', '!=', '0'),
+                                                ('crm_lead_id', '!=', False)]}}
+        else:
+            return {'domain': {'quotation_id': [('treasury_state', '=', 'to_pay'),
+                                                ('amount_untaxed_signed', '!=', '0'),
+                                                ('crm_lead_id', '!=', False)],}}
     
     #@api.onchange('quotation_id')
     def onchange_quotation_id(self):
@@ -192,3 +212,154 @@ class AccountMove(models.Model):
             # Actualizar el estado de las compras relacionadas
             self.quotation_id.write({'move_state': self.move_state})
         return res
+    
+    # def compute_product_totals(self):
+    #     for move in self:
+    #         for line in move.invoice_line_ids:
+    #             line.compute_product_totals()
+
+    #Campo de estado de ticket para reporte
+    ticket_state = fields.Selection([('open', 'Abierto'),('closed', 'Cerrado')], string='Estado de ticket', compute='_compute_ticket_state')
+
+    @api.depends('move_state')
+    def _compute_ticket_state(self):
+        for move in self:
+            if move.move_state == 'invoiced':
+                move.ticket_state = 'open'
+            else:
+                move.ticket_state = 'closed'
+    
+    #Reporte en Excel
+    # def generate_invoice_excel_report(self, invoices):
+    #     output = io.BytesIO()
+    #     workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+    #     worksheet = workbook.add_worksheet('reporte_Facturacion')
+
+    #     # Turn off gridlines
+    #     worksheet.hide_gridlines(2)
+
+    #     row = 8
+    #     col = 1
+    #     index= 0
+
+    #     # Create a format for the title
+    #     title_format = workbook.add_format({
+    #         'bold': True,
+    #         'font_name': 'Calibri',
+    #         'font_size': 16,
+    #         'align': 'center',
+    #         'valign': 'vcenter',
+    #     })
+
+    #     # Set the title in the worksheet
+    #     worksheet.merge_range('B3:I3', ('REPORTE - FACTURACION'), title_format)
+        
+    #     #Text
+    #     text_format = workbook.add_format({
+    #         'bold': True,
+    #         'font_name': 'Calibri',
+    #         'font_size': 11,
+    #     })
+    #     worksheet.merge_range('B5:C5', ('Fecha Inicio:'), text_format)
+    #     worksheet.merge_range('B7:C7', ('Fecha Fin:'), text_format)
+        
+    #     # Ruta de la imagen
+    #     imagen_ruta = 'dv_repair_equipment/static/src/img/coseinco.png'
+    #     # Insertar la imagen en una celda
+    #     worksheet.insert_image('J3', get_module_resource('dv_repair_equipment', 'static/src/img', 'coseinco.png'))
+
+    #     # Create a format for the header row
+    #     header_format = workbook.add_format({
+    #         'bold': True,
+    #         'font_name': 'Calibri',
+    #         'font_size': 11,
+    #         'bg_color': '#002060',  # Blue background color
+    #         'font_color': 'white',  # White font color
+    #         'align': 'center',  # Center alignment
+    #         'valign': 'vcenter',  # Vertical center alignment
+    #         'border': 1,  # Add a border around each cell
+    #     })
+
+    #     # Headers
+    #     headers = [('N°'),('TICKET/PROCESO'),('BIEN/SERVICIO'),('CLIENTE '),('ETAPA'),('FECHA/HORA INICIO'),
+    #                ('FECHA/HORA FINAL'),('USUARIO ENCARGADO'),('COMPROBANTE'),('IMPORTE'),('SITUACION')]
+    #     for header in headers:
+    #         worksheet.write(row, col, header, header_format)
+    #         col += 1
+
+    #     # Create a format for the data rows with borders
+    #     data_format = workbook.add_format({
+    #         'font_name': 'Calibri',
+    #         'font_size': 11,
+    #         'align': 'center',  # Center alignment
+    #         'valign': 'vcenter',  # Vertical center alignment
+    #         'border': 1,  # Add a border around each cell
+    #     })
+
+    #     # Data
+    #     for invoice in invoices:
+    #         index += 1
+    #         row += 1
+
+    #         # Store row data in a list
+    #         row_data = [index, invoice.crm_lead_id.name, invoice.crm_lead_id.product_or_service,
+    #                     invoice.partner_id.name, invoice.move_state,'','',invoice.crm_lead_id.repair_user_id.name,
+    #                     invoice.invoice_origin,invoice.amount_total_signed,invoice.ticket_state]
+
+    #         # Write the row data in a single line
+    #         worksheet.write_row(row, 1, row_data, data_format)
+
+    #     # Adjust column widths to content
+    #     worksheet.set_column(1, len(headers), 19)
+
+    #     workbook.close()
+    #     output.seek(0)
+    #     return base64.b64encode(output.read())
+
+    #Boton para descargar el reporte
+    def download_invoice_excel_report(self):
+        #Llamo a la funcion que genera el reporte
+        selected_invoices = self.env['account.move'].browse(self.env.context.get('active_ids', []))
+        #Datos de creación de registros
+        if len(selected_invoices) > 1:
+            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
+            last_date = sorted_invoices[0].create_date.strftime('%d/%m/%Y %H:%M:%S')
+            first_date = sorted_invoices[-1].create_date.strftime('%d/%m/%Y %H:%M:%S')
+        #Si solo hay un registro
+        else:
+            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
+            last_date = selected_invoices.create_date.strftime('%d/%m/%Y %H:%M:%S')
+            first_date = last_date
+        
+        name_sheet = 'reporte_Facturacion'
+        title = 'REPORTE - FACTURACION'
+        index = 0
+        #Header
+        headers = [('N°'),('TICKET/PROCESO'),('BIEN/SERVICIO'),('CLIENTE '),('ETAPA'),('FECHA/HORA INICIO'),
+                   ('FECHA/HORA FINAL'),('USUARIO ENCARGADO'),('COMPROBANTE'),('IMPORTE'),('SITUACIÓN')]
+        #Genero la data de las facturas seleccionadas
+        data=[]
+        for invoice in selected_invoices:
+            index += 1
+            data.append([index, invoice.crm_lead_id.name, invoice.crm_lead_id.product_or_service,
+                        invoice.partner_id.name, invoice.move_state,'','',invoice.crm_lead_id.repair_user_id.name,
+                        invoice.invoice_origin,invoice.amount_total_signed,invoice.ticket_state])
+        
+        #Genero el reporte
+        report_content = self.env['report.excel'].generate_invoice_excel_report(title, name_sheet, headers, data, first_date, last_date)
+
+        # Create a new attachment
+        attachment = self.env['ir.attachment'].create({
+            'name': 'Reporte_Coseinco.xlsx',
+            'type': 'binary',  # This indicates that it's a binary attachment
+            'datas': report_content,
+            'res_model': self._name,
+            'res_id': 0,
+        })
+
+        # Return an action to download the attachment
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/web/content/%s?download=true' % attachment.id,
+            'target': 'self',
+        }
