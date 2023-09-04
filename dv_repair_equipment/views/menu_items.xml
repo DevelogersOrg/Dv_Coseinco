@@ -7,15 +7,15 @@
             groups="dv_repair_equipment.client_app_group_user" sequence="1"/>
   <menuitem name="Compras" id="purchase_menu" parent="app_menu_root" action="purchase_order_action"
             groups="dv_repair_equipment.purchase_app_group_user" sequence="2"/>
-  <menuitem name="Almacen" id="warehouse_menu" parent="app_menu_root" action="warehouse_stock_transfer_status_action"
+  <menuitem name="Almacén" id="warehouse_menu" parent="app_menu_root" action="warehouse_stock_transfer_status_action"
             groups="dv_repair_equipment.warehouse_app_group_user" sequence="3"/>
-  <menuitem name="Tecnico" id="technician_menu" parent="app_menu_root" action="crm_lead_action_technician"
+  <menuitem name="Técnico" id="technician_menu" parent="app_menu_root" action="crm_lead_action_technician"
             groups="dv_repair_equipment.technician_app_group_user" sequence="4"/>
   <menuitem name="Despacho" id="picking_menu" parent="app_menu_root" action="pick_stock_transfer_status_action"
             groups="dv_repair_equipment.picking_app_group_user" sequence="5"/>
   <menuitem name="Facturación" id="invoicing_menu" parent="app_menu_root" action="account_move_action"
             groups="dv_repair_equipment.invoicing_app_group_user" sequence="6"/>
-  <menuitem name="Tesoreria" id="charge_menu" parent="app_menu_root" action="invoice_action"
+  <menuitem name="Tesorería" id="charge_menu" parent="app_menu_root" action="invoice_action"
             groups="dv_repair_equipment.invoicing_app_group_user" sequence="7"/>
 
     <menuitem id="delivery_boy_sub_menu_root"
@@ -46,11 +46,20 @@
         action='delivery_boy.delivery_boy_pickings_action'
         />
         
+  <menuitem id="client_sub_menu"
+        parent="client_menu"
+        name="Atención al Cliente"
+        groups="dv_repair_equipment.client_app_group_user"
+        action="crm_lead_action_client"
+        sequence="8"
+        />
+
   <menuitem id="report_time_sub_menu"
         parent="client_menu"
         name="Reporte de Tiempos"
         groups="dv_repair_equipment.client_app_group_user"
         action="report_time_type_action"
+        sequence="9"
         />
   <!-- Menus Heredados -->
   <!-- Heredar menu de ventas: Habilitado para Atención al Cliente, Facturación y Tesoreria -->
@@ -82,75 +91,84 @@
       <field name="sequence">4</field>
       <field name="groups_id" eval="[(3, ref('base.group_user')),(3, ref('base.group_partner_manager')),(6, 0, [ref('dv_repair_equipment.client_app_group_user'), ref('dv_repair_equipment.client_app_group_admin')])]"/>
   </record>
+  <!-- Heredar menu CRM: Habilitado para Atención al cliente -->
+  <record id="crm.crm_menu_root" model="ir.ui.menu">
+    <field name="name">CRM</field>
+    <field name="web_icon">crm,static/description/icon.png</field>
+    <field name="sequence">6</field>
+    <field name="groups_id" eval="[(3, ref('sales_team.group_sale_salesman')),(3, ref('sales_team.group_sale_manager')),(6, 0, [ref('dv_repair_equipment.client_app_group_user'), ref('dv_repair_equipment.client_app_group_admin')])]"/>
+  </record>
+  <!-- Heredar menu Sitio Web: Habilitado para Atención al cliente -->
+  <record id="website.menu_website_configuration" model="ir.ui.menu">
+    <field name="name">Website</field>
+    <field name="web_icon">website,static/description/icon.png</field>
+    <field name="sequence">9</field>
+    <field name="groups_id" eval="[(3, ref('base.group_user')),(6, 0, [ref('dv_repair_equipment.client_app_group_user'), ref('dv_repair_equipment.client_app_group_admin')])]"/>
+  </record>
+  <!-- Heredar menu de punto de ventas: Habilitado para Despacho y Facturacion -->
+  <record id="point_of_sale.menu_point_root" model="ir.ui.menu">
+    <field name="name">Point of Sale</field>
+    <field name="web_icon">point_of_sale,static/description/icon.png</field>
+    <field name="sequence">20</field>
+    <field name="groups_id" eval="[(3, ref('point_of_sale.group_pos_manager')),(3, ref('point_of_sale.group_pos_user')),
+                                  (6, 0, [ref('dv_repair_equipment.picking_app_group_user'), ref('dv_repair_equipment.picking_app_group_admin'),
+                                  ref('dv_repair_equipment.invoicing_app_group_user'),ref('dv_repair_equipment.invoicing_app_group_admin')])]"/>
+  </record>
+  <!-- Heredar menu de compras: Habilitado para Compras -->
+  <record id="purchase.menu_purchase_root" model="ir.ui.menu">
+    <field name="name">Purchase</field>
+    <field name="web_icon">purchase,static/description/icon.png</field>
+    <field name="sequence">25</field>
+    <field name="groups_id" eval="[(3, ref('purchase.group_purchase_manager')),(3, ref('purchase.group_purchase_user')),
+                                  (6, 0, [ref('dv_repair_equipment.purchase_app_group_user'), ref('dv_repair_equipment.purchase_app_group_admin')])]"/>
+  </record>
+  <!-- Heredar menu de inventario: Habilitado para Compras y Almacen -->
+  <record id="stock.menu_stock_root" model="ir.ui.menu">
+    <field name="name">Inventory</field>
+    <field name="web_icon">stock,static/description/icon.png</field>
+    <field name="sequence">30</field>
+    <field name="groups_id" eval="[(3, ref('stock.group_stock_manager')),(3, ref('stock.group_stock_user')),
+                                  (6, 0, [ref('dv_repair_equipment.purchase_app_group_user'), ref('dv_repair_equipment.purchase_app_group_admin'),
+                                  ref('dv_repair_equipment.warehouse_app_group_user'),ref('dv_repair_equipment.warehouse_app_group_admin')])]"/>
+  </record>
+  <!-- Heredar menu de Reparación: Habilitado para ninguno -->
+  <record id="repair.menu_repair_order" model="ir.ui.menu">
+    <field name="name">Repairs</field>
+    <field name="action" ref="repair.action_repair_order_tree"/>
+    <field name="web_icon">repair,static/description/icon.png</field>
+    <field name="sequence">36</field>
+    <field name="groups_id" eval="[(3, ref('stock.group_stock_user')),(6, 0, [ref('base.group_no_one')])]"/>
+  </record>
+  <!-- Heredar menu de Facturacion: Habilitado para Atencion al cliente y Facturacion -->
+  <record id="account.menu_finance" model="ir.ui.menu">
+    <field name="name">Invoicing</field>
+    <field name="web_icon">account,static/description/icon.png</field>
+    <field name="sequence">40</field>
+    <field name="groups_id" eval="[(3, ref('account.group_account_readonly')),(3, ref('account.group_account_invoice')),
+                                  (6, 0, [ref('dv_repair_equipment.client_app_group_user'), ref('dv_repair_equipment.client_app_group_admin'),
+                                  ref('dv_repair_equipment.invoicing_app_group_user'),ref('dv_repair_equipment.invoicing_app_group_admin')])]"/>
+  </record>
+  <!-- Heredar menu de Flota: Habilitado para ninguno -->
+  <record id="fleet.menu_root" model="ir.ui.menu">
+    <field name="name">Fleet</field>
+    <field name="web_icon">fleet,static/description/icon.png</field>
+    <field name="sequence">115</field>
+    <field name="groups_id" eval="[(3, ref('fleet.fleet_group_user')),(6, 0, [ref('base.group_no_one')])]"/>
+  </record>
+  <!-- Heredar menu de Empleados: Habilitado para ninguno -->
+  <record id="hr.menu_hr_root" model="ir.ui.menu">
+    <field name="name">Employees</field>
+    <field name="web_icon">hr,static/description/icon.png</field>
+    <field name="sequence">75</field>
+    <field name="groups_id" eval="[(3, ref('hr.group_hr_manager')),(3, ref('hr.group_hr_user')),(3, ref('base.group_user')),(6, 0, [ref('base.group_no_one')])]"/>
+  </record>
   <!-- Heredar menu de SUNAT: Habilitado para Atencion al cliente y Facturacion -->
-  <!-- <menuitem id="solse_pe_catalogo.solse_cpe_menu_root" 
-            name="SUNAT" 
-            web_icon="solse_pe_catalogo,static/description/icon.png" 
-            sequence="4"
-            groups_id="client_app_group_user,client_app_group_admin,invoicing_app_group_user,invoicing_app_group_admin"/> -->
-    <!-- Heredar menu CRM: Habilitado para Atención al cliente -->
-    <record id="crm.crm_menu_root" model="ir.ui.menu">
-      <field name="name">CRM</field>
-      <field name="web_icon">crm,static/description/icon.png</field>
-      <field name="sequence">6</field>
-      <field name="groups_id" eval="[(3, ref('sales_team.group_sale_salesman')),(3, ref('sales_team.group_sale_manager')),(6, 0, [ref('dv_repair_equipment.client_app_group_user'), ref('dv_repair_equipment.client_app_group_admin')])]"/>
-    </record>
-    <!-- Heredar menu Sitio Web: Habilitado para Atención al cliente -->
-    <record id="website.menu_website_configuration" model="ir.ui.menu">
-      <field name="name">Website</field>
-      <field name="web_icon">website,static/description/icon.png</field>
-      <field name="sequence">9</field>
-      <field name="groups_id" eval="[(3, ref('base.group_user')),(6, 0, [ref('dv_repair_equipment.client_app_group_user'), ref('dv_repair_equipment.client_app_group_admin')])]"/>
-    </record>
-    <!-- Heredar menu de punto de ventas: Habilitado para Despacho y Facturacion -->
-    <record id="point_of_sale.menu_point_root" model="ir.ui.menu">
-      <field name="name">Point of Sale</field>
-      <field name="web_icon">point_of_sale,static/description/icon.png</field>
-      <field name="sequence">20</field>
-      <field name="groups_id" eval="[(3, ref('point_of_sale.group_pos_manager')),(3, ref('point_of_sale.group_pos_user')),
-                                    (6, 0, [ref('dv_repair_equipment.picking_app_group_user'), ref('dv_repair_equipment.picking_app_group_admin'),
-                                    ref('dv_repair_equipment.invoicing_app_group_user'),ref('dv_repair_equipment.invoicing_app_group_admin')])]"/>
-    </record>
-    <!-- Heredar menu de compras: Habilitado para Compras -->
-    <record id="purchase.menu_purchase_root" model="ir.ui.menu">
-      <field name="name">Purchase</field>
-      <field name="web_icon">purchase,static/description/icon.png</field>
-      <field name="sequence">25</field>
-      <field name="groups_id" eval="[(3, ref('purchase.group_purchase_manager')),(3, ref('purchase.group_purchase_user')),
-                                    (6, 0, [ref('dv_repair_equipment.purchase_app_group_user'), ref('dv_repair_equipment.purchase_app_group_admin')])]"/>
-    </record>
-    <!-- Heredar menu de inventario: Habilitado para Compras y Almacen -->
-    <record id="stock.menu_stock_root" model="ir.ui.menu">
-      <field name="name">Inventory</field>
-      <field name="web_icon">stock,static/description/icon.png</field>
-      <field name="sequence">30</field>
-      <field name="groups_id" eval="[(3, ref('stock.group_stock_manager')),(3, ref('stock.group_stock_user')),
-                                    (6, 0, [ref('dv_repair_equipment.purchase_app_group_user'), ref('dv_repair_equipment.purchase_app_group_admin'),
-                                    ref('dv_repair_equipment.warehouse_app_group_user'),ref('dv_repair_equipment.warehouse_app_group_admin')])]"/>
-    </record>
-    <!-- Heredar menu de Reparación: Habilitado para ninguno -->
-    <record id="repair.menu_repair_order" model="ir.ui.menu">
-      <field name="name">Repairs</field>
-      <field name="action" ref="repair.action_repair_order_tree"/>
-      <field name="web_icon">repair,static/description/icon.png</field>
-      <field name="sequence">36</field>
-      <field name="groups_id" eval="[(3, ref('stock.group_stock_user'))]"/>
-    </record>
-    <!-- Heredar menu de Facturacion: Habilitado para Atencion al cliente y Facturacion -->
-    <record id="account.menu_finance" model="ir.ui.menu">
-      <field name="name">Invoicing</field>
-      <field name="web_icon">account,static/description/icon.png</field>
-      <field name="sequence">40</field>
-      <field name="groups_id" eval="[(3, ref('account.group_account_readonly')),(3, ref('account.group_account_invoice')),
-                                    (6, 0, [ref('dv_repair_equipment.client_app_group_user'), ref('dv_repair_equipment.client_app_group_admin'),
-                                    ref('dv_repair_equipment.invoicing_app_group_user'),ref('dv_repair_equipment.invoicing_app_group_admin')])]"/>
-    </record>
-    <!-- Heredar menu de Flota: Habilitado para ninguno -->
-    <record id="fleet.menu_root" model="ir.ui.menu">
-      <field name="name">Fleet</field>
-      <field name="web_icon">fleet,static/description/icon.png</field>
-      <field name="sequence">115</field>
-      <field name="groups_id" eval="[(3, ref('fleet.fleet_group_user'))]"/>
-    </record>
+  <record id="solse_pe_catalogo.solse_cpe_menu_root" model="ir.ui.menu">
+    <field name="name">SUNAT</field>
+    <field name="web_icon">solse_pe_catalogo,static/description/icon.png</field>
+    <field name="sequence">4</field>
+    <field name="groups_id" eval="[(6, 0, [ref('dv_repair_equipment.client_app_group_user'), ref('dv_repair_equipment.client_app_group_admin'),
+                                  ref('dv_repair_equipment.invoicing_app_group_user'),ref('dv_repair_equipment.invoicing_app_group_admin')])]"/>
+  </record>
 </odoo>
 <!-- repair.menu_repair_order -->

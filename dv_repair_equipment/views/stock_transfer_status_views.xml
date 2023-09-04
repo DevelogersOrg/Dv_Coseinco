@@ -28,7 +28,7 @@
                     <t t-esc="record.create_date.value" modifiers="{}"/>
                   </span>
                   <br/>
-                  <span>Actulizado:
+                  <span>Actualizado:
                     <t t-esc="record.__last_update.value" modifiers="{}"/>
                   </span>
                   <br/>
@@ -101,7 +101,11 @@
     <field name="name">stock.transfer.status.tree</field>
     <field name="model">stock.transfer.status</field>
     <field name="arch" type="xml">
-      <tree string="Almacen">
+      <tree string="Almacén">
+        <header>
+          <button name="download_stock_excel_report" string="Generar Reporte" type="object" class="oe_highlight" groups="dv_repair_equipment.technician_app_group_admin"/>
+          <button name="download_picking_excel_report" string="Generar Reporte" type="object" class="oe_highlight" groups="dv_repair_equipment.picking_app_group_admin"/>
+        </header>
         <field name="name"/>
         <field name="repair_product_required_ids"/>
         <field name="transfer_state"/>
@@ -113,7 +117,7 @@
     <field name="name">stock.transfer.status.tree</field>
     <field name="model">stock.transfer.status</field>
     <field name="arch" type="xml">
-      <tree string="Almacen">
+      <tree string="Almacén">
         <field name="name"/>
         <field name="repair_product_required_ids"/>
         <field name="transfer_state"/>
@@ -128,7 +132,7 @@
     <field name="name">stock.transfer.status.form</field>
     <field name="model">stock.transfer.status</field>
     <field name="arch" type="xml">
-      <form string="Almacen">
+      <form string="Almacén">
         <sheet>
           <h1>N :
             <field name="name"/>
@@ -189,7 +193,7 @@
     <field name="name">stock.transfer.status.form</field>
     <field name="model">stock.transfer.status</field>
     <field name="arch" type="xml">
-      <form string="Almacen">
+      <form string="Almacén">
         <sheet>
           <h1>N :
             <field name="name"/>
@@ -269,7 +273,7 @@
   <!-- _________________________________________________________ -->
   <!-- Almacen -->
   <record id="warehouse_stock_transfer_status_action" model="ir.actions.act_window">
-    <field name="name">Almacen</field>
+    <field name="name">Almacén</field>
     <field name="type">ir.actions.act_window</field>
     <field name="res_model">stock.transfer.status</field>
     <field name="view_mode">kanban,tree,form</field>

@@ -1,7 +1,5 @@
 from odoo import models, fields, api
 from datetime import timedelta
-from datetime import datetime
-import pytz
 import base64
 import io
 import os
@@ -129,10 +127,9 @@ class CrmLead(models.Model):
                 if record.product_or_service == 'service':
                     record.client_state = 'quoted'
                     record.crm_lead_state = 'quoted'
-                    self._onchange_client_state()   
             else:
                 has_quotation = False
-            record.has_quotation = has_quotation 
+            record.has_quotation = has_quotation    
    
     def action_create_transfer_status(self):
         self.ensure_one()
@@ -177,7 +174,7 @@ class CrmLead(models.Model):
     def _expand_repair_states(self, states, domain, order):
         return [key for key, val in type(self).repair_state.selection]
 
-    #Confirmación desde Atención al Cliente
+
     def action_change_both_state(self):
         if self.is_displayed_in_both:
             return
@@ -198,23 +195,7 @@ class CrmLead(models.Model):
         # Si el diagnóstico está listo, mostrar en ambos lados el registro
         if next_state == 'dg_ready':
             self.is_displayed_in_both = True
-
-        self._onchange_client_state()
-        
-        # Set fechas de inicio y fin
-        if next_state == 'assigned':
-            self.start_date = fields.Datetime.now()
-        if next_state == 'dg_ready':
-            self.end_date = fields.Datetime.now()
-            self.start_date_tech = fields.Datetime.now()
         return self.reload_view()
-    
-    #Fechas de inicio y fin de ticket
-    start_date = fields.Datetime(string='Fecha de Inicio')
-    end_date = fields.Datetime(string='Fecha de Fin')
-    start_date_tech = fields.Datetime(string='Fecha de Inicio')
-    end_date_tech = fields.Datetime(string='Fecha de Fin')
-
 
     def is_diagnosis_ready_to_continue(self, current_state):
         if current_state != 'assigned':
@@ -302,7 +283,6 @@ class CrmLead(models.Model):
             }
         }
 
-    #Confirmación desde Técnico
     def set_diagnosis_ready(self):
         if self.need_external_diagnosis and self.crm_lead_state != 'dg_ready':
             return self.show_error_message('Alto ahi!!', 'Necesitas terminar el diagnóstico externo para continuar')
@@ -325,21 +305,19 @@ class CrmLead(models.Model):
     def do_repair(self):
         if self.repair_state != 'confirmed':
             return self.show_error_message('Error', 'Se debe haber confirmado el servicio para continuar')
+        
         self.repair_state = 'in_repair'
         self.crm_lead_state = 'repairing'
         # Recargar la vista
-        self._onchange_client_state()
         return self.reload_view()
 
     def conclude_repair(self):
-        if self.final_product_state and self.conclusion and self.confirmation_attachment:
+        if self.final_product_state and self.conclusion and self.reparation_proofs:
             self.repair_state = 'ready'
             self.crm_lead_state = 'confirmed'
             if self.repair_products_to_return_ids:
                 self.sudo().create_order_to_picking()
             self.sudo().create_account_move()
-            self._onchange_client_state()
-            self.end_date_tech = fields.Datetime.now()
 
             return self.reload_view()
 
@@ -552,275 +530,3 @@ class CrmLead(models.Model):
             record.given_products_state_probe_by_client = False
             record.given_products_state_probe_by_warehouse = False
             record.reparation_proofs = False
-    
-    #Grupos de usuarios
-    is_customer_support = fields.Boolean(string='Atención al Cliente', compute='_compute_is_customer_support')
-    is_technician = fields.Boolean(string='Técnico', compute='_compute_is_customer_support')
-
-    @api.depends('is_customer_support', 'is_technician')
-    def _compute_is_customer_support(self):
-        customer_support_group = self.env.ref('dv_repair_equipment.client_app_group_user')
-        technician_group = self.env.ref('dv_repair_equipment.technician_app_group_user')
-        for record in self:
-            groups = record.env.user.groups_id
-            record.is_customer_support = customer_support_group in groups
-            record.is_technician = technician_group in groups
-
-    @api.model_create_single
-    def create(self, values):
-        lead = super(CrmLead, self).create(values)
-        lead.name = lead.display_name
-        #Identificacion de tipo de usuario
-        if lead.is_customer_support:
-            module = 'Atención al Cliente'
-        else:
-            module = 'Técnico'
-        report_time = self.env['report.time'].create({
-            'name': lead.display_name,
-            'module': module,
-            'stage': lead.client_state,
-            'start_date': datetime.now(),
-            'user_id': lead.user_id.id,
-            'status': 'Abierto',
-        })
-        return lead
-    
-    #Verificación de cambio de etapa
-    def _onchange_client_state(self):
-        report_time = self.env['report.time']
-        if self.is_customer_support:
-            module = 'Atención al Cliente'
-        else:
-            module = 'Técnico'
-        
-        if self.client_state == 'assigned':
-            status = 'Abierto'
-            preview_ticket = report_time.search([('name', '=', self.name),('stage', '=', 'new')], limit=1)
-            if preview_ticket:
-                preview_ticket.write({
-                    'end_date': datetime.now(),
-                    'status': 'Cerrado'
-                })
-                self._create_report_time_record(self.name, module, self.client_state, self.write_uid.id, status)
-        
-        if self.client_state == 'dg_ready':
-            status= 'Abierto'
-            preview_ticket = report_time.search([('name', '=', self.name),('stage', '=', 'assigned')], limit=1)
-            if preview_ticket:
-                preview_ticket.write({
-                    'end_date': datetime.now(),
-                    'status': 'Cerrado'
-                })
-                self._create_report_time_record(self.name, module, self.client_state, self.write_uid.id, status)
-
-        if self.client_state == 'quoted' and self.crm_lead_state == 'quoted':
-            status= 'Abierto'
-            preview_ticket = report_time.search([('name', '=', self.name),('stage', '=', 'dg_ready')], limit=1)
-            if preview_ticket:
-                preview_ticket.write({
-                    'end_date': datetime.now(),
-                    'status': 'Cerrado'
-                })
-                self._create_report_time_record(self.name, module, self.client_state, self.write_uid.id, status)
-        
-        if self.repair_state == 'in_repair' and self.crm_lead_state == 'repairing':
-            status= 'Abierto'
-            preview_ticket = report_time.search([('name', '=', self.name),('stage', '=', 'confirmed')], limit=1)
-            if preview_ticket:
-                preview_ticket.write({
-                    'end_date': datetime.now(),
-                    'status': 'Cerrado'
-                })
-                self._create_report_time_record(self.name, module, self.repair_state, self.write_uid.id, status)
-        
-            preview_transfer_ticket = report_time.search([('name', '=', self.name),('stage', '=', 'delivery')], limit=1)
-            if preview_transfer_ticket:
-                preview_transfer_ticket.write({
-                    'end_date': datetime.now(),
-                })
-
-        if self.repair_state == 'ready' and self.crm_lead_state == 'confirmed':
-            status= 'Cerrado'
-            preview_ticket = report_time.search([('name', '=', self.name),('stage', '=', 'in_repair')], limit=1)
-            if preview_ticket:
-                preview_ticket.write({
-                    'end_date': datetime.now(),
-                    'status': 'Cerrado'
-                })
-                self._create_report_time_record(self.name, module, self.repair_state, self.write_uid.id, status)
-                self._create_report_time_record(self.name, 'Despacho', self.stock_transfter_status_id.picking_state, self.write_uid.id, 'Abierto')
-    #Crear en report.time
-    def _create_report_time_record(self, name, module, client_state, user_id, status):
-        report_time = self.env['report.time']
-        report_time.create({
-            'name': name,
-            'module': module,
-            'stage': client_state,
-            'start_date': datetime.now(),
-            'user_id': user_id,
-            'status': status,
-        })
-
-    #Boton de reporte de Atención al Cliente
-    def download_client_excel_report(self):
-        #Llamo a la funcion que genera el reporte
-        selected_invoices = self.env['crm.lead'].browse(self.env.context.get('active_ids', []))
-        #Datos de creación de registros
-        if len(selected_invoices) > 1:
-            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
-            last_date = sorted_invoices[0].create_date.strftime('%d/%m/%Y')
-            first_date = sorted_invoices[-1].create_date.strftime('%d/%m/%Y')
-        #Si solo hay un registro
-        else:
-            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
-            last_date = selected_invoices.create_date.strftime('%d/%m/%Y')
-            first_date = last_date
-        
-        name_sheet = 'Gestión Atención Al Cliente'
-        title = 'REPORTE - ATENCIÓN AL CLIENTE '
-        index = 0
-        #Header
-        headers = [('N°'),('TICKET/PROCESO'),('BIEN/SERVICIO'),('TIPO'),('CLIENTE '),('ETAPA'),('FECHA/HORA INICIO'),
-                   ('FECHA/HORA FINAL'),('IMPORTE'),('USUARIO ENCARGADO'),('STATUS'),('SITUACIÓN')]
-        #Genero la data de las facturas seleccionadas
-        data=[]
-        for invoice in selected_invoices:
-            index += 1
-            start_date = invoice.start_date.strftime('%d/%m/%Y %H:%M:%S') if invoice.start_date else ''
-            end_date = invoice.end_date.strftime('%d/%m/%Y %H:%M:%S') if invoice.end_date else ''
-            data.append([index, invoice.name, invoice.product_or_service_t.get(invoice.product_or_service), invoice.repair_order_type_id.name,
-                        invoice.partner_id.name, invoice.client_state_t.get(invoice.client_state), start_date, end_date, 
-                        invoice.expected_revenue,invoice.write_uid.name, invoice.crm_lead_state_t.get(invoice.crm_lead_state), 
-                        invoice.ticket_client_state_t.get(invoice.ticket_client_state)])
-        
-        #Genero el reporte
-        report_content = self.env['report.excel'].generate_invoice_excel_report(title, name_sheet, headers, data, first_date, last_date)
-        date = datetime.now().strftime('%d/%m/%Y')
-        file_name = f'Reporte_Coseinco_Atencion_Cliente_{date}.xlsx'
-        # Create a new attachment
-        attachment = self.env['ir.attachment'].create({
-            'name': file_name,
-            'type': 'binary',  # This indicates that it's a binary attachment
-            'datas': report_content,
-            'res_model': self._name,
-            'res_id': 0,
-        })
-
-        # Return an action to download the attachment
-        return {
-            'type': 'ir.actions.act_url',
-            'url': '/web/content/%s?download=true' % attachment.id,
-            'target': 'self',
-        }
-    
-    #Boton de reporte de Reparaciones
-    def download_repair_excel_report(self):
-        #Llamo a la funcion que genera el reporte
-        selected_invoices = self.env['crm.lead'].browse(self.env.context.get('active_ids', []))
-        #Datos de creación de registros
-        if len(selected_invoices) > 1:
-            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
-            last_date = sorted_invoices[0].create_date.strftime('%d/%m/%Y %H:%M:%S')
-            first_date = sorted_invoices[-1].create_date.strftime('%d/%m/%Y %H:%M:%S')
-        #Si solo hay un registro
-        else:
-            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
-            last_date = selected_invoices.create_date.strftime('%d/%m/%Y %H:%M:%S')
-            first_date = last_date
-        
-        name_sheet = 'Gestión Técnico'
-        title = 'REPORTE - TÉCNICO'
-        index = 0
-        #Header
-        headers = [('N°'),('TICKET/PROCESO'),('BIEN/SERVICIO'),('TIPO'),('CLIENTE '),('ETAPA'),('FECHA/HORA INICIO'),
-                   ('FECHA/HORA FINAL'),('IMPORTE'),('USUARIO ENCARGADO'),('STATUS'),('SITUACIÓN')]
-        #Genero la data de los tickets seleccionados
-        data=[]
-        for invoice in selected_invoices:
-            index += 1
-            start_date = invoice.start_date_tech.strftime('%d/%m/%Y %H:%M:%S') if invoice.start_date_tech else ''
-            end_date = invoice.end_date_tech.strftime('%d/%m/%Y %H:%M:%S') if invoice.end_date_tech else ''
-            data.append([index, invoice.name, invoice.product_or_service, invoice.repair_order_type_id.name,
-                        invoice.partner_id.name, invoice.repair_state_t.get(invoice.repair_state), start_date, end_date, invoice.expected_revenue,invoice.write_uid.name,
-                        invoice.crm_lead_state_t.get(invoice.crm_lead_state),invoice.ticket_repair_state_t.get(invoice.ticket_repair_state)])
-        
-        #Genero el reporte
-        report_content = self.env['report.excel'].generate_invoice_excel_report(title, name_sheet, headers, data, first_date, last_date)
-        date = datetime.now().strftime('%d/%m/%Y')
-        file_name = f'Reporte_Coseinco_Reparaciones_{date}.xlsx'
-        # Create a new attachment
-        attachment = self.env['ir.attachment'].create({
-            'name': file_name,
-            'type': 'binary',  # This indicates that it's a binary attachment
-            'datas': report_content,
-            'res_model': self._name,
-            'res_id': 0,
-        })
-
-        # Return an action to download the attachment
-        return {
-            'type': 'ir.actions.act_url',
-            'url': '/web/content/%s?download=true' % attachment.id,
-            'target': 'self',
-        }
-    
-    #Campo de estado de ticket para reporte
-    ticket_client_state = fields.Selection([('open', 'Abierto'),('closed', 'Cerrado')], string='Estado de ticket', compute='_compute_ticket_state')
-    ticket_repair_state = fields.Selection([('open', 'Abierto'),('closed', 'Cerrado')], string='Estado de ticket', compute='_compute_ticket_state')
-    @api.depends('client_state','repair_state')
-    def _compute_ticket_state(self):
-        for move in self:
-            if move.client_state == 'confirmed':
-                move.ticket_client_state = 'closed'
-            else:
-                move.ticket_client_state = 'open'
-            if move.repair_state == 'ready':
-                move.ticket_repair_state = 'closed'
-            else:
-                move.ticket_repair_state = 'open'
-
-    # Diccionario de traducciones
-    client_state_t = {
-        'new': 'Nuevo Ingreso',
-        'assigned': 'Detalles del diagnóstico',
-        'dg_ready': 'Diagnóstico inicial',
-        'quoted': 'Cotizado',
-        'confirmed': 'Confirmado',
-    }
-
-    product_or_service_t = {
-        'product': 'Producto',
-        'service': 'Servicio',
-    }
-    
-    crm_lead_state_t = {
-        'new': 'Nuevo Ingreso',
-        'assigned': 'Detalles del diagnóstico',
-        'dg_ready': 'Diagnóstico inicial',
-        'dg_ready_ready': 'Diagnóstico listo',
-        'warehouse': 'En almacén',
-        'ready_to_repair': 'Listo para reparar',
-        'repairing': 'En reparación',
-        'to_finish': 'Por concluir',
-        'finished': 'Concluido',
-    }
-
-    ticket_client_state_t = {
-        'open': 'Abierto',
-        'closed': 'Cerrado',
-    }
-
-    ticket_repair_state_t = {
-        'open': 'Abierto',
-        'closed': 'Cerrado',
-    }
-
-    repair_state_t = {
-        'new': 'Nuevo Ingreso',
-        'assigned': 'Detalles del diagnóstico',
-        'dg_ready': 'Diagnóstico inicial',
-        'waiting_for_products': 'Esperando repuestos',
-        'confirmed': 'Confirmado',
-        'in_repair': 'En reparación',
-        'ready': 'Servicio Culminado',
-    }

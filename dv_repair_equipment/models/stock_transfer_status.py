@@ -1,5 +1,7 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
+from datetime import timedelta
+from datetime import datetime
 import base64
 import io
 import os
@@ -119,6 +121,8 @@ class StockTransferStatus(models.Model):
         self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).write({
             'crm_lead_state': 'purchase',
         })
+        self.start_transfer_date = fields.Datetime.now()
+        self._onchange_transfer_state()
         return {
             'effect': {
             'fadeout': 'slow',
@@ -136,12 +140,15 @@ class StockTransferStatus(models.Model):
         self.purchase_order_id.purchase_state = 'received'
         self.deliver_products()
 
+        self.end_transfer_date = fields.Datetime.now()
+        # self._onchange_transfer_state()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
         }
     
     def deliver_products(self):
+        self.start_transfer_date = fields.Datetime.now()
         if self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).product_or_service == 'service':
             return self.deliver_products_to_tech()
         if self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).product_or_service == 'product':
@@ -149,13 +156,14 @@ class StockTransferStatus(models.Model):
         else:
             raise models.ValidationError(
                 f"El estado de venta: {self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).crm_lead_state} no coincide con los valores esperados (service, product)")
-
+        
     def deliver_products_to_tech(self):
         self.transfer_state = 'delivery'
         self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).write({
             'crm_lead_state': 'ready_to_repair',
             'repair_state': 'confirmed',
         })
+        self._onchange_transfer_state()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
@@ -168,6 +176,7 @@ class StockTransferStatus(models.Model):
         })
         self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).create_order_to_picking()
         self.env['crm.lead'].sudo().browse(self.crm_lead_id.id).create_account_move()
+        self._onchange_transfer_state()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
@@ -245,6 +254,7 @@ class StockTransferStatus(models.Model):
             self.change_account_move_state()
             if not self.stock_picking_id:
                 self.create_stock_picking()
+        self._onchange_transfer_state()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
@@ -301,3 +311,242 @@ class StockTransferStatus(models.Model):
         all_records = self.env['stock.transfer.status'].search([])
         for record in all_records:
             record.given_products_state_probe_by_technician = False
+    
+    
+    #Boton de reporte de Almacen
+    def download_stock_excel_report(self):
+        #Llamo a la funcion que genera el reporte
+        selected_invoices = self.env['stock.transfer.status'].browse(self.env.context.get('active_ids', []))
+        #Datos de creación de registros
+        if len(selected_invoices) > 1:
+            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
+            last_date = sorted_invoices[0].create_date.strftime('%d/%m/%Y')
+            first_date = sorted_invoices[-1].create_date.strftime('%d/%m/%Y')
+        #Si solo hay un registro
+        else:
+            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
+            last_date = selected_invoices.create_date.strftime('%d/%m/%Y')
+            first_date = last_date
+        
+        name_sheet = 'Gestión Almacén'
+        title = 'REPORTE - ALMACÉN'
+        index = 0
+        #Header
+        headers = [('N°'),('BIEN/SERVICIO'),('TICKET/PROCESO'),('CLIENTE '),('ETAPA'),('FECHA/HORA INICIO'),
+                   ('FECHA/HORA FINAL'),('USUARIO ENCARGADO'),('SITUACIÓN')]
+        #Genero la data de las facturas seleccionadas
+        data=[]
+        for invoice in selected_invoices:
+            index += 1
+            start_date = invoice.start_transfer_date.strftime('%d/%m/%Y %H:%M:%S') if invoice.start_transfer_date else ''
+            end_date = invoice.end_transfer_date.strftime('%d/%m/%Y %H:%M:%S') if invoice.end_transfer_date else ''
+            data.append([index, invoice.crm_lead_id.product_or_service, invoice.crm_lead_id.name, 
+                        invoice.crm_lead_id.partner_id.name, invoice.transfer_state_t.get(invoice.transfer_state), start_date, 
+                        end_date, invoice.write_uid.name, invoice.ticket_transfer_state_t.get(invoice.ticket_transfer_state)])
+        
+        #Genero el reporte
+        report_content = self.env['report.excel'].generate_invoice_excel_report(title, name_sheet, headers, data, first_date, last_date)
+        date = datetime.now().strftime('%d/%m/%Y')
+        file_name = f'Reporte_Coseinco_Almacen_{date}.xlsx'
+        # Create a new attachment
+        attachment = self.env['ir.attachment'].create({
+            'name': file_name,
+            'type': 'binary',  # This indicates that it's a binary attachment
+            'datas': report_content,
+            'res_model': self._name,
+            'res_id': 0,
+        })
+
+        # Return an action to download the attachment
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/web/content/%s?download=true' % attachment.id,
+            'target': 'self',
+        }
+    
+    #Boton de reporte de Despacho
+    def download_picking_excel_report(self):
+        #Llamo a la funcion que genera el reporte
+        selected_invoices = self.env['stock.transfer.status'].browse(self.env.context.get('active_ids', []))
+        #Datos de creación de registros
+        if len(selected_invoices) > 1:
+            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
+            last_date = sorted_invoices[0].create_date.strftime('%d/%m/%Y %H:%M:%S')
+            first_date = sorted_invoices[-1].create_date.strftime('%d/%m/%Y %H:%M:%S')
+        #Si solo hay un registro
+        else:
+            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
+            last_date = selected_invoices.create_date.strftime('%d/%m/%Y %H:%M:%S')
+            first_date = last_date
+        
+        name_sheet = 'Gestión Despacho'
+        title = 'REPORTE - DESPACHO'
+        index = 0
+        #Header
+        headers = [('N°'),('TICKET/PROCESO'),('BIEN/SERVICIO'),('CLIENTE '),('ETAPA'),('FECHA/HORA INICIO'),
+                   ('FECHA/HORA FINAL'),('USUARIO ENCARGADO'),('TRANSPORTISTA'),('ZONA ENTREGA '),('SITUACIÓN')]
+        #Genero la data de las facturas seleccionadas
+        data=[]
+        for invoice in selected_invoices:
+            index += 1
+            data.append([index, invoice.crm_lead_id.name, invoice.crm_lead_id.product_or_service,
+                        invoice.crm_lead_id.partner_id.name, invoice.picking_state,'','', invoice.write_uid.name,
+                        invoice.delivery_boy_partner_id.name, invoice.delivery_address_id.city, invoice.ticket_picking_state])
+        
+        #Genero el reporte
+        report_content = self.env['report.excel'].generate_invoice_excel_report(title, name_sheet, headers, data, first_date, last_date)
+        date = datetime.now().strftime('%d/%m/%Y')
+        file_name = f'Reporte_Coseinco_Despacho_{date}.xlsx'
+        # Create a new attachment
+        attachment = self.env['ir.attachment'].create({
+            'name': file_name,
+            'type': 'binary',  # This indicates that it's a binary attachment
+            'datas': report_content,
+            'res_model': self._name,
+            'res_id': 0,
+        })
+
+        # Return an action to download the attachment
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/web/content/%s?download=true' % attachment.id,
+            'target': 'self',
+        }
+    
+    #Campo de estado de ticket de Almacen
+    ticket_transfer_state = fields.Selection([('open', 'Abierto'),('closed', 'Cerrado')], string='Estado de ticket', compute='_compute_ticket_state')
+    ticket_picking_state = fields.Selection([('open', 'Abierto'),('closed', 'Cerrado')], string='Estado de ticket', compute='_compute_ticket_state')
+    @api.depends('transfer_state', 'picking_state')
+    def _compute_ticket_state(self):
+        for move in self:
+            if move.transfer_state == 'delivery':
+                move.ticket_transfer_state = 'closed'
+            else:
+                move.ticket_transfer_state = 'open'
+            if move.picking_state == 'delivered':
+                move.ticket_picking_state = 'closed'
+            else:
+                move.ticket_picking_state = 'open'
+    
+    #Fecha de inicio y fin de Ticket de almacen
+    start_transfer_date = fields.Datetime(string="Fecha de inicio")
+    end_transfer_date = fields.Datetime(string="Fecha de fin")
+
+    #Grupos de usuarios
+    is_transfer = fields.Boolean(string='Almacén', compute='_compute_is_transfer')
+    is_picking = fields.Boolean(string='Despacho', compute='_compute_is_transfer')
+
+    @api.depends('is_transfer', 'is_picking')
+    def _compute_is_transfer(self):
+        transfer_group = self.env.ref('dv_repair_equipment.warehouse_app_group_user')
+        picking_group = self.env.ref('dv_repair_equipment.picking_app_group_user')
+        for record in self:
+            groups = record.env.user.groups_id
+            record.is_transfer = transfer_group in groups
+            record.is_picking = picking_group in groups
+
+    #Verificación de cambio de etapa
+    def _onchange_transfer_state(self):
+        report_time = self.env['report.time']
+        if self.is_transfer:
+            module = 'Almacén'
+        else:
+            module = 'Despacho'
+        
+        if self.transfer_state == 'request':
+            status = 'Abierto'
+            preview_ticket = report_time.search([('name', '=', self.crm_lead_id.name),('stage', '=', 'quoted')], limit=1)
+            if preview_ticket:
+                preview_ticket.write({
+                    'end_date': datetime.now(),
+                    'status': 'Cerrado'
+                })
+                self.env['crm.lead']._create_report_time_record(self.crm_lead_id.name, module, self.transfer_state, self.write_uid.id, status)
+        
+        if self.transfer_state == 'delivery':
+            status = 'Cerrado'
+            preview_ticket = report_time.search([('name', '=', self.crm_lead_id.name),('stage', '=', 'in_process')], limit=1)
+            if preview_ticket:
+                preview_ticket.write({
+                    'end_date': datetime.now(),
+                    'status': 'Cerrado'
+                })
+            else:
+                preview_ticket = report_time.search([('name', '=', self.crm_lead_id.name),('stage', '=', 'quoted')], limit=1)
+                if preview_ticket:
+                    preview_ticket.write({
+                        'end_date': datetime.now(),
+                        'status': 'Cerrado'
+                    })
+            self.env['crm.lead']._create_report_time_record(self.crm_lead_id.name, module, self.transfer_state, self.write_uid.id, status)
+            self.env['crm.lead']._create_report_time_record(self.crm_lead_id.name, 'Técnico', self.crm_lead_id.repair_state, self.write_uid.id, 'Abierto')
+            return
+        if self.picking_state == 'confirmed':
+            status = 'Abierto'
+            preview_ticket = report_time.search([('name', '=', self.crm_lead_id.name),('stage', '=', 'tb_confirmed')], limit=1)
+            if preview_ticket:
+                preview_ticket.write({
+                    'end_date': datetime.now(),
+                    'status': 'Cerrado'
+                })
+                self.env['crm.lead']._create_report_time_record(self.crm_lead_id.name, module, self.picking_state, self.write_uid.id, status)
+            preview_technician_ticket = report_time.search([('name', '=', self.crm_lead_id.name),('stage', '=', 'ready')], limit=1)
+            if preview_technician_ticket:
+                preview_technician_ticket.write({
+                    'end_date': datetime.now(),
+                })
+
+        if self.picking_state == 'to_ship':
+            status = 'Abierto'
+            preview_ticket = report_time.search([('name', '=', self.crm_lead_id.name),('stage', '=', 'confirmed'),('module', '=', module)], limit=1)
+            if preview_ticket:
+                preview_ticket.write({
+                    'end_date': datetime.now(),
+                    'status': 'Cerrado'
+                })
+                self.env['crm.lead']._create_report_time_record(self.crm_lead_id.name, module, self.picking_state, self.write_uid.id, status)
+                self.env['crm.lead']._create_report_time_record(self.crm_lead_id.name, 'Facturación', 'tb_invoiced', self.write_uid.id, 'Abierto')
+                self.env['crm.lead']._create_report_time_record(self.crm_lead_id.name, 'Tesorería', 'to_pay', self.write_uid.id, 'Abierto')
+
+        if self.picking_state == 'shiped':
+            status = 'Abierto'
+            preview_ticket = report_time.search([('name', '=', self.crm_lead_id.name),('stage', '=', 'to_ship')], limit=1)
+            if preview_ticket:
+                preview_ticket.write({
+                    'end_date': datetime.now(),
+                    'status': 'Cerrado'
+                })
+                self.env['crm.lead']._create_report_time_record(self.crm_lead_id.name, module, self.picking_state, self.write_uid.id, status)
+
+        if self.picking_state == 'delivered':
+            status = 'Cerrado'
+            preview_ticket = report_time.search([('name', '=', self.crm_lead_id.name),('stage', '=', 'shiped')], limit=1)
+            if preview_ticket:
+                preview_ticket.write({
+                    'end_date': datetime.now(),
+                    'status': 'Cerrado'
+                })
+                self.env['crm.lead']._create_report_time_record(self.crm_lead_id.name, module, self.picking_state, self.write_uid.id, status)
+    
+    #Diccionario de traducciones
+    transfer_state_t = {
+        'new': 'Solicitud de Repuestos',
+        'request': 'En proceso de compra',
+        'income': 'Ingreso de Repuestos',
+        'delivery': 'Entrega de Repuestos',
+    }
+    picking_state_t = {
+        'tb_confirmed': 'Equipo a confirmar recepción',
+        'confirmed': 'Recepción de Equipo Confirmado',
+        'to_ship': 'Despacho Programado',
+        'shiped': 'Despachado',
+        'delivered': 'Entregado',
+    }
+    ticket_transfer_state_t = {
+        'open': 'Abierto',
+        'closed': 'Cerrado',
+    }
+    ticket_picking_state_t = {
+        'open': 'Abierto',
+        'closed': 'Cerrado',
+    }

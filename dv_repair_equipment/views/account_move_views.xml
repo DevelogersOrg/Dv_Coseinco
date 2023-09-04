@@ -42,9 +42,10 @@
       <tree string="Invoices" js_class="account_tree" sample="1" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" default_order='move_state'>
         <header>
           <button name="action_register_payment" type="object" string="Register Payment" groups="account.group_account_user" invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'out_receipt', 'in_invoice', 'in_refund','in_receipt')"/>
-          <button name="download_invoice_excel_report" string="Generar Reporte" type="object" class="oe_highlight"/>
+          <button name="download_invoice_excel_report" string="Generar Reporte" type="object" class="oe_highlight" groups="dv_repair_equipment.invoicing_app_group_admin"/>
         </header>
         <field name="name" decoration-bf="1"/>
+        <field name="crm_lead_id" readonly="1"/>
         <field name="partner_id" invisible="1"/>
         <field name="invoice_source_email" invisible="1"/>
         <field name="invoice_partner_display_name" invisible="context.get('default_move_type') not in ('in_invoice', 'in_refund','in_receipt')" groups="base.group_user" string="Vendor"/>
@@ -83,8 +84,10 @@
         <label for="quotation_id"/>
         <div class="o_row">
           <field name="quotation_related" invisible="1"/>
-          <field name="quotation_id" widget="many2many_tags" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
-          <button name="onchange_quotation_id" type="object" string="Actualizar" class="btn-link mb-1 px-0" icon="fa-refresh" />
+          <field name="quotation_id" widget="many2many_tags" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"
+                  attrs="{'readonly': [('move_state', '=', 'invoiced')]}"/>
+          <button name="onchange_quotation_id" type="object" string="Actualizar" class="btn-link mb-1 px-0" icon="fa-refresh" 
+                  attrs="{'invisible': [('move_state', '=', 'invoiced')]}"/>
         </div>
         <field name="crm_lead_id" invisible="1"/>
         <!-- <button name="compute_product_totals" type="object" string="Agrupar" class="btn-link mb-1 px-0" icon="fa-external-link"/> -->
@@ -171,7 +174,7 @@
     <field name="name">Facturación</field>
     <field name="type">ir.actions.act_window</field>
     <field name="res_model">account.move</field>
-    <field name="view_mode">tree,kanban,form</field>
+    <field name="view_mode">kanban,tree,form</field>
     <field name="help" type="html">
       <p class="o_view_nocontent_smiling_face">
           No hay registros para mostrar
@@ -180,8 +183,8 @@
     <field name="domain">[('crm_lead_id', '!=', False)]</field>
     <field name="view_ids" eval="[
       (5, 0, 0),
-      (0, 0, {'view_mode': 'tree', 'view_id': ref('dv_repair_equipment.account_view_account_view_tree')}),
       (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.account_view_account_view_kanban')}),
+      (0, 0, {'view_mode': 'tree', 'view_id': ref('dv_repair_equipment.account_view_account_view_tree')}),
       (0, 0, {'view_mode': 'form', 'view_id': ref('account.view_move_form')}),]"/>
   </record>
 </odoo>

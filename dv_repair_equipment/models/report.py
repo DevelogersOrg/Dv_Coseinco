@@ -19,7 +19,9 @@ class report_excel(models.Model):
 
         row = 8
         col = 1
-        index= 0
+        
+        #Número de encabezados
+        num_headers = len(headers)
 
         # Crear un formato para el titulo
         title_format = workbook.add_format({
@@ -43,18 +45,18 @@ class report_excel(models.Model):
         worksheet.merge_range('B7:C7', ('Fecha Fin:'), text_format)
         
         # Insertar la imagen en una celda
-        worksheet.insert_image('J2', get_module_resource('dv_repair_equipment', 'static/src/img', 'coseinco.png'))
+        worksheet.insert_image(1, num_headers-1, get_module_resource('dv_repair_equipment', 'static/src/img', 'coseinco.png'))
 
         date_format = workbook.add_format({
-            'num_format': 'dd/mm/yyyy HH:MM:SS',
+            'num_format': 'dd/mm/yyyy',
             'font_name': 'Calibri',
             'font_size': 11,
             'align': 'center',
             'border': 1,
         })
 
-        worksheet.merge_range('J5:L5', first_date, date_format)
-        worksheet.merge_range('J7:L7', last_date, date_format)
+        worksheet.merge_range(4,num_headers - 3, 4, num_headers, first_date, date_format)
+        worksheet.merge_range(6,num_headers - 3, 6, num_headers, last_date, date_format)
         # Create a format for the header row
         header_format = workbook.add_format({
             'bold': True,

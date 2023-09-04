@@ -36,7 +36,7 @@
                                 <div class="text-muted">
                                     <span>Creado :<t t-esc="record.create_date.value" modifiers="{}" /></span>
                                     <br />
-                                    <span>Actulizado: <t t-esc="record.__last_update.value"
+                                    <span>Actualizado: <t t-esc="record.__last_update.value"
                                             modifiers="{}" /></span>
                                     <br />
                                 </div>
@@ -64,7 +64,7 @@
     </record>
 
 
-    <!-- Kanban para tecnico -->
+    <!-- Kanban para técnico -->
     <record id="crm_lead_technician_kanban_view" model="ir.ui.view">
         <field name="name">crm.lead.view.kanban</field>
         <field name="model">crm.lead</field>
@@ -91,7 +91,7 @@
                                 <div class="text-muted">
                                     <span>Creado :<t t-esc="record.create_date.value" modifiers="{}" /></span>
                                     <br />
-                                    <span>Actulizado: <t t-esc="record.__last_update.value"
+                                    <span>Actualizado: <t t-esc="record.__last_update.value"
                                             modifiers="{}" /></span>
                                     <br />
                                 </div>
@@ -168,7 +168,7 @@
                                 attrs="{'required': [('client_state','=','assigned')], 'readonly': [('client_state', '!=', 'assigned')]}"
                                 string="Cliente *" />
                         </group>
-                        <group string="Tecnico" nolabel="1">
+                        <group string="Técnico" nolabel="1">
                             <field name="repair_user_id"
                                 attrs="{'required': [('client_state','=','assigned')]}"
                                 string="Técnico *"/>
@@ -451,9 +451,9 @@
             }</field> -->
     </record>
 
-    <!-- Acción para el tecnico -->
+    <!-- Acción para el técnico -->
     <record id="crm_lead_action_technician" model="ir.actions.act_window">
-        <field name="name">Tecnico</field>
+        <field name="name">Técnico</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">crm.lead</field>
         <field name="view_mode">kanban,tree,form</field>
@@ -471,6 +471,21 @@
           (0, 0, {'view_mode': 'kanban', 'view_id': ref('dv_repair_equipment.crm_lead_technician_kanban_view')}),
           (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
           (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_lead_view_form')}),]" />
+    </record>
+    <!-- Vista heredada de crm_case_tree_view_oppor -->
+    <record id="crm_case_tree_view_oppor_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.tree.view.inherited</field>
+        <field name="model">crm.lead</field>
+        <field name="priority">5</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor" />
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <header>
+                    <button name="download_client_excel_report" string="Generar Reporte" type="object" class="oe_highlight" groups="dv_repair_equipment.client_app_group_admin"/>
+                    <button name="download_repair_excel_report" string="Generar Reporte" type="object" class="oe_highlight" groups="dv_repair_equipment.technician_app_group_admin"/>
+                </header>
+            </xpath>
+        </field>
     </record>
     <!-- <record id="crm_lead_search_view" model="ir.ui.view">
         <field name="name">Atención al Cliente - Vista de Búsqueda</field>

@@ -7,9 +7,7 @@ from odoo.tools.misc import formatLang, format_date, get_lang
 from werkzeug.wrappers import Response
 from odoo.http import request
 from odoo.modules.module import get_module_resource
-import io
-import os
-import xlsxwriter
+from datetime import datetime, timedelta
 
 _logger = logging.getLogger(__name__)
 
@@ -46,7 +44,7 @@ class AccountMove(models.Model):
             self.move_state) + 1] if self.move_state != 'invoiced' else 'invoiced'
         if self.move_state == 'invoiced':
             self.create_invoice()
-
+        self._onchange_client_state()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
@@ -66,6 +64,7 @@ class AccountMove(models.Model):
     def action_treasury_state_pay(self):
         self.treasury_state = 'paid'
         self.payment_state = 'paid'
+        self._onchange_treasury_state()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
@@ -116,21 +115,8 @@ class AccountMove(models.Model):
     #Enlace de cotizacion con factura
     quotation_id = fields.Many2many('account.move', 'account_move_account_move_rel','account_move_id','related_account_move_id', 
                                     string='Enlace cotizaciones', 
-                                    domain=[('treasury_state', '=', 'to_pay'), ('amount_untaxed_signed', '!=', '0'),('crm_lead_id', '!=', False)])
-    
-    #Dominio de quotation_id
-    @api.onchange('partner_id')
-    def onchange_partner_id(self):
-        if self.partner_id:
-            return {'domain': {'quotation_id': [('partner_id', '=', self.partner_id.id),
-                                                ('treasury_state', '=', 'to_pay'),
-                                                ('amount_untaxed_signed', '!=', '0'),
-                                                ('crm_lead_id', '!=', False)]}}
-        else:
-            return {'domain': {'quotation_id': [('treasury_state', '=', 'to_pay'),
-                                                ('amount_untaxed_signed', '!=', '0'),
-                                                ('crm_lead_id', '!=', False)],}}
-    
+                                    domain="[('partner_id', '=', partner_id), ('id', '!=', id), ('move_state', '=', move_state), ('crm_lead_id', '!=', False), ('quotation_id', '=', False)]")
+        
     #@api.onchange('quotation_id')
     def onchange_quotation_id(self):
         # Obtener las líneas de factura relacionadas previamente agregadas
@@ -202,15 +188,21 @@ class AccountMove(models.Model):
     
     def write(self, vals):
         # Obtener el estado anterior de la compra original
-        previous_state = self.move_state
+        previous_move_state = self.move_state
+        previous_treasury_state = self.treasury_state
 
         # Actualizar el estado de la compra original
         res = super(AccountMove, self).write(vals)
 
         # Verificar si el estado ha cambiado
-        if 'move_state' in vals and self.move_state != previous_state:
-            # Actualizar el estado de las compras relacionadas
-            self.quotation_id.write({'move_state': self.move_state})
+        if 'move_state' in vals and self.move_state != previous_move_state:
+            # Actualizar el estado de las Facturación relacionadas
+            for related_quotation in self.quotation_id:
+                related_quotation.write({'move_state': self.move_state})
+        if 'treasury_state' in vals and previous_treasury_state == 'to_pay':
+            # Actualizar el estado de Tesoreria
+            for related_quotation in self.quotation_id:
+                related_quotation.write({'treasury_state': 'paid'})
         return res
     
     # def compute_product_totals(self):
@@ -219,104 +211,21 @@ class AccountMove(models.Model):
     #             line.compute_product_totals()
 
     #Campo de estado de ticket para reporte
-    ticket_state = fields.Selection([('open', 'Abierto'),('closed', 'Cerrado')], string='Estado de ticket', compute='_compute_ticket_state')
-
-    @api.depends('move_state')
+    ticket_move_state = fields.Selection([('open', 'Abierto'),('closed', 'Cerrado')], string='Estado de ticket', compute='_compute_ticket_state')
+    ticket_treasury_state = fields.Selection([('open', 'Abierto'),('closed', 'Cerrado')], string='Estado de ticket', compute='_compute_ticket_state')
+    @api.depends('move_state', 'treasury_state')
     def _compute_ticket_state(self):
         for move in self:
             if move.move_state == 'invoiced':
-                move.ticket_state = 'open'
+                move.ticket_move_state = 'closed'
             else:
-                move.ticket_state = 'closed'
-    
-    #Reporte en Excel
-    # def generate_invoice_excel_report(self, invoices):
-    #     output = io.BytesIO()
-    #     workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-    #     worksheet = workbook.add_worksheet('reporte_Facturacion')
+                move.ticket_move_state = 'open'
+            if move.treasury_state == 'paid':
+                move.ticket_treasury_state = 'closed'
+            else:
+                move.ticket_treasury_state = 'open'
 
-    #     # Turn off gridlines
-    #     worksheet.hide_gridlines(2)
-
-    #     row = 8
-    #     col = 1
-    #     index= 0
-
-    #     # Create a format for the title
-    #     title_format = workbook.add_format({
-    #         'bold': True,
-    #         'font_name': 'Calibri',
-    #         'font_size': 16,
-    #         'align': 'center',
-    #         'valign': 'vcenter',
-    #     })
-
-    #     # Set the title in the worksheet
-    #     worksheet.merge_range('B3:I3', ('REPORTE - FACTURACION'), title_format)
-        
-    #     #Text
-    #     text_format = workbook.add_format({
-    #         'bold': True,
-    #         'font_name': 'Calibri',
-    #         'font_size': 11,
-    #     })
-    #     worksheet.merge_range('B5:C5', ('Fecha Inicio:'), text_format)
-    #     worksheet.merge_range('B7:C7', ('Fecha Fin:'), text_format)
-        
-    #     # Ruta de la imagen
-    #     imagen_ruta = 'dv_repair_equipment/static/src/img/coseinco.png'
-    #     # Insertar la imagen en una celda
-    #     worksheet.insert_image('J3', get_module_resource('dv_repair_equipment', 'static/src/img', 'coseinco.png'))
-
-    #     # Create a format for the header row
-    #     header_format = workbook.add_format({
-    #         'bold': True,
-    #         'font_name': 'Calibri',
-    #         'font_size': 11,
-    #         'bg_color': '#002060',  # Blue background color
-    #         'font_color': 'white',  # White font color
-    #         'align': 'center',  # Center alignment
-    #         'valign': 'vcenter',  # Vertical center alignment
-    #         'border': 1,  # Add a border around each cell
-    #     })
-
-    #     # Headers
-    #     headers = [('N°'),('TICKET/PROCESO'),('BIEN/SERVICIO'),('CLIENTE '),('ETAPA'),('FECHA/HORA INICIO'),
-    #                ('FECHA/HORA FINAL'),('USUARIO ENCARGADO'),('COMPROBANTE'),('IMPORTE'),('SITUACION')]
-    #     for header in headers:
-    #         worksheet.write(row, col, header, header_format)
-    #         col += 1
-
-    #     # Create a format for the data rows with borders
-    #     data_format = workbook.add_format({
-    #         'font_name': 'Calibri',
-    #         'font_size': 11,
-    #         'align': 'center',  # Center alignment
-    #         'valign': 'vcenter',  # Vertical center alignment
-    #         'border': 1,  # Add a border around each cell
-    #     })
-
-    #     # Data
-    #     for invoice in invoices:
-    #         index += 1
-    #         row += 1
-
-    #         # Store row data in a list
-    #         row_data = [index, invoice.crm_lead_id.name, invoice.crm_lead_id.product_or_service,
-    #                     invoice.partner_id.name, invoice.move_state,'','',invoice.crm_lead_id.repair_user_id.name,
-    #                     invoice.invoice_origin,invoice.amount_total_signed,invoice.ticket_state]
-
-    #         # Write the row data in a single line
-    #         worksheet.write_row(row, 1, row_data, data_format)
-
-    #     # Adjust column widths to content
-    #     worksheet.set_column(1, len(headers), 19)
-
-    #     workbook.close()
-    #     output.seek(0)
-    #     return base64.b64encode(output.read())
-
-    #Boton para descargar el reporte
+    #Boton para descargar el reporte de Facturación
     def download_invoice_excel_report(self):
         #Llamo a la funcion que genera el reporte
         selected_invoices = self.env['account.move'].browse(self.env.context.get('active_ids', []))
@@ -331,7 +240,7 @@ class AccountMove(models.Model):
             last_date = selected_invoices.create_date.strftime('%d/%m/%Y %H:%M:%S')
             first_date = last_date
         
-        name_sheet = 'reporte_Facturacion'
+        name_sheet = 'Gestion Facturacion'
         title = 'REPORTE - FACTURACION'
         index = 0
         #Header
@@ -343,14 +252,15 @@ class AccountMove(models.Model):
             index += 1
             data.append([index, invoice.crm_lead_id.name, invoice.crm_lead_id.product_or_service,
                         invoice.partner_id.name, invoice.move_state,'','',invoice.crm_lead_id.repair_user_id.name,
-                        invoice.invoice_origin,invoice.amount_total_signed,invoice.ticket_state])
+                        invoice.invoice_origin,invoice.amount_total_signed,invoice.ticket_move_state])
         
         #Genero el reporte
         report_content = self.env['report.excel'].generate_invoice_excel_report(title, name_sheet, headers, data, first_date, last_date)
-
+        date = datetime.now().strftime('%d/%m/%Y')
+        file_name = f'Reporte_Coseinco_Facturacion_{date}.xlsx'
         # Create a new attachment
         attachment = self.env['ir.attachment'].create({
-            'name': 'Reporte_Coseinco.xlsx',
+            'name': file_name,
             'type': 'binary',  # This indicates that it's a binary attachment
             'datas': report_content,
             'res_model': self._name,
@@ -363,3 +273,86 @@ class AccountMove(models.Model):
             'url': '/web/content/%s?download=true' % attachment.id,
             'target': 'self',
         }
+    
+    #Boton para descargar el reporte de Tesoreria
+    def download_treasury_excel_report(self):
+        #Llamo a la funcion que genera el reporte
+        selected_invoices = self.env['account.move'].browse(self.env.context.get('active_ids', []))
+        #Datos de creación de registros
+        if len(selected_invoices) > 1:
+            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
+            last_date = sorted_invoices[0].create_date.strftime('%d/%m/%Y %H:%M:%S')
+            first_date = sorted_invoices[-1].create_date.strftime('%d/%m/%Y %H:%M:%S')
+        #Si solo hay un registro
+        else:
+            sorted_invoices = sorted(selected_invoices, key=lambda x: x.create_date)
+            last_date = selected_invoices.create_date.strftime('%d/%m/%Y %H:%M:%S')
+            first_date = last_date
+        
+        name_sheet = 'Gestion Cobranza'
+        title = 'REPORTE - TESORERIA'
+        index = 0
+        #Header
+        headers = [('N°'),('TICKET/PROCESO'),('BIEN/SERVICIO'),('CLIENTE '),('ETAPA'),('FECHA/HORA INICIO'),
+                   ('FECHA/HORA FINAL'),('USUARIO ENCARGADO'),('COMPROBANTE'),('IMPORTE'),('SITUACIÓN')]
+        #Genero la data de las facturas seleccionadas
+        data=[]
+        for invoice in selected_invoices:
+            index += 1
+            data.append([index, invoice.crm_lead_id.name, invoice.crm_lead_id.product_or_service,
+                        invoice.partner_id.name, invoice.treasury_state,'','',invoice.invoice_user_id.name,
+                        invoice.invoice_origin,invoice.amount_total_signed,invoice.ticket_treasury_state])
+        
+        #Genero el reporte
+        report_content = self.env['report.excel'].generate_invoice_excel_report(title, name_sheet, headers, data, first_date, last_date)
+        date = datetime.now().strftime('%d/%m/%Y')
+        file_name = f'Reporte_Coseinco_Tesoreria_{date}.xlsx'
+        # Create a new attachment
+        attachment = self.env['ir.attachment'].create({
+            'name': file_name,
+            'type': 'binary',  # This indicates that it's a binary attachment
+            'datas': report_content,
+            'res_model': self._name,
+            'res_id': 0,
+        })
+
+        # Return an action to download the attachment
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/web/content/%s?download=true' % attachment.id,
+            'target': 'self',
+        }
+    
+    #Verificación de cambio de etapa Facturación
+    def _onchange_client_state(self):
+        report_time = self.env['report.time']
+        module = 'Facturación'
+        
+        if self.move_state == 'invoiced':
+            status = 'Cerrado'
+            preview_ticket = report_time.search([('name', '=', self.crm_lead_id.name),('stage', '=', 'tb_invoiced')], limit=1)
+            if preview_ticket:
+                preview_ticket.write({
+                    'end_date': datetime.now(),
+                    'status': 'Cerrado'
+                })
+                self.env['crm.lead']._create_report_time_record(self.crm_lead_id.name, module, self.move_state, self.write_uid.id, status)
+            preview_picking_ticket = report_time.search([('name', '=', self.crm_lead_id.name),('stage', '=', 'delivered')], limit=1)
+            if preview_picking_ticket:
+                preview_picking_ticket.write({
+                    'end_date': datetime.now(),
+                })
+
+    #Verificación de cambio de etapa Tesoreria
+    def _onchange_treasury_state(self):
+        report_time = self.env['report.time']
+        module = 'Tesoreria'
+        if self.treasury_state == 'paid':
+            status = 'Cerrado'
+            preview_ticket = report_time.search([('name', '=', self.crm_lead_id.name),('stage', '=', 'to_pay')], limit=1)
+            if preview_ticket:
+                preview_ticket.write({
+                    'end_date': datetime.now(),
+                    'status': 'Cerrado'
+                })
+                self.env['crm.lead']._create_report_time_record(self.crm_lead_id.name, module, self.treasury_state, self.write_uid.id, status)
